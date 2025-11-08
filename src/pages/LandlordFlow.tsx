@@ -4,17 +4,31 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressSteps } from "@/components/ProgressSteps";
 import { TenantCard } from "@/components/TenantCard";
+import { VerificationStep } from "@/components/VerificationStep";
+import { PropertyListing } from "@/components/PropertyListing";
+import { ContractPreview } from "@/components/ContractPreview";
+import { ApplicationStatus } from "@/components/ApplicationStatus";
 import { tenants } from "@/data/mockData";
 import { Tenant } from "@/types";
-import { ArrowLeft, CheckCircle2, Users } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Users, FileText, MessageSquare, Wrench } from "lucide-react";
 import { toast } from "sonner";
 
 const landlordSteps = ["Verify", "Listing", "Applications", "Compare", "Contract", "Management", "Support"];
 
 const LandlordFlow = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(3); // Start at Applications for demo
+  const [currentStep, setCurrentStep] = useState(1);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+
+  const handleVerification = () => {
+    setCurrentStep(2);
+    toast.success("Verification complete!");
+  };
+
+  const handleListingSubmit = () => {
+    setCurrentStep(3);
+    toast.success("Listing published! AI matching in progress...");
+  };
 
   const handleTenantSelect = (tenant: Tenant) => {
     setSelectedTenant(tenant);
@@ -27,8 +41,19 @@ const LandlordFlow = () => {
     toast.success("Tenant approved! Contract generation in progress...");
   };
 
+  const handleContractApproval = () => {
+    setCurrentStep(6);
+    toast.success("Contract sent to tenant for signature!");
+  };
+
   const renderStep = () => {
     switch (currentStep) {
+      case 1:
+        return <VerificationStep onVerify={handleVerification} />;
+
+      case 2:
+        return <PropertyListing onSubmit={handleListingSubmit} />;
+
       case 3:
         return (
           <div className="max-w-6xl mx-auto">
@@ -159,29 +184,154 @@ const LandlordFlow = () => {
         ) : null;
 
       case 5:
-        return (
-          <div className="max-w-2xl mx-auto">
-            <Card className="p-8 text-center">
+        return selectedTenant ? (
+          <div className="max-w-4xl mx-auto space-y-6">
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <FileText className="w-6 h-6 text-primary" />
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">Contract Generation</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Legally compliant contract created for {selectedTenant.name}
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <ContractPreview
+              propertyName="Cozy Apartment in Marais, Paris"
+              tenantName={selectedTenant.name}
+              landlordName="Your Name"
+              monthlyRent={850}
+              deposit={850}
+              startDate="2026-01-01"
+            />
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">Ready to send?</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Contract will be sent to {selectedTenant.name} for digital signature
+                  </p>
+                </div>
+                <Button onClick={handleContractApproval} size="lg">
+                  Send Contract
+                  <FileText className="ml-2 w-4 h-4" />
+                </Button>
+              </div>
+            </Card>
+          </div>
+        ) : null;
+
+      case 6:
+        return selectedTenant ? (
+          <div className="max-w-3xl mx-auto space-y-6">
+            <Card className="p-8">
               <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-8 h-8 text-success" />
               </div>
-              <h2 className="text-3xl font-bold mb-4 text-foreground">Tenant Approved!</h2>
-              <p className="text-muted-foreground mb-8">
-                <strong>{selectedTenant?.name}</strong> has been approved as your tenant. 
-                A legally compliant contract is being generated automatically.
+              <h2 className="text-3xl font-bold mb-4 text-foreground text-center">Rental Management Active!</h2>
+              <p className="text-muted-foreground mb-6 text-center">
+                Contract sent to <strong>{selectedTenant.name}</strong>. Track the rental process below.
               </p>
-              <div className="space-y-4">
-                <div className="p-4 bg-muted rounded-lg text-left">
-                  <h3 className="font-semibold mb-2 text-foreground">Next Steps:</h3>
+            </Card>
+
+            <ApplicationStatus
+              currentStage="Awaiting Tenant Signature"
+              steps={[
+                {
+                  title: "Tenant Approved",
+                  status: "completed",
+                  date: new Date().toLocaleDateString('en-GB'),
+                  description: `${selectedTenant.name} approved as your tenant`
+                },
+                {
+                  title: "Contract Generated",
+                  status: "completed",
+                  date: new Date().toLocaleDateString('en-GB'),
+                  description: "Legally compliant contract created and sent"
+                },
+                {
+                  title: "Tenant Signature",
+                  status: "in-progress",
+                  date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'),
+                  description: "Waiting for tenant to review and sign digitally"
+                },
+                {
+                  title: "Payment & Escrow",
+                  status: "pending",
+                  description: "Tenant payment secured in escrow"
+                },
+                {
+                  title: "Move-in Coordination",
+                  status: "pending",
+                  date: selectedTenant.move_in,
+                  description: "Schedule property inspection and key handover"
+                }
+              ]}
+            />
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <Card className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                  <h3 className="font-semibold text-foreground">Communication</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Message {selectedTenant.name} directly through the platform
+                </p>
+                <Button className="w-full" variant="outline">
+                  Open Chat
+                </Button>
+              </Card>
+
+              <Card className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Wrench className="w-5 h-5 text-primary" />
+                  <h3 className="font-semibold text-foreground">Property Support</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  24/7 support for maintenance and issues
+                </p>
+                <Button className="w-full" variant="outline">
+                  Get Support
+                </Button>
+              </Card>
+            </div>
+
+            <Card className="p-6">
+              <Button onClick={() => navigate('/')} variant="outline" className="w-full">
+                Return to Dashboard
+              </Button>
+            </Card>
+          </div>
+        ) : null;
+
+      case 7:
+        return (
+          <div className="max-w-2xl mx-auto">
+            <Card className="p-8 text-center">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageSquare className="w-8 h-8 text-primary" />
+              </div>
+              <h2 className="text-3xl font-bold mb-4 text-foreground">Support & Maintenance</h2>
+              <p className="text-muted-foreground mb-8">
+                Get 24/7 support for your rental property and tenant management
+              </p>
+              <div className="space-y-4 text-left">
+                <div className="p-4 bg-muted rounded-lg">
+                  <h3 className="font-semibold mb-2 text-foreground">Available Services:</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>✓ Contract generation (automated)</li>
-                    <li>✓ Digital signature collection</li>
-                    <li>✓ Deposit & rent escrow setup</li>
-                    <li>✓ Move-in coordination</li>
+                    <li>✓ Emergency maintenance coordination</li>
+                    <li>✓ Rent collection & payment tracking</li>
+                    <li>✓ Legal support & dispute resolution</li>
+                    <li>✓ Property inspection scheduling</li>
+                    <li>✓ Tenant communication management</li>
                   </ul>
                 </div>
-                <Button onClick={() => navigate('/')} variant="outline">
-                  Return to Dashboard
+                <Button className="w-full" size="lg">
+                  Contact Support Team
                 </Button>
               </div>
             </Card>

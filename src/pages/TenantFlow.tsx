@@ -4,13 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressSteps } from "@/components/ProgressSteps";
 import { PropertyCard } from "@/components/PropertyCard";
+import { LegalChecks } from "@/components/LegalChecks";
+import { ContractPreview } from "@/components/ContractPreview";
+import { PaymentEscrow } from "@/components/PaymentEscrow";
+import { ApplicationStatus } from "@/components/ApplicationStatus";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { properties, amenityLabels } from "@/data/mockData";
+import { legalChecks } from "@/data/legalChecks";
 import { Property, TenantProfile } from "@/types";
-import { ArrowLeft, ArrowRight, Shield, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Shield, CheckCircle2, FileText, User } from "lucide-react";
 import { toast } from "sonner";
 
 const tenantSteps = ["Profile", "Matches", "Details", "Application", "Contract", "Payment", "Status"];
@@ -39,8 +44,18 @@ const TenantFlow = () => {
   };
 
   const handleApplicationSubmit = () => {
-    setCurrentStep(4);
+    setCurrentStep(5);
     toast.success("Application submitted successfully!");
+  };
+
+  const handleContractReview = () => {
+    setCurrentStep(6);
+    toast.success("Contract approved!");
+  };
+
+  const handlePayment = () => {
+    setCurrentStep(7);
+    toast.success("Payment processed successfully!");
   };
 
   const renderStep = () => {
@@ -217,25 +232,181 @@ const TenantFlow = () => {
         ) : null;
 
       case 4:
-        return (
+        return selectedProperty ? (
           <div className="max-w-2xl mx-auto">
+            <Card className="p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">Express Application</h2>
+                  <p className="text-sm text-muted-foreground">Complete your profile verification</p>
+                </div>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleApplicationSubmit(); }}>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Full Name</Label>
+                    <Input placeholder="John Doe" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input type="email" placeholder="john@example.com" required />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Phone Number</Label>
+                    <Input type="tel" placeholder="+33 6 12 34 56 78" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Occupation</Label>
+                    <Input placeholder="Software Engineer" required />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Monthly Income (€)</Label>
+                  <Input type="number" placeholder="3000" required />
+                </div>
+
+                <div className="space-y-3 p-4 bg-muted rounded-lg">
+                  <Label className="text-sm font-medium">Required Documents</Label>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Checkbox id="id-doc" />
+                      <label htmlFor="id-doc" className="cursor-pointer">Government-issued ID</label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox id="income-proof" />
+                      <label htmlFor="income-proof" className="cursor-pointer">Proof of income (last 3 months)</label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox id="bank-statement" />
+                      <label htmlFor="bank-statement" className="cursor-pointer">Bank statements</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-accent/5 rounded-lg border border-accent/20">
+                  <p className="text-sm text-foreground">
+                    <strong>Note:</strong> All information is verified and encrypted. Your privacy is protected under GDPR regulations.
+                  </p>
+                </div>
+
+                <Button type="submit" className="w-full" size="lg">
+                  Submit Application
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </form>
+            </Card>
+          </div>
+        ) : null;
+
+      case 5:
+        return selectedProperty ? (
+          <div className="max-w-4xl mx-auto space-y-6">
+            <Card className="p-6">
+              <h2 className="text-2xl font-bold mb-4 text-foreground">Contract Review & Legal Audit</h2>
+              <p className="text-muted-foreground mb-6">
+                Your contract has been automatically generated and audited for legal compliance
+              </p>
+            </Card>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <ContractPreview
+                propertyName={selectedProperty.name}
+                tenantName="Your Name"
+                monthlyRent={selectedProperty.price}
+                deposit={selectedProperty.price}
+                startDate={profile.moveInDate || "2026-01-01"}
+              />
+              <LegalChecks checks={legalChecks} />
+            </div>
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">Ready to proceed?</h3>
+                  <p className="text-sm text-muted-foreground">Review complete - move to secure payment</p>
+                </div>
+                <Button onClick={handleContractReview} size="lg">
+                  Approve & Continue
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </div>
+            </Card>
+          </div>
+        ) : null;
+
+      case 6:
+        return selectedProperty ? (
+          <div className="max-w-2xl mx-auto">
+            <PaymentEscrow
+              monthlyRent={selectedProperty.price}
+              deposit={selectedProperty.price}
+              onPayment={handlePayment}
+            />
+          </div>
+        ) : null;
+
+      case 7:
+        return selectedProperty ? (
+          <div className="max-w-3xl mx-auto space-y-6">
             <Card className="p-8 text-center">
               <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-8 h-8 text-success" />
               </div>
-              <h2 className="text-3xl font-bold mb-4 text-foreground">Application Submitted!</h2>
-              <p className="text-muted-foreground mb-8">
-                Your application for <strong>{selectedProperty?.name}</strong> has been submitted successfully. 
-                The landlord will review it and get back to you within 24-48 hours.
+              <h2 className="text-3xl font-bold mb-4 text-foreground">Payment Successful!</h2>
+              <p className="text-muted-foreground mb-6">
+                Your payment has been secured in escrow. Track your application status below.
               </p>
-              <div className="space-y-4">
-                <div className="p-4 bg-muted rounded-lg text-left">
-                  <h3 className="font-semibold mb-2 text-foreground">Next Steps:</h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>✓ Contract review & signing</li>
-                    <li>✓ Secure deposit payment</li>
-                    <li>✓ Move-in coordination</li>
-                  </ul>
+            </Card>
+
+            <ApplicationStatus
+              currentStage="Payment Received"
+              steps={[
+                {
+                  title: "Application Submitted",
+                  status: "completed",
+                  date: new Date().toLocaleDateString('en-GB'),
+                  description: "Your application has been submitted to the landlord"
+                },
+                {
+                  title: "Contract Generated",
+                  status: "completed",
+                  date: new Date().toLocaleDateString('en-GB'),
+                  description: "Legally compliant contract created and audited"
+                },
+                {
+                  title: "Payment Received",
+                  status: "completed",
+                  date: new Date().toLocaleDateString('en-GB'),
+                  description: "First month's rent + deposit secured in escrow"
+                },
+                {
+                  title: "Landlord Review",
+                  status: "in-progress",
+                  date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'),
+                  description: "Landlord reviewing your application"
+                },
+                {
+                  title: "Move-in Coordination",
+                  status: "pending",
+                  date: profile.moveInDate ? new Date(profile.moveInDate).toLocaleDateString('en-GB') : "TBD",
+                  description: "Schedule property inspection and key handover"
+                }
+              ]}
+            />
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">What happens next?</h3>
+                  <p className="text-sm text-muted-foreground">You'll receive updates via email and SMS</p>
                 </div>
                 <Button onClick={() => navigate('/')} variant="outline">
                   Return to Home
@@ -243,7 +414,7 @@ const TenantFlow = () => {
               </div>
             </Card>
           </div>
-        );
+        ) : null;
 
       default:
         return null;
