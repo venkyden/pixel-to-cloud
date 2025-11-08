@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import RoleSelection from "./pages/RoleSelection";
 import TenantFlow from "./pages/TenantFlow";
 import LandlordFlow from "./pages/LandlordFlow";
+import IncidentDashboard from "./pages/IncidentDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<RoleSelection />} />
           <Route path="/tenant" element={<TenantFlow />} />
           <Route path="/landlord" element={<LandlordFlow />} />
+          <Route path="/incidents" element={<IncidentDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

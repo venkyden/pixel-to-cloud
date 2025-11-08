@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { RoleCard } from "@/components/RoleCard";
-import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Shield } from "lucide-react";
 
 const RoleSelection = () => {
   const navigate = useNavigate();
@@ -64,6 +65,18 @@ const RoleSelection = () => {
               ]}
               onClick={() => navigate('/landlord')}
             />
+          </div>
+
+          <div className="mt-8 text-center">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate('/incidents')}
+              className="gap-2"
+            >
+              <Shield className="w-5 h-5" />
+              View Transparency Dashboard
+            </Button>
           </div>
         </div>
       </main>
