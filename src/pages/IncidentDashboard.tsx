@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,18 +14,15 @@ import { IncidentTimeline } from "@/components/incidents/IncidentTimeline";
 import { mockIncidents, mockIncidentStats } from "@/data/mockIncidents";
 import { Incident } from "@/types/incidents";
 import { 
-  ArrowLeft, 
   Search, 
   Filter, 
   Download,
   Plus,
   FileText,
-  Paperclip,
-  Shield
+  Paperclip
 } from "lucide-react";
 
 const IncidentDashboard = () => {
-  const navigate = useNavigate();
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -43,26 +41,9 @@ const IncidentDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-primary">Roomivo</h1>
-              <Badge variant="outline" className="text-sm">
-                <Shield className="w-3 h-3 mr-1" />
-                Transparency Dashboard
-              </Badge>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => navigate('/')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1 container py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -301,6 +282,7 @@ const IncidentDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+      <Footer />
     </div>
   );
 };
