@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,53 +10,83 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Download, CreditCard } from "lucide-react";
+import { Download, CreditCard, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface Payment {
   id: string;
-  date: string;
+  payment_date: string;
   description: string;
   amount: number;
-  status: "completed" | "pending" | "failed";
-  method: string;
+  status: string;
+  currency: string;
+  property_id: string;
 }
 
-const mockPayments: Payment[] = [
-  {
-    id: "PAY001",
-    date: "2024-01-15",
-    description: "Rent - January 2024",
-    amount: 2500,
-    status: "completed",
-    method: "Credit Card",
-  },
-  {
-    id: "PAY002",
-    date: "2023-12-15",
-    description: "Rent - December 2023",
-    amount: 2500,
-    status: "completed",
-    method: "Bank Transfer",
-  },
-  {
-    id: "PAY003",
-    date: "2023-11-15",
-    description: "Rent - November 2023",
-    amount: 2500,
-    status: "completed",
-    method: "Credit Card",
-  },
-];
-
 export const PaymentHistory = () => {
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (user) {
+      fetchPayments();
+    }
+  }, [user]);
+
+  const fetchPayments = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("payments")
+        .select("*")
+        .order("payment_date", { ascending: false });
+
+      if (error) throw error;
+
+      setPayments(data || []);
+    } catch (error) {
+      console.error("Error fetching payments:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load payment history",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants = {
       completed: "default",
       pending: "secondary",
       failed: "destructive",
     } as const;
-    return <Badge variant={variants[status as keyof typeof variants]}>{status}</Badge>;
+    return <Badge variant={variants[status as keyof typeof variants] || "secondary"}>{status}</Badge>;
   };
+
+  const handleDownloadReceipt = (paymentId: string) => {
+    toast({
+      title: "Download Started",
+      description: "Your receipt is being downloaded",
+    });
+    // TODO: Implement actual receipt download
+  };
+
+  if (!user) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-center text-muted-foreground">Please log in to view payment history</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -66,34 +97,50 @@ export const PaymentHistory = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Receipt</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mockPayments.map((payment) => (
-              <TableRow key={payment.id}>
-                <TableCell>{new Date(payment.date).toLocaleDateString()}</TableCell>
-                <TableCell>{payment.description}</TableCell>
-                <TableCell>{payment.method}</TableCell>
-                <TableCell className="font-semibold">${payment.amount}</TableCell>
-                <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </TableCell>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        ) : payments.length === 0 ? (
+          <p className="text-center text-muted-foreground py-8">No payment history available</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Receipt</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {payments.map((payment) => (
+                <TableRow key={payment.id}>
+                  <TableCell>
+                    {payment.payment_date 
+                      ? new Date(payment.payment_date).toLocaleDateString()
+                      : 'N/A'}
+                  </TableCell>
+                  <TableCell>{payment.description || 'Payment'}</TableCell>
+                  <TableCell className="font-semibold">
+                    {payment.currency}{Number(payment.amount).toFixed(2)}
+                  </TableCell>
+                  <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleDownloadReceipt(payment.id)}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
     </Card>
   );

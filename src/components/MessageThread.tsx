@@ -1,65 +1,163 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { formatDistanceToNow } from "date-fns";
 
 interface Message {
   id: string;
-  sender: string;
+  sender_id: string;
+  recipient_id: string;
   content: string;
-  timestamp: string;
-  isOwn: boolean;
+  created_at: string;
+  read: boolean;
+  property_id?: string;
 }
 
 interface MessageThreadProps {
+  recipientId: string;
   recipientName: string;
+  propertyId?: string;
   propertyName?: string;
 }
 
-export const MessageThread = ({ recipientName, propertyName }: MessageThreadProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      sender: recipientName,
-      content: "Hi! I'm interested in viewing the property. When would be a good time?",
-      timestamp: "10:30 AM",
-      isOwn: false,
-    },
-    {
-      id: "2",
-      sender: "You",
-      content: "Hello! I have availability this Thursday or Friday afternoon. Would either work for you?",
-      timestamp: "10:45 AM",
-      isOwn: true,
-    },
-    {
-      id: "3",
-      sender: recipientName,
-      content: "Friday at 2 PM would be perfect! What's the address?",
-      timestamp: "11:00 AM",
-      isOwn: false,
-    },
-  ]);
+export const MessageThread = ({ recipientId, recipientName, propertyId, propertyName }: MessageThreadProps) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const handleSend = () => {
-    if (newMessage.trim()) {
-      setMessages([
-        ...messages,
-        {
-          id: Date.now().toString(),
-          sender: "You",
-          content: newMessage,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          isOwn: true,
-        },
-      ]);
-      setNewMessage("");
+  useEffect(() => {
+    if (user && recipientId) {
+      fetchMessages();
+      subscribeToMessages();
+    }
+  }, [user, recipientId]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  const fetchMessages = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+
+      setMessages(data || []);
+
+      // Mark messages as read
+      const unreadIds = (data || [])
+        .filter(m => m.recipient_id === user.id && !m.read)
+        .map(m => m.id);
+
+      if (unreadIds.length > 0) {
+        await supabase
+          .from("messages")
+          .update({ read: true })
+          .in("id", unreadIds);
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load messages",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const subscribeToMessages = () => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('messages-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `recipient_id=eq.${user.id}`
+        },
+        (payload) => {
+          if (payload.new.sender_id === recipientId) {
+            setMessages(prev => [...prev, payload.new as Message]);
+            
+            // Mark as read immediately
+            supabase
+              .from("messages")
+              .update({ read: true })
+              .eq("id", payload.new.id)
+              .then();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  };
+
+  const handleSend = async () => {
+    if (!newMessage.trim() || !user || sending) return;
+
+    setSending(true);
+    try {
+      const { error } = await supabase.from("messages").insert({
+        sender_id: user.id,
+        recipient_id: recipientId,
+        content: newMessage.trim(),
+        property_id: propertyId,
+        read: false,
+      });
+
+      if (error) throw error;
+
+      setNewMessage("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <Card className="flex flex-col h-[600px] items-center justify-center">
+        <p className="text-muted-foreground">Please log in to view messages</p>
+      </Card>
+    );
+  }
 
   return (
     <Card className="flex flex-col h-[600px]">
@@ -78,31 +176,45 @@ export const MessageThread = ({ recipientName, propertyName }: MessageThreadProp
       </div>
 
       <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-[70%] rounded-lg p-3 ${
-                  message.isOwn
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground"
-                }`}
-              >
-                <p className="text-sm">{message.content}</p>
-                <p
-                  className={`text-xs mt-1 ${
-                    message.isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
-                  }`}
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">No messages yet. Start the conversation!</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {messages.map((message) => {
+              const isOwn = message.sender_id === user.id;
+              return (
+                <div
+                  key={message.id}
+                  className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
                 >
-                  {message.timestamp}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+                  <div
+                    className={`max-w-[70%] rounded-lg p-3 ${
+                      isOwn
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-foreground"
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p
+                      className={`text-xs mt-1 ${
+                        isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
+                      }`}
+                    >
+                      {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={scrollRef} />
+          </div>
+        )}
       </ScrollArea>
 
       <div className="p-4 border-t">
@@ -111,10 +223,11 @@ export const MessageThread = ({ recipientName, propertyName }: MessageThreadProp
             placeholder="Type a message..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
+            onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+            disabled={sending}
           />
-          <Button onClick={handleSend} size="icon">
-            <Send className="h-4 w-4" />
+          <Button onClick={handleSend} size="icon" disabled={sending || !newMessage.trim()}>
+            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </div>
       </div>

@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -13,39 +20,88 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Wrench, Plus } from "lucide-react";
+import { Wrench, Plus, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { formatDistanceToNow } from "date-fns";
 
-interface MaintenanceRequest {
+interface Incident {
   id: string;
   title: string;
   description: string;
-  status: "pending" | "in-progress" | "completed";
-  priority: "low" | "medium" | "high";
-  date: string;
+  status: string;
+  priority: string;
+  created_at: string;
+  category: string;
+  property_id: string;
 }
-
-const mockRequests: MaintenanceRequest[] = [
-  {
-    id: "1",
-    title: "Leaking Faucet",
-    description: "Kitchen faucet is dripping constantly",
-    status: "in-progress",
-    priority: "medium",
-    date: "2024-01-15",
-  },
-  {
-    id: "2",
-    title: "AC Not Working",
-    description: "Air conditioning unit not cooling",
-    status: "pending",
-    priority: "high",
-    date: "2024-01-14",
-  },
-];
 
 export const MaintenanceRequests = () => {
   const { toast } = useToast();
-  const [requests] = useState<MaintenanceRequest[]>(mockRequests);
+  const { user } = useAuth();
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    priority: "medium",
+    category: "maintenance",
+    property_id: "",
+  });
+
+  useEffect(() => {
+    if (user) {
+      fetchIncidents();
+      fetchUserProperties();
+    }
+  }, [user]);
+
+  const fetchUserProperties = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("id, name")
+        .eq("owner_id", user.id);
+
+      if (error) throw error;
+      setProperties(data || []);
+      
+      if (data && data.length > 0) {
+        setFormData(prev => ({ ...prev, property_id: data[0].id }));
+      }
+    } catch (error) {
+      console.error("Error fetching properties:", error);
+    }
+  };
+
+  const fetchIncidents = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("incidents")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setIncidents(data || []);
+    } catch (error) {
+      console.error("Error fetching incidents:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load maintenance requests",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -65,11 +121,54 @@ export const MaintenanceRequests = () => {
     return <Badge className={colors[priority as keyof typeof colors]}>{priority}</Badge>;
   };
 
-  const handleSubmit = () => {
-    toast({
-      title: "Request Submitted",
-      description: "We'll review your maintenance request shortly.",
-    });
+  const handleSubmit = async () => {
+    if (!user || !formData.title || !formData.description || !formData.property_id) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from("incidents").insert([{
+        title: formData.title,
+        description: formData.description,
+        priority: formData.priority as any,
+        category: formData.category as any,
+        property_id: formData.property_id,
+        reported_by: user.id,
+        status: "open" as any,
+      }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Request Submitted",
+        description: "We'll review your maintenance request shortly.",
+      });
+
+      setFormData({
+        title: "",
+        description: "",
+        priority: "medium",
+        category: "maintenance",
+        property_id: properties[0]?.id || "",
+      });
+      setIsDialogOpen(false);
+      fetchIncidents();
+    } catch (error: any) {
+      console.error("Error submitting request:", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit request: " + error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -80,9 +179,9 @@ export const MaintenanceRequests = () => {
             <Wrench className="h-5 w-5" />
             Maintenance Requests
           </CardTitle>
-          <Dialog>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button disabled={properties.length === 0}>
                 <Plus className="mr-2 h-4 w-4" />
                 New Request
               </Button>
@@ -93,24 +192,61 @@ export const MaintenanceRequests = () => {
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
+                  <Label>Property</Label>
+                  <Select 
+                    value={formData.property_id}
+                    onValueChange={(value) => setFormData({...formData, property_id: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select property" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {properties.map((property) => (
+                        <SelectItem key={property.id} value={property.id}>
+                          {property.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
                   <Label>Title</Label>
-                  <Input placeholder="Brief description of the issue" />
+                  <Input 
+                    placeholder="Brief description of the issue"
+                    value={formData.title}
+                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Description</Label>
-                  <Textarea placeholder="Detailed description of the problem" rows={4} />
+                  <Textarea 
+                    placeholder="Detailed description of the problem" 
+                    rows={4}
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Priority</Label>
                   <div className="flex gap-2">
-                    {["Low", "Medium", "High"].map((priority) => (
-                      <Button key={priority} variant="outline" className="flex-1">
+                    {["low", "medium", "high"].map((priority) => (
+                      <Button 
+                        key={priority} 
+                        variant={formData.priority === priority ? "default" : "outline"}
+                        className="flex-1"
+                        onClick={() => setFormData({...formData, priority})}
+                      >
                         {priority}
                       </Button>
                     ))}
                   </div>
                 </div>
-                <Button className="w-full" onClick={handleSubmit}>
+                <Button 
+                  className="w-full" 
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                >
+                  {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   Submit Request
                 </Button>
               </div>
@@ -119,25 +255,37 @@ export const MaintenanceRequests = () => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {requests.map((request) => (
-            <div key={request.id} className="p-4 border rounded-lg space-y-2">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <h4 className="font-semibold text-foreground">{request.title}</h4>
-                  <p className="text-sm text-muted-foreground">{request.description}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(request.date).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  {getPriorityBadge(request.priority)}
-                  {getStatusBadge(request.status)}
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        ) : incidents.length === 0 ? (
+          <p className="text-center text-muted-foreground py-8">
+            {properties.length === 0 
+              ? "You need to add properties first to create maintenance requests"
+              : "No maintenance requests yet"}
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {incidents.map((incident) => (
+              <div key={incident.id} className="p-4 border rounded-lg space-y-2">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <h4 className="font-semibold text-foreground">{incident.title}</h4>
+                    <p className="text-sm text-muted-foreground">{incident.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(incident.created_at), { addSuffix: true })}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {getPriorityBadge(incident.priority)}
+                    {getStatusBadge(incident.status)}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
