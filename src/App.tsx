@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { CookieConsent } from "@/components/CookieConsent";
 import { AIChatbot } from "@/components/AIChatbot";
+import Landing from "./pages/Landing";
 import RoleSelection from "./pages/RoleSelection";
 import TenantFlow from "./pages/TenantFlow";
 import LandlordFlow from "./pages/LandlordFlow";
@@ -32,10 +33,11 @@ const App = () => (
         <LanguageProvider>
           <AuthProvider>
             <Routes>
+              <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
-              <Route path="/" element={<ProtectedRoute><RoleSelection /></ProtectedRoute>} />
+              <Route path="/role-selection" element={<ProtectedRoute><RoleSelection /></ProtectedRoute>} />
               <Route path="/tenant" element={<ProtectedRoute><TenantFlow /></ProtectedRoute>} />
               <Route path="/landlord" element={<ProtectedRoute><LandlordFlow /></ProtectedRoute>} />
               <Route path="/incidents" element={<ProtectedRoute><IncidentDashboard /></ProtectedRoute>} />

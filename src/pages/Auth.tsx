@@ -84,7 +84,7 @@ export default function Auth() {
         if (consentError) console.error("Consent update error:", consentError);
 
         toast.success(t("auth.accountCreated"));
-        navigate("/");
+        navigate("/role-selection");
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
@@ -120,7 +120,7 @@ export default function Auth() {
       if (error) throw error;
 
       toast.success(t("auth.signedIn"));
-      navigate("/");
+      navigate("/role-selection");
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
