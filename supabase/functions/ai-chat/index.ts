@@ -21,6 +21,48 @@ serve(async (req) => {
     }
 
     const { messages, language = "fr", pageContext } = await req.json();
+    
+    // Input validation
+    const MAX_MESSAGES = 50;
+    const MAX_MESSAGE_LENGTH = 10000;
+    const MAX_CONTEXT_LENGTH = 5000;
+
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid messages format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (messages.length > MAX_MESSAGES) {
+      return new Response(
+        JSON.stringify({ error: 'Too many messages. Maximum 50 messages allowed.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    for (const msg of messages) {
+      if (!msg.content || typeof msg.content !== 'string') {
+        return new Response(
+          JSON.stringify({ error: 'Invalid message content' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (msg.content.length > MAX_MESSAGE_LENGTH) {
+        return new Response(
+          JSON.stringify({ error: 'Message too long. Maximum 10,000 characters per message.' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    if (pageContext && typeof pageContext === 'string' && pageContext.length > MAX_CONTEXT_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: 'Page context too long. Maximum 5,000 characters.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {

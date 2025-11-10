@@ -24,6 +24,7 @@ import { Wrench, Plus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
+import { z } from "zod";
 
 interface Incident {
   id: string;
@@ -122,23 +123,43 @@ export const MaintenanceRequests = () => {
   };
 
   const handleSubmit = async () => {
-    if (!user || !formData.title || !formData.description || !formData.property_id) {
+    if (!user) {
       toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
+        title: "Authentication required",
+        description: "Please log in to submit a request",
         variant: "destructive",
       });
       return;
     }
 
-    setSubmitting(true);
+    // Validate incident data
+    const incidentSchema = z.object({
+      title: z.string()
+        .trim()
+        .min(1, "Title is required")
+        .max(200, "Title must be less than 200 characters"),
+      description: z.string()
+        .trim()
+        .min(1, "Description is required")
+        .max(2000, "Description must be less than 2000 characters"),
+      property_id: z.string().uuid("Invalid property"),
+    });
+
     try {
-      const { error } = await supabase.from("incidents").insert([{
+      const validated = incidentSchema.parse({
         title: formData.title,
         description: formData.description,
+        property_id: formData.property_id,
+      });
+
+      setSubmitting(true);
+
+      const { error } = await supabase.from("incidents").insert([{
+        title: validated.title,
+        description: validated.description,
         priority: formData.priority as any,
         category: formData.category as any,
-        property_id: formData.property_id,
+        property_id: validated.property_id,
         reported_by: user.id,
         status: "open" as any,
       }]);
@@ -160,6 +181,15 @@ export const MaintenanceRequests = () => {
       setIsDialogOpen(false);
       fetchIncidents();
     } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
       console.error("Error submitting request:", error);
       toast({
         title: "Error",

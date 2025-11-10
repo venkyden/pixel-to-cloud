@@ -22,6 +22,39 @@ serve(async (req) => {
     }
 
     const { question, documentContext, language } = await req.json();
+    
+    // Input validation
+    const MAX_QUESTION_LENGTH = 1000;
+    const MAX_DOCUMENT_SIZE = 50000; // 50KB
+
+    if (!question || typeof question !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid question format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (question.length > MAX_QUESTION_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: 'Question too long. Maximum 1,000 characters.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!documentContext || typeof documentContext !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid document context format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (documentContext.length > MAX_DOCUMENT_SIZE) {
+      return new Response(
+        JSON.stringify({ error: 'Document too large. Maximum 50,000 characters.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!LOVABLE_API_KEY) {

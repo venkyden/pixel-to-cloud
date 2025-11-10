@@ -22,6 +22,48 @@ serve(async (req) => {
     }
 
     const { query, properties, language } = await req.json();
+    
+    // Input validation
+    const MAX_QUERY_LENGTH = 1000;
+    const MAX_PROPERTIES = 100;
+    const MAX_PROPERTIES_JSON_SIZE = 500000; // 500KB
+
+    if (!query || typeof query !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid query format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (query.length > MAX_QUERY_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: 'Query too long. Maximum 1,000 characters.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!properties || !Array.isArray(properties)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid properties format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (properties.length > MAX_PROPERTIES) {
+      return new Response(
+        JSON.stringify({ error: 'Too many properties. Maximum 100 properties allowed.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const propertiesJson = JSON.stringify(properties);
+    if (propertiesJson.length > MAX_PROPERTIES_JSON_SIZE) {
+      return new Response(
+        JSON.stringify({ error: 'Properties data too large. Maximum 500KB.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
     if (!LOVABLE_API_KEY) {

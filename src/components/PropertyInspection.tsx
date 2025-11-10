@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
+import { z } from "zod";
 
 interface Inspection {
   id: string;
@@ -182,8 +183,17 @@ export const PropertyInspection = () => {
       return;
     }
 
-    setUploading(true);
+    // Validate inspection data
+    const inspectionSchema = z.object({
+      notes: z.string().trim().max(5000, "Notes must be less than 5000 characters"),
+      type: z.enum(["check-in", "check-out"]),
+    });
+
     try {
+      const validated = inspectionSchema.parse({ notes, type: inspectionType });
+
+      setUploading(true);
+      
       // Upload to storage
       const filePath = `${user.id}/${selectedProperty}/${Date.now()}-${selectedFile.name}`;
       const { error: uploadError } = await supabase.storage
@@ -203,9 +213,9 @@ export const PropertyInspection = () => {
         .insert({
           property_id: selectedProperty,
           user_id: user.id,
-          type: inspectionType,
+          type: validated.type,
+          notes: validated.notes,
           video_url: urlData.publicUrl,
-          notes: notes,
         });
 
       if (insertError) throw insertError;
@@ -223,6 +233,15 @@ export const PropertyInspection = () => {
       // Refresh inspections
       fetchInspections();
     } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
       console.error("Error uploading video:", error);
       toast({
         title: "Upload failed",
