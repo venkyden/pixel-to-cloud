@@ -5,8 +5,9 @@ import { PaymentHistory } from "@/components/PaymentHistory";
 import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { MaintenanceRequests } from "@/components/MaintenanceRequests";
 import { DocumentVault } from "@/components/DocumentVault";
+import { PropertyInspection } from "@/components/PropertyInspection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, Receipt, Wrench, FileText } from "lucide-react";
+import { BarChart3, Receipt, Wrench, FileText, Video } from "lucide-react";
 
 export default function Dashboard() {
   return (
@@ -19,7 +20,7 @@ export default function Dashboard() {
         </div>
 
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="analytics">
               <BarChart3 className="mr-2 h-4 w-4" />
               Analytics
@@ -35,6 +36,10 @@ export default function Dashboard() {
             <TabsTrigger value="documents">
               <FileText className="mr-2 h-4 w-4" />
               Documents
+            </TabsTrigger>
+            <TabsTrigger value="inspections">
+              <Video className="mr-2 h-4 w-4" />
+              Inspections
             </TabsTrigger>
             <TabsTrigger value="invoices">
               <Receipt className="mr-2 h-4 w-4" />
@@ -56,6 +61,10 @@ export default function Dashboard() {
 
           <TabsContent value="documents">
             <DocumentVault />
+          </TabsContent>
+
+          <TabsContent value="inspections">
+            <PropertyInspection />
           </TabsContent>
 
           <TabsContent value="invoices">
