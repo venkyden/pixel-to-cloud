@@ -9,6 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
+import { z } from "zod";
+
+const messageSchema = z.object({
+  content: z.string().trim()
+    .min(1, "Message cannot be empty")
+    .max(2000, "Message is too long (max 2000 characters)"),
+});
 
 interface Message {
   id: string;
@@ -128,10 +135,13 @@ export const MessageThread = ({ recipientId, recipientName, propertyId, property
 
     setSending(true);
     try {
+      // Validate message content
+      const validatedData = messageSchema.parse({ content: newMessage.trim() });
+
       const { error } = await supabase.from("messages").insert({
         sender_id: user.id,
         recipient_id: recipientId,
-        content: newMessage.trim(),
+        content: validatedData.content,
         property_id: propertyId,
         read: false,
       });
@@ -140,12 +150,20 @@ export const MessageThread = ({ recipientId, recipientName, propertyId, property
 
       setNewMessage("");
     } catch (error) {
-      console.error("Error sending message:", error);
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Invalid message",
+          description: error.errors[0]?.message || "Please check your message",
+          variant: "destructive",
+        });
+      } else {
+        console.error("Error sending message:", error);
+        toast({
+          title: "Error",
+          description: "Failed to send message",
+          variant: "destructive",
+        });
+      }
     } finally {
       setSending(false);
     }
