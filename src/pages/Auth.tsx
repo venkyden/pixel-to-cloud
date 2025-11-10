@@ -22,6 +22,7 @@ export default function Auth() {
     const firstName = formData.get("firstName") as string;
     const lastName = formData.get("lastName") as string;
     const role = formData.get("role") as string;
+    const marketingConsent = formData.get("marketingConsent") === "on";
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -48,6 +49,19 @@ export default function Auth() {
           });
 
         if (roleError) throw roleError;
+
+        // Update GDPR consent
+        const { error: consentError } = await supabase
+          .from("profiles")
+          .update({
+            gdpr_consent_given: true,
+            gdpr_consent_date: new Date().toISOString(),
+            marketing_consent: marketingConsent,
+            data_processing_consent: true
+          })
+          .eq("id", data.user.id);
+
+        if (consentError) console.error("Consent update error:", consentError);
 
         toast.success("Account created successfully!");
         navigate("/");
@@ -183,6 +197,55 @@ export default function Auth() {
                     <option value="landlord">Landlord</option>
                   </select>
                 </div>
+                
+                {/* GDPR Consent */}
+                <div className="space-y-3 pt-2 border-t">
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      id="gdpr-consent"
+                      name="gdprConsent"
+                      required
+                      className="mt-1"
+                    />
+                    <Label htmlFor="gdpr-consent" className="text-xs leading-relaxed cursor-pointer">
+                      J'accepte que mes données personnelles soient traitées conformément à la{" "}
+                      <a href="/privacy" target="_blank" className="text-primary hover:underline">
+                        Politique de Confidentialité
+                      </a>{" "}
+                      et au RGPD. *
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      id="terms-consent"
+                      name="termsConsent"
+                      required
+                      className="mt-1"
+                    />
+                    <Label htmlFor="terms-consent" className="text-xs leading-relaxed cursor-pointer">
+                      J'accepte les{" "}
+                      <a href="/terms" target="_blank" className="text-primary hover:underline">
+                        Conditions Générales d'Utilisation
+                      </a>. *
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      id="marketing-consent"
+                      name="marketingConsent"
+                      className="mt-1"
+                    />
+                    <Label htmlFor="marketing-consent" className="text-xs leading-relaxed cursor-pointer">
+                      J'accepte de recevoir des communications marketing (optionnel)
+                    </Label>
+                  </div>
+                </div>
+                
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Creating account..." : "Sign Up"}
                 </Button>

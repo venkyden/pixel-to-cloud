@@ -14,6 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          record_id: string | null
+          table_name: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      data_deletion_requests: {
+        Row: {
+          completed_at: string | null
+          id: string
+          reason: string | null
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          reason?: string | null
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          reason?: string | null
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      data_exports: {
+        Row: {
+          created_at: string
+          download_url: string | null
+          expires_at: string | null
+          id: string
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          download_url?: string | null
+          expires_at?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          download_url?: string | null
+          expires_at?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           created_at: string
@@ -232,30 +322,42 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          data_processing_consent: boolean | null
           email: string | null
           first_name: string | null
+          gdpr_consent_date: string | null
+          gdpr_consent_given: boolean | null
           id: string
           last_name: string | null
+          marketing_consent: boolean | null
           phone: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          data_processing_consent?: boolean | null
           email?: string | null
           first_name?: string | null
+          gdpr_consent_date?: string | null
+          gdpr_consent_given?: boolean | null
           id: string
           last_name?: string | null
+          marketing_consent?: boolean | null
           phone?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          data_processing_consent?: boolean | null
           email?: string | null
           first_name?: string | null
+          gdpr_consent_date?: string | null
+          gdpr_consent_given?: boolean | null
           id?: string
           last_name?: string | null
+          marketing_consent?: boolean | null
           phone?: string | null
           updated_at?: string
         }

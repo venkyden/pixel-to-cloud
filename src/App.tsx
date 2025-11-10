@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { CookieConsent } from "@/components/CookieConsent";
 import RoleSelection from "./pages/RoleSelection";
 import TenantFlow from "./pages/TenantFlow";
 import LandlordFlow from "./pages/LandlordFlow";
@@ -13,6 +14,8 @@ import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import Properties from "./pages/Properties";
 import Dashboard from "./pages/Dashboard";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 
@@ -27,6 +30,8 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="/" element={<ProtectedRoute><RoleSelection /></ProtectedRoute>} />
             <Route path="/tenant" element={<ProtectedRoute><TenantFlow /></ProtectedRoute>} />
             <Route path="/landlord" element={<ProtectedRoute><LandlordFlow /></ProtectedRoute>} />
@@ -37,6 +42,7 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <CookieConsent />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
