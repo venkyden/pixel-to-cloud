@@ -8,6 +8,7 @@ import { ComparisonTable } from "@/components/ComparisonTable";
 import { ImageGallery } from "@/components/ImageGallery";
 import { MapView } from "@/components/MapView";
 import { ReviewCard } from "@/components/ReviewCard";
+import { AIPropertySearch } from "@/components/AIPropertySearch";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -17,6 +18,7 @@ import { GitCompare } from "lucide-react";
 
 export default function Properties() {
   const [properties, setProperties] = useState<Property[]>([]);
+  const [displayProperties, setDisplayProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [compareMode, setCompareMode] = useState(false);
@@ -74,12 +76,26 @@ export default function Properties() {
       }));
 
       setProperties(formattedProperties);
+      setDisplayProperties(formattedProperties);
     } catch (error: any) {
       toast.error("Failed to load properties");
       console.error(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAISearchResults = (matches: Array<{ id: number; score: number; reason: string }>) => {
+    const updatedProperties = properties.map(prop => {
+      const match = matches.find(m => m.id === prop.id);
+      return match ? { ...prop, match_score: match.score, match_reason: match.reason } : prop;
+    });
+    
+    const sortedProperties = updatedProperties
+      .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+      .filter(p => (p.match_score || 0) > 0);
+    
+    setDisplayProperties(sortedProperties.length > 0 ? sortedProperties : updatedProperties);
   };
 
   const toggleCompareSelection = (property: Property) => {
@@ -105,7 +121,7 @@ export default function Properties() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Available Properties</h1>
-            <p className="text-muted-foreground">{properties.length} properties found</p>
+            <p className="text-muted-foreground">{displayProperties.length} properties found</p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -130,11 +146,15 @@ export default function Properties() {
           </div>
 
           <div className="lg:col-span-3">
-            {properties.length === 0 ? (
+            <AIPropertySearch 
+              properties={properties} 
+              onSearchResults={handleAISearchResults}
+            />
+            {displayProperties.length === 0 ? (
               <p className="text-muted-foreground">No properties available yet.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {properties.map((property) => (
+                {displayProperties.map((property) => (
                   <div key={property.id} className="relative">
                     {compareMode && (
                       <div className="absolute top-4 right-4 z-10">

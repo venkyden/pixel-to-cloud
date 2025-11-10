@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Eye, Upload } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AIDocumentChat } from "@/components/AIDocumentChat";
+import { FileText, Download, Eye, Upload, MessageSquare } from "lucide-react";
 
 interface Document {
   id: string;
@@ -40,7 +43,10 @@ const mockDocuments: Document[] = [
 ];
 
 export const DocumentVault = () => {
+  const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -80,6 +86,13 @@ export const DocumentVault = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setSelectedDoc(doc)}
+                >
+                  <MessageSquare className="h-4 w-4" />
+                </Button>
                 <Button variant="ghost" size="sm">
                   <Eye className="h-4 w-4" />
                 </Button>
@@ -92,5 +105,22 @@ export const DocumentVault = () => {
         </div>
       </CardContent>
     </Card>
+
+    <Dialog open={!!selectedDoc} onOpenChange={() => setSelectedDoc(null)}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        {selectedDoc && (
+          <>
+            <DialogHeader>
+              <DialogTitle>AI Document Analysis</DialogTitle>
+            </DialogHeader>
+            <AIDocumentChat
+              documentName={selectedDoc.name}
+              documentContext={`Document: ${selectedDoc.name}\nType: ${selectedDoc.category}\nDate: ${selectedDoc.uploadDate}\n\nThis is a ${selectedDoc.category} document. The assistant should help answer questions about typical content found in such documents.`}
+            />
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -19,8 +20,21 @@ export const AIChatbot = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { language, t } = useLanguage();
+  const location = useLocation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const getPageContext = () => {
+    const path = location.pathname;
+    if (path.includes('/properties')) return language === 'fr' ? 'page des propriétés' : 'properties page';
+    if (path.includes('/dashboard')) return language === 'fr' ? 'tableau de bord' : 'dashboard';
+    if (path.includes('/messages')) return language === 'fr' ? 'page des messages' : 'messages page';
+    if (path.includes('/incidents')) return language === 'fr' ? 'page des incidents' : 'incidents page';
+    if (path.includes('/profile')) return language === 'fr' ? 'page de profil' : 'profile page';
+    if (path.includes('/tenant')) return language === 'fr' ? 'parcours locataire' : 'tenant flow';
+    if (path.includes('/landlord')) return language === 'fr' ? 'parcours propriétaire' : 'landlord flow';
+    return language === 'fr' ? 'page d\'accueil' : 'home page';
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -47,7 +61,8 @@ export const AIChatbot = () => {
         },
         body: JSON.stringify({ 
           messages: newMessages,
-          language 
+          language,
+          pageContext: getPageContext()
         }),
         signal: abortControllerRef.current.signal,
       });

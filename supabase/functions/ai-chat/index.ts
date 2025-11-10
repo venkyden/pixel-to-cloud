@@ -11,12 +11,16 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, language = "fr" } = await req.json();
+    const { messages, language = "fr", pageContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    const contextInfo = pageContext ? (language === "fr" 
+      ? ` L'utilisateur est actuellement sur la ${pageContext}.`
+      : ` The user is currently on the ${pageContext}.`) : "";
 
     const systemPrompt = language === "fr" 
       ? `Tu es l'assistant virtuel de Roomivo, une plateforme de location transparente qui met en relation locataires et propriétaires en France.
@@ -29,7 +33,7 @@ Tu peux aider avec :
 - Gestion des incidents et médiation
 - Conformité RGPD et protection des données
 
-Sois précis, professionnel et empathique. Cite toujours les lois françaises pertinentes. Si tu ne sais pas, dis-le clairement.`
+Sois précis, professionnel et empathique. Cite toujours les lois françaises pertinentes. Si tu ne sais pas, dis-le clairement.${contextInfo}`
       : `You are Roomivo's virtual assistant, a transparent rental platform connecting tenants and landlords in France.
 
 You can help with:
@@ -40,7 +44,7 @@ You can help with:
 - Incident management and mediation
 - GDPR compliance and data protection
 
-Be precise, professional, and empathetic. Always cite relevant French laws. If you don't know, say so clearly.`;
+Be precise, professional, and empathetic. Always cite relevant French laws. If you don't know, say so clearly.${contextInfo}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
