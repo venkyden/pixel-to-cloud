@@ -9,6 +9,8 @@ import { ImageGallery } from "@/components/ImageGallery";
 import { MapView } from "@/components/MapView";
 import { ReviewCard } from "@/components/ReviewCard";
 import { AIPropertySearch } from "@/components/AIPropertySearch";
+import { AdvancedFilters, PropertyFilters } from "@/components/AdvancedFilters";
+import { SavedSearches } from "@/components/SavedSearches";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -23,6 +25,7 @@ export default function Properties() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<Property[]>([]);
+  const [filters, setFilters] = useState<PropertyFilters>({});
 
   const mockImages = [
     "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
@@ -49,6 +52,48 @@ export default function Properties() {
   useEffect(() => {
     fetchProperties();
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [filters, properties]);
+
+  const applyFilters = () => {
+    let filtered = [...properties];
+
+    if (filters.minPrice) {
+      filtered = filtered.filter(p => p.price >= filters.minPrice!);
+    }
+    if (filters.maxPrice) {
+      filtered = filtered.filter(p => p.price <= filters.maxPrice!);
+    }
+    if (filters.minRooms) {
+      filtered = filtered.filter(p => p.rooms >= filters.minRooms!);
+    }
+    if (filters.maxRooms) {
+      filtered = filtered.filter(p => p.rooms <= filters.maxRooms!);
+    }
+    if (filters.location) {
+      filtered = filtered.filter(p =>
+        p.location.toLowerCase().includes(filters.location!.toLowerCase())
+      );
+    }
+    if (filters.amenities && filters.amenities.length > 0) {
+      filtered = filtered.filter(p =>
+        filters.amenities!.every(amenity => p.amenities.includes(amenity))
+      );
+    }
+    if (filters.minTransportScore) {
+      filtered = filtered.filter(p => p.transport_score >= filters.minTransportScore!);
+    }
+    if (filters.minNeighborhoodRating) {
+      filtered = filtered.filter(p => p.neighborhood_rating >= filters.minNeighborhoodRating!);
+    }
+    if (filters.legalStatus) {
+      filtered = filtered.filter(p => p.legal_status === filters.legalStatus);
+    }
+
+    setDisplayProperties(filtered);
+  };
 
   const fetchProperties = async () => {
     try {
@@ -124,6 +169,12 @@ export default function Properties() {
             <p className="text-muted-foreground">{displayProperties.length} properties found</p>
           </div>
           <div className="flex gap-2">
+            <SavedSearches onLoadSearch={setFilters} />
+            <AdvancedFilters
+              filters={filters}
+              onFiltersChange={setFilters}
+              onSaveSearch={() => {}}
+            />
             <Button
               variant={compareMode ? "default" : "outline"}
               onClick={() => setCompareMode(!compareMode)}
