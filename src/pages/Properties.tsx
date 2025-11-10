@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FilterSidebar } from "@/components/FilterSidebar";
@@ -10,11 +11,13 @@ import { ReviewCard } from "@/components/ReviewCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { properties } from "@/data/mockData";
 import { Property } from "@/types";
+import { toast } from "sonner";
 import { GitCompare } from "lucide-react";
 
 export default function Properties() {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<Property[]>([]);
@@ -41,6 +44,44 @@ export default function Properties() {
     },
   ];
 
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const fetchProperties = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const formattedProperties: Property[] = (data || []).map((prop: any) => ({
+        id: Number(prop.id.split('-')[0]),
+        name: prop.name,
+        price: Number(prop.price),
+        currency: prop.currency || '€',
+        rooms: prop.rooms,
+        location: prop.location,
+        amenities: prop.amenities || [],
+        description: prop.description || '',
+        neighborhood_rating: prop.neighborhood_rating || 0,
+        transport_score: prop.transport_score || 0,
+        legal_status: prop.legal_status || 'pending',
+        match_score: 0,
+        match_reason: ''
+      }));
+
+      setProperties(formattedProperties);
+    } catch (error: any) {
+      toast.error("Failed to load properties");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const toggleCompareSelection = (property: Property) => {
     if (selectedForComparison.find((p) => p.id === property.id)) {
       setSelectedForComparison(selectedForComparison.filter((p) => p.id !== property.id));
@@ -48,6 +89,14 @@ export default function Properties() {
       setSelectedForComparison([...selectedForComparison, property]);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -81,26 +130,30 @@ export default function Properties() {
           </div>
 
           <div className="lg:col-span-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {properties.map((property) => (
-                <div key={property.id} className="relative">
-                  {compareMode && (
-                    <div className="absolute top-4 right-4 z-10">
-                      <input
-                        type="checkbox"
-                        checked={!!selectedForComparison.find((p) => p.id === property.id)}
-                        onChange={() => toggleCompareSelection(property)}
-                        className="w-5 h-5"
-                      />
-                    </div>
-                  )}
-                  <PropertyCard
-                    property={property}
-                    onSelect={() => !compareMode && setSelectedProperty(property)}
-                  />
-                </div>
-              ))}
-            </div>
+            {properties.length === 0 ? (
+              <p className="text-muted-foreground">No properties available yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {properties.map((property) => (
+                  <div key={property.id} className="relative">
+                    {compareMode && (
+                      <div className="absolute top-4 right-4 z-10">
+                        <input
+                          type="checkbox"
+                          checked={!!selectedForComparison.find((p) => p.id === property.id)}
+                          onChange={() => toggleCompareSelection(property)}
+                          className="w-5 h-5"
+                        />
+                      </div>
+                    )}
+                    <PropertyCard
+                      property={property}
+                      onSelect={() => !compareMode && setSelectedProperty(property)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -126,7 +179,7 @@ export default function Properties() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <h4 className="font-semibold mb-1">Price</h4>
-                        <p className="text-muted-foreground">${selectedProperty.price}/month</p>
+                        <p className="text-muted-foreground">{selectedProperty.currency}{selectedProperty.price}/month</p>
                       </div>
                       <div>
                         <h4 className="font-semibold mb-1">Rooms</h4>

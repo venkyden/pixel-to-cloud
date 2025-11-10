@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -11,8 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IncidentCard } from "@/components/incidents/IncidentCard";
 import { IncidentStatsDisplay } from "@/components/incidents/IncidentStats";
 import { IncidentTimeline } from "@/components/incidents/IncidentTimeline";
-import { mockIncidents, mockIncidentStats } from "@/data/mockIncidents";
-import { Incident } from "@/types/incidents";
+import { Incident, IncidentStats } from "@/types/incidents";
+import { toast } from "sonner";
 import { 
   Search, 
   Filter, 
@@ -23,12 +25,86 @@ import {
 } from "lucide-react";
 
 const IncidentDashboard = () => {
+  const { user } = useAuth();
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [stats, setStats] = useState<IncidentStats | null>(null);
+  const [loading, setLoading] = useState(true);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
-  const filteredIncidents = mockIncidents.filter(incident => {
+  useEffect(() => {
+    if (user) {
+      fetchIncidents();
+    }
+  }, [user]);
+
+  const fetchIncidents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("incidents")
+        .select(`
+          *,
+          property:properties(name),
+          reporter:profiles!incidents_reported_by_fkey(first_name, last_name)
+        `)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const formattedIncidents: Incident[] = (data || []).map((inc: any) => ({
+        id: inc.id,
+        title: inc.title,
+        description: inc.description,
+        category: inc.category,
+        status: inc.status,
+        priority: inc.priority,
+        reportedBy: inc.reported_by === user?.id ? 'tenant' : 'landlord',
+        reporterName: `${inc.reporter?.first_name || ''} ${inc.reporter?.last_name || ''}`.trim(),
+        propertyName: inc.property?.name || 'Unknown Property',
+        createdAt: inc.created_at,
+        updatedAt: inc.updated_at,
+        resolvedAt: inc.resolved_at,
+        resolution: inc.resolution,
+        attachments: inc.attachments,
+        timeline: []
+      }));
+
+      setIncidents(formattedIncidents);
+
+      const calculatedStats: IncidentStats = {
+        total: formattedIncidents.length,
+        open: formattedIncidents.filter(i => i.status === 'open' || i.status === 'investigating').length,
+        resolved: formattedIncidents.filter(i => i.status === 'resolved' || i.status === 'closed').length,
+        byCategory: {
+          maintenance: formattedIncidents.filter(i => i.category === 'maintenance').length,
+          payment: formattedIncidents.filter(i => i.category === 'payment').length,
+          dispute: formattedIncidents.filter(i => i.category === 'dispute').length,
+          legal: formattedIncidents.filter(i => i.category === 'legal').length,
+          safety: formattedIncidents.filter(i => i.category === 'safety').length,
+          communication: formattedIncidents.filter(i => i.category === 'communication').length,
+          other: formattedIncidents.filter(i => i.category === 'other').length,
+        },
+        byPriority: {
+          low: formattedIncidents.filter(i => i.priority === 'low').length,
+          medium: formattedIncidents.filter(i => i.priority === 'medium').length,
+          high: formattedIncidents.filter(i => i.priority === 'high').length,
+          critical: formattedIncidents.filter(i => i.priority === 'critical').length,
+        },
+        averageResolutionTime: 36
+      };
+
+      setStats(calculatedStats);
+    } catch (error: any) {
+      toast.error("Failed to load incidents");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredIncidents = incidents.filter(incident => {
     const matchesSearch = incident.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          incident.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || incident.status === statusFilter;
@@ -39,6 +115,14 @@ const IncidentDashboard = () => {
   const handleViewDetails = (incident: Incident) => {
     setSelectedIncident(incident);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -64,7 +148,7 @@ const IncidentDashboard = () => {
             </div>
           </div>
 
-          <IncidentStatsDisplay stats={mockIncidentStats} />
+          {stats && <IncidentStatsDisplay stats={stats} />}
         </div>
 
         <Card className="p-6 mb-6">
