@@ -8,3 +8,6 @@ verify_jwt = true
 
 [functions.ai-document-qa]
 verify_jwt = true
+
+[functions.create-notification]
+verify_jwt = true
