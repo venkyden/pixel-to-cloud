@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/NotificationBell";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +18,7 @@ import { Home, User, LogOut, Menu, X } from "lucide-react";
 export const Header = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -41,7 +44,8 @@ export const Header = () => {
           </Link>
         </nav>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <LanguageSwitcher />
           <NotificationBell />
           
           <DropdownMenu>
@@ -55,7 +59,7 @@ export const Header = () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate("/profile")}>
                 <User className="mr-2 h-4 w-4" />
-                Profile
+                {t("header.profile")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/dashboard")}>
                 Dashboard
@@ -63,7 +67,7 @@ export const Header = () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={signOut}>
                 <LogOut className="mr-2 h-4 w-4" />
-                Logout
+                {t("header.signOut")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -6,10 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
 export default function Auth() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,7 +43,6 @@ export default function Auth() {
       if (error) throw error;
 
       if (data.user) {
-        // Insert role
         const { error: roleError } = await supabase
           .from("user_roles")
           .insert({
@@ -50,7 +52,6 @@ export default function Auth() {
 
         if (roleError) throw roleError;
 
-        // Update GDPR consent
         const { error: consentError } = await supabase
           .from("profiles")
           .update({
@@ -63,7 +64,7 @@ export default function Auth() {
 
         if (consentError) console.error("Consent update error:", consentError);
 
-        toast.success("Account created successfully!");
+        toast.success(t("auth.accountCreated"));
         navigate("/");
       }
     } catch (error: any) {
@@ -89,7 +90,7 @@ export default function Auth() {
 
       if (error) throw error;
 
-      toast.success("Signed in successfully!");
+      toast.success(t("auth.signedIn"));
       navigate("/");
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in");
@@ -100,22 +101,26 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
+      
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Welcome</CardTitle>
-          <CardDescription>Sign in or create an account to continue</CardDescription>
+          <CardTitle>{t("auth.welcome")}</CardTitle>
+          <CardDescription>{t("auth.signInDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">{t("common.signIn")}</TabsTrigger>
+              <TabsTrigger value="signup">{t("common.signUp")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-email">{t("common.email")}</Label>
                   <Input
                     id="signin-email"
                     name="email"
@@ -125,7 +130,7 @@ export default function Auth() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <Label htmlFor="signin-password">{t("common.password")}</Label>
                   <Input
                     id="signin-password"
                     name="password"
@@ -135,7 +140,7 @@ export default function Auth() {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign In"}
+                  {isLoading ? t("auth.signingIn") : t("common.signIn")}
                 </Button>
               </form>
             </TabsContent>
@@ -144,7 +149,7 @@ export default function Auth() {
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
+                    <Label htmlFor="firstName">{t("common.firstName")}</Label>
                     <Input
                       id="firstName"
                       name="firstName"
@@ -154,7 +159,7 @@ export default function Auth() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
+                    <Label htmlFor="lastName">{t("common.lastName")}</Label>
                     <Input
                       id="lastName"
                       name="lastName"
@@ -165,7 +170,7 @@ export default function Auth() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t("common.email")}</Label>
                   <Input
                     id="signup-email"
                     name="email"
@@ -175,7 +180,7 @@ export default function Auth() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">{t("common.password")}</Label>
                   <Input
                     id="signup-password"
                     name="password"
@@ -186,19 +191,18 @@ export default function Auth() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="role">I am a...</Label>
+                  <Label htmlFor="role">{t("auth.iAmA")}</Label>
                   <select
                     id="role"
                     name="role"
                     className="w-full h-10 px-3 rounded-md border border-input bg-background"
                     required
                   >
-                    <option value="tenant">Tenant</option>
-                    <option value="landlord">Landlord</option>
+                    <option value="tenant">{t("auth.tenant")}</option>
+                    <option value="landlord">{t("auth.landlord")}</option>
                   </select>
                 </div>
                 
-                {/* GDPR Consent */}
                 <div className="space-y-3 pt-2 border-t">
                   <div className="flex items-start gap-2">
                     <input
@@ -209,11 +213,11 @@ export default function Auth() {
                       className="mt-1"
                     />
                     <Label htmlFor="gdpr-consent" className="text-xs leading-relaxed cursor-pointer">
-                      J'accepte que mes données personnelles soient traitées conformément à la{" "}
+                      {t("auth.gdprConsent")}{" "}
                       <a href="/privacy" target="_blank" className="text-primary hover:underline">
-                        Politique de Confidentialité
+                        {t("auth.privacyPolicy")}
                       </a>{" "}
-                      et au RGPD. *
+                      {t("auth.andGDPR")} {t("auth.required")}
                     </Label>
                   </div>
                   
@@ -226,10 +230,10 @@ export default function Auth() {
                       className="mt-1"
                     />
                     <Label htmlFor="terms-consent" className="text-xs leading-relaxed cursor-pointer">
-                      J'accepte les{" "}
+                      {t("auth.termsConsent")}{" "}
                       <a href="/terms" target="_blank" className="text-primary hover:underline">
-                        Conditions Générales d'Utilisation
-                      </a>. *
+                        {t("auth.termsOfService")}
+                      </a> {t("auth.required")}
                     </Label>
                   </div>
                   
@@ -241,13 +245,13 @@ export default function Auth() {
                       className="mt-1"
                     />
                     <Label htmlFor="marketing-consent" className="text-xs leading-relaxed cursor-pointer">
-                      J'accepte de recevoir des communications marketing (optionnel)
+                      {t("auth.marketingConsent")}
                     </Label>
                   </div>
                 </div>
                 
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : "Sign Up"}
+                  {isLoading ? t("auth.creatingAccount") : t("auth.createAccount")}
                 </Button>
               </form>
             </TabsContent>

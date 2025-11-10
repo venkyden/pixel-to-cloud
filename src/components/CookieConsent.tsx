@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { X } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const CookieConsent = () => {
   const [showBanner, setShowBanner] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const consent = localStorage.getItem("cookie-consent");
@@ -38,26 +40,24 @@ export const CookieConsent = () => {
         <div className="flex items-start gap-4">
           <div className="flex-1">
             <h3 className="font-semibold text-lg mb-2 text-foreground">
-              Protection de vos données
+              {t("cookie.title")}
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Nous utilisons des cookies essentiels pour assurer le bon fonctionnement de notre plateforme. 
-              Conformément au RGPD et à la législation française, nous respectons votre vie privée. 
-              Nous ne stockons que les cookies nécessaires à l'authentification et aux préférences de l'interface.
+              {t("cookie.description")}
             </p>
             <div className="flex flex-wrap gap-2">
               <Button onClick={acceptCookies} size="sm">
-                Accepter les cookies essentiels
+                {t("cookie.acceptEssential")}
               </Button>
               <Button onClick={rejectCookies} variant="outline" size="sm">
-                Refuser les cookies non-essentiels
+                {t("cookie.rejectNonEssential")}
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm"
                 onClick={() => window.open("/privacy", "_blank")}
               >
-                En savoir plus
+                {t("cookie.learnMore")}
               </Button>
             </div>
           </div>
