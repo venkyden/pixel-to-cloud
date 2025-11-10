@@ -194,5 +194,13 @@
     "phone": "Phone",
     "location": "Paris, France",
     "copyright": "All rights reserved."
+  },
+  "ai": {
+    "chatTitle": "Roomivo Assistant",
+    "greeting": "Hello! I'm your Roomivo assistant. How can I help you today?",
+    "placeholder": "Ask your question...",
+    "errorRate": "Rate limit reached. Please try again later.",
+    "errorCredits": "AI credits exhausted. Please add credits.",
+    "errorGeneral": "Error communicating with AI"
   }
 }

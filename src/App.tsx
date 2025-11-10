@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { CookieConsent } from "@/components/CookieConsent";
+import { AIChatbot } from "@/components/AIChatbot";
 import RoleSelection from "./pages/RoleSelection";
 import TenantFlow from "./pages/TenantFlow";
 import LandlordFlow from "./pages/LandlordFlow";
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CookieConsent />
+            <AIChatbot />
           </AuthProvider>
         </LanguageProvider>
       </BrowserRouter>

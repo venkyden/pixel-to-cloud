@@ -194,5 +194,13 @@
     "phone": "Téléphone",
     "location": "Paris, France",
     "copyright": "Tous droits réservés."
+  },
+  "ai": {
+    "chatTitle": "Assistant Roomivo",
+    "greeting": "Bonjour ! Je suis votre assistant Roomivo. Comment puis-je vous aider aujourd'hui ?",
+    "placeholder": "Posez votre question...",
+    "errorRate": "Limite de taux atteinte. Veuillez réessayer plus tard.",
+    "errorCredits": "Crédits IA épuisés. Veuillez ajouter des crédits.",
+    "errorGeneral": "Erreur lors de la communication avec l'IA"
   }
 }
