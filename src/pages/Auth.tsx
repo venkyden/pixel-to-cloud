@@ -9,6 +9,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const signUpSchema = z.object({
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters").max(128, "Password must be less than 128 characters"),
+  firstName: z.string().trim().min(1, "First name is required").max(100, "First name must be less than 100 characters"),
+  lastName: z.string().trim().min(1, "Last name is required").max(100, "Last name must be less than 100 characters"),
+  role: z.enum(["tenant", "landlord"], { errorMap: () => ({ message: "Please select a valid role" }) })
+});
+
+const signInSchema = z.object({
+  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
+  password: z.string().min(1, "Password is required")
+});
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -20,14 +34,19 @@ export default function Auth() {
     setIsLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const firstName = formData.get("firstName") as string;
-    const lastName = formData.get("lastName") as string;
-    const role = formData.get("role") as string;
+    const rawData = {
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+      firstName: formData.get("firstName") as string,
+      lastName: formData.get("lastName") as string,
+      role: formData.get("role") as string
+    };
     const marketingConsent = formData.get("marketingConsent") === "on";
 
     try {
+      // Validate input
+      const validatedData = signUpSchema.parse(rawData);
+      const { email, password, firstName, lastName, role } = validatedData;
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -47,7 +66,7 @@ export default function Auth() {
           .from("user_roles")
           .insert({
             user_id: data.user.id,
-            role: role as "tenant" | "landlord"
+            role: role
           });
 
         if (roleError) throw roleError;
@@ -68,7 +87,11 @@ export default function Auth() {
         navigate("/");
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign up");
+      if (error instanceof z.ZodError) {
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.message || "Failed to sign up");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -79,10 +102,16 @@ export default function Auth() {
     setIsLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const rawData = {
+      email: formData.get("email") as string,
+      password: formData.get("password") as string
+    };
 
     try {
+      // Validate input
+      const validatedData = signInSchema.parse(rawData);
+      const { email, password } = validatedData;
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -93,7 +122,11 @@ export default function Auth() {
       toast.success(t("auth.signedIn"));
       navigate("/");
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign in");
+      if (error instanceof z.ZodError) {
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.message || "Failed to sign in");
+      }
     } finally {
       setIsLoading(false);
     }
