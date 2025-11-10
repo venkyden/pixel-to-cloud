@@ -43,7 +43,8 @@ export const LegalChecks = ({ checks }: LegalChecksProps) => {
     <Card className="p-6">
       <div className="flex items-center gap-2 mb-6">
         <Shield className="w-6 h-6 text-primary" />
-        <h3 className="text-xl font-semibold text-foreground">Legal Compliance Check</h3>
+        <h3 className="text-xl font-semibold text-foreground">Vérification de Conformité Réglementaire</h3>
+        <Badge variant="outline" className="ml-auto text-xs">Loi 1989 + ALUR</Badge>
       </div>
       
       <div className="space-y-4">

@@ -1,5 +1,8 @@
 import { Incident, IncidentStats } from "@/types/incidents";
 
+// ⚠️ DONNÉES DE DÉMONSTRATION - Incidents exemples
+// En production, ces données proviennent de la table 'incidents' dans Supabase
+
 export const mockIncidents: Incident[] = [
   {
     id: "INC-001",

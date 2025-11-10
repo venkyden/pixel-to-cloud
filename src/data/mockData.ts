@@ -1,5 +1,9 @@
 import { Property, Tenant } from "@/types";
 
+// ⚠️ DONNÉES DE DÉMONSTRATION
+// Ces données sont des exemples à des fins de développement et démonstration uniquement.
+// Dans un environnement de production, ces données proviendraient de la base de données Supabase.
+
 export const properties: Property[] = [
   {
     id: 1,
