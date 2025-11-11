@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { TenantDashboard } from "@/components/TenantDashboard";
 import { Card } from "@/components/ui/card";
 import { ProgressSteps } from "@/components/ProgressSteps";
 import { PropertyCard } from "@/components/PropertyCard";
@@ -459,8 +460,7 @@ const TenantFlow = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <ProgressSteps steps={tenantSteps} currentStep={currentStep} />
-        {renderStep()}
+        <TenantDashboard />
       </main>
     </div>
   );

@@ -17,41 +17,41 @@ export default function Landing() {
 
   const features = [
     {
-      icon: Zap,
-      title: "AI-Powered Matching",
-      description: "Find your perfect home or tenant in minutes with intelligent matching algorithms"
-    },
-    {
       icon: Shield,
-      title: "Legal Compliance",
-      description: "Built-in legal checks and verified contracts to ensure full compliance"
-    },
-    {
-      icon: Video,
-      title: "Video Inspections",
-      description: "Document property condition with video uploads for transparent check-in/check-out"
+      title: "Paiement Sécurisé par Séquestre",
+      description: "Votre argent protégé jusqu'à l'emménagement. Conforme à la loi française (DSP2)"
     },
     {
       icon: FileCheck,
-      title: "Smart Contracts",
-      description: "Digital contracts with e-signatures and automated legal verification"
+      title: "État des Lieux Photo",
+      description: "Preuve légale incontestable. Les deux parties signent numériquement l'inspection"
     },
     {
       icon: CheckCircle,
-      title: "Secure Payments",
-      description: "Escrow protection and automated payment processing for peace of mind"
+      title: "Vérification d'Identité",
+      description: "Protection anti-arnaque. Vérification RGPD-conforme dès la candidature"
+    },
+    {
+      icon: Zap,
+      title: "Automatisation Intelligente",
+      description: "Pas de réponse? Pas de problème. Actions automatiques après délai d'attente"
     },
     {
       icon: Users,
-      title: "Zero Disputes",
-      description: "Complete transparency and documentation to eliminate rental disputes"
+      title: "Gestion Simplifiée",
+      description: "Tableau de bord unique pour tout gérer. Zéro paperasse, zéro stress"
+    },
+    {
+      icon: Shield,
+      title: "100% Conforme Loi Française",
+      description: "Loi du 6 juillet 1989, ALUR, ELAN. Tous vos documents légaux générés automatiquement"
     }
   ];
 
   const stats = [
-    { value: "95%", label: "Dispute Reduction" },
-    { value: "10x", label: "Faster Matching" },
-    { value: "100%", label: "Legal Compliance" }
+    { value: "100%", label: "Conforme Loi 1989" },
+    { value: "48h", label: "Premier Emménagement" },
+    { value: "0€", label: "Frais Cachés" }
   ];
 
   return (
@@ -79,13 +79,13 @@ export default function Landing() {
         <div className="container mx-auto text-center space-y-8 animate-fade-in">
           <div className="space-y-4">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tight">
-              Transparent Rentals,
+              Roomivo
               <br />
-              <span className="text-primary">Zero Disputes</span>
+              <span className="text-primary">Le premier pas vers l'installation</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Find your perfect home or tenant in minutes with AI-powered matching.
-              Smart, secure, and legally compliant.
+              Location sécurisée, anti-arnaque, 100% conforme à la loi française.
+              Pour les locataires et propriétaires qui veulent gagner du temps.
             </p>
           </div>
 
@@ -95,7 +95,7 @@ export default function Landing() {
               className="text-lg h-14 px-8"
               onClick={() => navigate("/auth")}
             >
-              Start Free Trial
+              Commencer Gratuitement
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
@@ -104,7 +104,7 @@ export default function Landing() {
               className="text-lg h-14 px-8"
               onClick={() => navigate("/auth")}
             >
-              View Demo
+              Comment ça marche?
             </Button>
           </div>
 
@@ -131,10 +131,10 @@ export default function Landing() {
         <div className="container mx-auto space-y-12">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
-              Everything You Need
+              Anti-Arnaque · Gain de Temps · Légal
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              All the tools to make renting simple, transparent, and dispute-free
+              L'essentiel pour louer en toute sécurité, sans paperasse ni mauvaises surprises
             </p>
           </div>
 
@@ -165,11 +165,11 @@ export default function Landing() {
         <div className="container mx-auto">
           <Card className="p-12 text-center space-y-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
-              Ready to Get Started?
+              Prêt à Démarrer?
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of landlords and tenants who trust Roomivo for their rental needs.
-              No credit card required.
+              Inscription gratuite. Aucune carte bancaire requise.
+              Propriétaires et locataires bienvenus.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
               <Button 
@@ -177,7 +177,7 @@ export default function Landing() {
                 className="text-lg h-14 px-8"
                 onClick={() => navigate("/auth")}
               >
-                Create Free Account
+                Créer un Compte Gratuit
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
@@ -195,7 +195,7 @@ export default function Landing() {
                 <span className="text-xl font-bold text-foreground">Roomivo</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Making rentals transparent and dispute-free
+                Le premier pas vers l'installation
               </p>
             </div>
             
