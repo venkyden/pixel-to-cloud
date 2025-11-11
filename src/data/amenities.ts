@@ -1,11 +1,15 @@
 // Amenity labels for property features
-export const amenityLabels: Record<string, string> = {
-  balcony: "Balcony",
-  elevator: "Elevator",
-  near_metro: "Near Metro",
-  garden_access: "Garden",
-  parking: "Parking",
-  pet_friendly: "Pet Friendly",
-  furnished: "Furnished",
-  near_shops: "Near Shops"
-};
+// NOTE: Use translation keys from locales/en.json and locales/fr.json
+// via the useLanguage hook's t() function: t("amenities.balcony")
+export const amenityKeys = [
+  "balcony",
+  "elevator",
+  "near_metro",
+  "garden_access",
+  "parking",
+  "pet_friendly",
+  "furnished",
+  "near_shops"
+] as const;
+
+export type AmenityKey = typeof amenityKeys[number];

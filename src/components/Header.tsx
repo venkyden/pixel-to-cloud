@@ -31,16 +31,16 @@ export const Header = () => {
 
         <nav className="hidden md:flex items-center space-x-6">
           <Link to="/properties" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Properties
+            {t("header.properties")}
           </Link>
           <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Dashboard
+            {t("header.dashboard")}
           </Link>
           <Link to="/incidents" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Incidents
+            {t("header.incidents")}
           </Link>
           <Link to="/messages" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Messages
+            {t("header.messages")}
           </Link>
         </nav>
 
@@ -55,14 +55,14 @@ export const Header = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{t("header.myAccount")}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate("/profile")}>
                 <User className="mr-2 h-4 w-4" />
                 {t("header.profile")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/dashboard")}>
-                Dashboard
+                {t("header.dashboard")}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={signOut}>
@@ -87,16 +87,16 @@ export const Header = () => {
         <div className="md:hidden border-t bg-background">
           <nav className="container py-4 flex flex-col space-y-3">
             <Link to="/properties" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Properties
+              {t("header.properties")}
             </Link>
             <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Dashboard
+              {t("header.dashboard")}
             </Link>
             <Link to="/incidents" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Incidents
+              {t("header.incidents")}
             </Link>
             <Link to="/messages" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Messages
+              {t("header.messages")}
             </Link>
           </nav>
         </div>

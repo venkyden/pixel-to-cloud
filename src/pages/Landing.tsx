@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Home, 
   Shield, 
@@ -8,50 +9,50 @@ import {
   CheckCircle, 
   Users, 
   FileCheck,
-  ArrowRight,
-  Video
+  ArrowRight
 } from "lucide-react";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const features = [
     {
       icon: Shield,
-      title: "Paiement Sécurisé par Séquestre",
-      description: "Votre argent protégé jusqu'à l'emménagement. Conforme à la loi française (DSP2)"
+      title: t("landing.securePayment"),
+      description: t("landing.securePaymentDesc")
     },
     {
       icon: FileCheck,
-      title: "État des Lieux Photo",
-      description: "Preuve légale incontestable. Les deux parties signent numériquement l'inspection"
+      title: t("landing.photoInspection"),
+      description: t("landing.photoInspectionDesc")
     },
     {
       icon: CheckCircle,
-      title: "Vérification d'Identité",
-      description: "Protection anti-arnaque. Vérification RGPD-conforme dès la candidature"
+      title: t("landing.idVerification"),
+      description: t("landing.idVerificationDesc")
     },
     {
       icon: Zap,
-      title: "Automatisation Intelligente",
-      description: "Pas de réponse? Pas de problème. Actions automatiques après délai d'attente"
+      title: t("landing.smartAutomation"),
+      description: t("landing.smartAutomationDesc")
     },
     {
       icon: Users,
-      title: "Gestion Simplifiée",
-      description: "Tableau de bord unique pour tout gérer. Zéro paperasse, zéro stress"
+      title: t("landing.simpleManagement"),
+      description: t("landing.simpleManagementDesc")
     },
     {
       icon: Shield,
-      title: "100% Conforme Loi Française",
-      description: "Loi du 6 juillet 1989, ALUR, ELAN. Tous vos documents légaux générés automatiquement"
+      title: t("landing.legalCompliance"),
+      description: t("landing.legalComplianceDesc")
     }
   ];
 
   const stats = [
-    { value: "100%", label: "Conforme Loi 1989" },
-    { value: "48h", label: "Premier Emménagement" },
-    { value: "0€", label: "Frais Cachés" }
+    { value: "100%", label: t("landing.statsCompliance") },
+    { value: "48h", label: t("landing.statsSpeed") },
+    { value: "0€", label: t("landing.statsNoFees") }
   ];
 
   return (
@@ -61,14 +62,14 @@ export default function Landing() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Home className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold text-foreground">Roomivo</span>
+            <span className="text-xl font-bold text-foreground">{t("landing.title")}</span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate("/auth")}>
-              Login
+              {t("landing.login")}
             </Button>
             <Button onClick={() => navigate("/auth")}>
-              Get Started
+              {t("landing.getStarted")}
             </Button>
           </div>
         </div>
@@ -79,13 +80,12 @@ export default function Landing() {
         <div className="container mx-auto text-center space-y-8 animate-fade-in">
           <div className="space-y-4">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tight">
-              Roomivo
+              {t("landing.title")}
               <br />
-              <span className="text-primary">Le premier pas vers l'installation</span>
+              <span className="text-primary">{t("landing.tagline")}</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Location sécurisée, anti-arnaque, 100% conforme à la loi française.
-              Pour les locataires et propriétaires qui veulent gagner du temps.
+              {t("landing.subtitle")}
             </p>
           </div>
 
@@ -95,7 +95,7 @@ export default function Landing() {
               className="text-lg h-14 px-8"
               onClick={() => navigate("/auth")}
             >
-              Commencer Gratuitement
+              {t("landing.startFree")}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
@@ -104,7 +104,7 @@ export default function Landing() {
               className="text-lg h-14 px-8"
               onClick={() => navigate("/auth")}
             >
-              Comment ça marche?
+              {t("landing.howItWorks")}
             </Button>
           </div>
 
@@ -131,10 +131,10 @@ export default function Landing() {
         <div className="container mx-auto space-y-12">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
-              Anti-Arnaque · Gain de Temps · Légal
+              {t("landing.featuresTitle")}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              L'essentiel pour louer en toute sécurité, sans paperasse ni mauvaises surprises
+              {t("landing.featuresSubtitle")}
             </p>
           </div>
 
@@ -165,11 +165,10 @@ export default function Landing() {
         <div className="container mx-auto">
           <Card className="p-12 text-center space-y-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
-              Prêt à Démarrer?
+              {t("landing.ctaTitle")}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Inscription gratuite. Aucune carte bancaire requise.
-              Propriétaires et locataires bienvenus.
+              {t("landing.ctaSubtitle")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
               <Button 
@@ -177,7 +176,7 @@ export default function Landing() {
                 className="text-lg h-14 px-8"
                 onClick={() => navigate("/auth")}
               >
-                Créer un Compte Gratuit
+                {t("landing.createAccount")}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
@@ -192,40 +191,40 @@ export default function Landing() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <Home className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold text-foreground">Roomivo</span>
+                <span className="text-xl font-bold text-foreground">{t("landing.title")}</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Le premier pas vers l'installation
+                {t("landing.footerTagline")}
               </p>
             </div>
             
             <div className="space-y-4">
-              <h4 className="font-semibold text-foreground">Product</h4>
+              <h4 className="font-semibold text-foreground">{t("landing.footerProduct")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t("landing.footerFeatures")}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t("landing.footerPricing")}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t("landing.footerSecurity")}</a></li>
               </ul>
             </div>
             
             <div className="space-y-4">
-              <h4 className="font-semibold text-foreground">Company</h4>
+              <h4 className="font-semibold text-foreground">{t("landing.footerCompany")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t("landing.footerAbout")}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t("landing.footerBlog")}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t("landing.footerCareers")}</a></li>
               </ul>
             </div>
             
             <div className="space-y-4">
-              <h4 className="font-semibold text-foreground">Legal</h4>
+              <h4 className="font-semibold text-foreground">{t("landing.footerLegal")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
                   <button 
                     onClick={() => navigate("/privacy")}
                     className="hover:text-primary transition-colors"
                   >
-                    Privacy
+                    {t("landing.footerPrivacy")}
                   </button>
                 </li>
                 <li>
@@ -233,7 +232,7 @@ export default function Landing() {
                     onClick={() => navigate("/terms")}
                     className="hover:text-primary transition-colors"
                   >
-                    Terms
+                    {t("landing.footerTerms")}
                   </button>
                 </li>
               </ul>
@@ -241,7 +240,7 @@ export default function Landing() {
           </div>
           
           <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} Roomivo. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} {t("landing.title")}. {t("landing.footerRights")}</p>
           </div>
         </div>
       </footer>

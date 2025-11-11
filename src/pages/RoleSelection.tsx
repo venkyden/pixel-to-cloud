@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Home, Users, Key, Shield, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,10 +10,11 @@ import { toast } from "sonner";
 export default function RoleSelection() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const handleRoleSelection = async (role: "tenant" | "landlord") => {
     if (!user) {
-      toast.error("Vous devez être connecté");
+      toast.error(t("roleSelection.mustBeLoggedIn"));
       navigate("/auth");
       return;
     }
@@ -34,11 +36,11 @@ export default function RoleSelection() {
         if (error) throw error;
       }
 
-      toast.success(`Bienvenue en tant que ${role === "tenant" ? "locataire" : "propriétaire"}!`);
+      toast.success(role === "tenant" ? t("roleSelection.welcomeTenant") : t("roleSelection.welcomeLandlord"));
       navigate(role === "tenant" ? "/tenant" : "/landlord");
     } catch (error: any) {
       console.error("Error setting role:", error);
-      toast.error("Erreur lors de la sélection du rôle");
+      toast.error(t("roleSelection.errorSelectingRole"));
     }
   };
 
@@ -52,7 +54,7 @@ export default function RoleSelection() {
             <span className="text-xl font-bold text-foreground">Roomivo</span>
           </button>
           <Button variant="ghost" onClick={() => navigate("/profile")}>
-            Mon Profil
+            {t("roleSelection.myProfile")}
           </Button>
         </div>
       </nav>
@@ -63,10 +65,10 @@ export default function RoleSelection() {
           {/* Hero Section */}
           <div className="text-center space-y-4 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-              Vous êtes...
+              {t("roleSelection.title")}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Choisissez votre profil pour accéder aux fonctionnalités adaptées
+              {t("roleSelection.subtitle")}
             </p>
           </div>
 
@@ -78,9 +80,9 @@ export default function RoleSelection() {
                 <div className="w-20 h-20 rounded-full bg-primary/10 mx-auto flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                   <Users className="w-10 h-10 text-primary" />
                 </div>
-                <CardTitle className="text-2xl">Je cherche un logement</CardTitle>
+                <CardTitle className="text-2xl">{t("roleSelection.tenantTitle")}</CardTitle>
                 <CardDescription className="text-base">
-                  Accédez aux annonces et postulez en toute sécurité
+                  {t("roleSelection.tenantDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -88,22 +90,22 @@ export default function RoleSelection() {
                   <div className="flex items-start gap-3 text-sm">
                     <Shield className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium text-foreground">Paiement sécurisé par séquestre</p>
-                      <p className="text-muted-foreground">Votre argent protégé jusqu'à l'emménagement</p>
+                      <p className="font-medium text-foreground">{t("roleSelection.tenantFeature1")}</p>
+                      <p className="text-muted-foreground">{t("roleSelection.tenantFeature1Desc")}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 text-sm">
                     <Shield className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium text-foreground">État des lieux photo</p>
-                      <p className="text-muted-foreground">Preuve légale pour récupérer votre dépôt</p>
+                      <p className="font-medium text-foreground">{t("roleSelection.tenantFeature2")}</p>
+                      <p className="text-muted-foreground">{t("roleSelection.tenantFeature2Desc")}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 text-sm">
                     <Shield className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium text-foreground">Candidature simplifiée</p>
-                      <p className="text-muted-foreground">Upload de documents une seule fois</p>
+                      <p className="font-medium text-foreground">{t("roleSelection.tenantFeature3")}</p>
+                      <p className="text-muted-foreground">{t("roleSelection.tenantFeature3Desc")}</p>
                     </div>
                   </div>
                 </div>
@@ -112,7 +114,7 @@ export default function RoleSelection() {
                   className="w-full" 
                   size="lg"
                 >
-                  Continuer comme Locataire
+                  {t("roleSelection.tenantCta")}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </CardContent>
@@ -124,9 +126,9 @@ export default function RoleSelection() {
                 <div className="w-20 h-20 rounded-full bg-secondary/10 mx-auto flex items-center justify-center mb-4 group-hover:bg-secondary/20 transition-colors">
                   <Key className="w-10 h-10 text-secondary" />
                 </div>
-                <CardTitle className="text-2xl">Je loue mon bien</CardTitle>
+                <CardTitle className="text-2xl">{t("roleSelection.landlordTitle")}</CardTitle>
                 <CardDescription className="text-base">
-                  Trouvez le locataire idéal rapidement et en sécurité
+                  {t("roleSelection.landlordDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -134,22 +136,22 @@ export default function RoleSelection() {
                   <div className="flex items-start gap-3 text-sm">
                     <Shield className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium text-foreground">Vérification d'identité</p>
-                      <p className="text-muted-foreground">Locataires vérifiés, zéro arnaque</p>
+                      <p className="font-medium text-foreground">{t("roleSelection.landlordFeature1")}</p>
+                      <p className="text-muted-foreground">{t("roleSelection.landlordFeature1Desc")}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 text-sm">
                     <Shield className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium text-foreground">Gestion simplifiée</p>
-                      <p className="text-muted-foreground">Tout sur un seul tableau de bord</p>
+                      <p className="font-medium text-foreground">{t("roleSelection.landlordFeature2")}</p>
+                      <p className="text-muted-foreground">{t("roleSelection.landlordFeature2Desc")}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3 text-sm">
                     <Shield className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium text-foreground">100% conforme à la loi</p>
-                      <p className="text-muted-foreground">Documents légaux générés automatiquement</p>
+                      <p className="font-medium text-foreground">{t("roleSelection.landlordFeature3")}</p>
+                      <p className="text-muted-foreground">{t("roleSelection.landlordFeature3Desc")}</p>
                     </div>
                   </div>
                 </div>
@@ -159,7 +161,7 @@ export default function RoleSelection() {
                   size="lg"
                   variant="secondary"
                 >
-                  Continuer comme Propriétaire
+                  {t("roleSelection.landlordCta")}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </CardContent>
@@ -169,20 +171,20 @@ export default function RoleSelection() {
           {/* Info Section */}
           <div className="text-center space-y-4 pt-8 animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <p className="text-sm text-muted-foreground">
-              Vous pouvez avoir les deux profils si vous êtes à la fois locataire et propriétaire
+              {t("roleSelection.dualRole")}
             </p>
             <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Shield className="w-3 h-3" />
-                <span>100% Sécurisé</span>
+                <span>{t("roleSelection.secure")}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Shield className="w-3 h-3" />
-                <span>Conforme RGPD</span>
+                <span>{t("roleSelection.gdprCompliant")}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Shield className="w-3 h-3" />
-                <span>Loi 1989</span>
+                <span>{t("roleSelection.law1989")}</span>
               </div>
             </div>
           </div>
