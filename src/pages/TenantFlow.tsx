@@ -13,7 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { amenityLabels } from "@/data/amenities";
+import { amenityKeys } from "@/data/amenities";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { legalChecks } from "@/data/legalChecks";
 import { Property, TenantProfile } from "@/types";
 import { ArrowLeft, ArrowRight, Shield, CheckCircle2, FileText, User } from "lucide-react";
@@ -27,6 +28,7 @@ const tenantSteps = ["Profile", "Matches", "Details", "Application", "Contract",
 const TenantFlow = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [profile, setProfile] = useState<TenantProfile>({
     budget: "600-900",
@@ -132,7 +134,7 @@ const TenantFlow = () => {
               <div className="space-y-3">
                 <Label>Desired Amenities</Label>
                 <div className="grid grid-cols-2 gap-3">
-                  {Object.entries(amenityLabels).map(([key, label]) => (
+                  {amenityKeys.map((key) => (
                     <div key={key} className="flex items-center space-x-2">
                       <Checkbox 
                         id={key}
@@ -145,7 +147,7 @@ const TenantFlow = () => {
                         }}
                       />
                       <label htmlFor={key} className="text-sm cursor-pointer">
-                        {label}
+                        {t(`amenities.${key}`)}
                       </label>
                     </div>
                   ))}

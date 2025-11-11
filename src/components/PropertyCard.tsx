@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Home, TrendingUp, Shield } from "lucide-react";
-import { amenityLabels } from "@/data/amenities";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface PropertyCardProps {
   property: Property;
@@ -11,6 +11,8 @@ interface PropertyCardProps {
 }
 
 export const PropertyCard = ({ property, onSelect }: PropertyCardProps) => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="p-6 hover:shadow-lg transition-all">
       <div className="flex justify-between items-start mb-4">
@@ -45,7 +47,7 @@ export const PropertyCard = ({ property, onSelect }: PropertyCardProps) => {
         </Badge>
         {property.amenities.map((amenity) => (
           <Badge key={amenity} variant="outline" className="text-xs">
-            {amenityLabels[amenity] || amenity}
+            {t(`amenities.${amenity}`) || amenity}
           </Badge>
         ))}
       </div>

@@ -5,7 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { amenityLabels } from "@/data/amenities";
+import { amenityKeys } from "@/data/amenities";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Home, ArrowRight } from "lucide-react";
 
 interface PropertyListingProps {
@@ -13,6 +14,8 @@ interface PropertyListingProps {
 }
 
 export const PropertyListing = ({ onSubmit }: PropertyListingProps) => {
+  const { t } = useLanguage();
+  
   return (
     <Card className="p-8 max-w-3xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
@@ -69,11 +72,11 @@ export const PropertyListing = ({ onSubmit }: PropertyListingProps) => {
         <div className="space-y-3">
           <Label>Amenities</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {Object.entries(amenityLabels).map(([key, label]) => (
+            {amenityKeys.map((key) => (
               <div key={key} className="flex items-center space-x-2">
                 <Checkbox id={`landlord-${key}`} />
                 <label htmlFor={`landlord-${key}`} className="text-sm cursor-pointer">
-                  {label}
+                  {t(`amenities.${key}`)}
                 </label>
               </div>
             ))}
