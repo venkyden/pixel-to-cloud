@@ -81,7 +81,7 @@ export default function Auth() {
           })
           .eq("id", data.user.id);
 
-        if (consentError) console.error("Consent update error:", consentError);
+        if (consentError && import.meta.env.DEV) console.error("Consent update error:", consentError);
 
         toast.success(t("auth.accountCreated"));
         navigate("/role-selection");

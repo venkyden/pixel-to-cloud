@@ -50,7 +50,7 @@ export const PaymentHistory = () => {
 
       setPayments(data || []);
     } catch (error) {
-      console.error("Error fetching payments:", error);
+      if (import.meta.env.DEV) console.error("Error fetching payments:", error);
       toast({
         title: "Error",
         description: "Failed to load payment history",

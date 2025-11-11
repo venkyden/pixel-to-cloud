@@ -73,7 +73,7 @@ export const PropertyInspection = () => {
         setSelectedProperty(data[0].id);
       }
     } catch (error) {
-      console.error("Error fetching properties:", error);
+      if (import.meta.env.DEV) console.error("Error fetching properties:", error);
     }
   };
 
@@ -89,7 +89,7 @@ export const PropertyInspection = () => {
       if (error) throw error;
       setInspections(data || []);
     } catch (error) {
-      console.error("Error fetching inspections:", error);
+      if (import.meta.env.DEV) console.error("Error fetching inspections:", error);
     } finally {
       setLoading(false);
     }
@@ -126,7 +126,7 @@ export const PropertyInspection = () => {
         description: "Recording property condition...",
       });
     } catch (error) {
-      console.error("Error starting recording:", error);
+      if (import.meta.env.DEV) console.error("Error starting recording:", error);
       toast({
         title: "Camera access denied",
         description: "Please allow camera access to record video",
@@ -202,10 +202,12 @@ export const PropertyInspection = () => {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
+      // Get signed URL (expires in 1 hour)
+      const { data: signedUrl, error: urlError } = await supabase.storage
         .from("property-videos")
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 3600);
+
+      if (urlError || !signedUrl) throw urlError || new Error("Failed to create signed URL");
 
       // Create inspection record
       const { error: insertError } = await supabase
@@ -215,7 +217,7 @@ export const PropertyInspection = () => {
           user_id: user.id,
           type: validated.type,
           notes: validated.notes,
-          video_url: urlData.publicUrl,
+          video_url: signedUrl.signedUrl,
         });
 
       if (insertError) throw insertError;
@@ -242,7 +244,7 @@ export const PropertyInspection = () => {
         return;
       }
       
-      console.error("Error uploading video:", error);
+      if (import.meta.env.DEV) console.error("Error uploading video:", error);
       toast({
         title: "Upload failed",
         description: error.message,
@@ -276,7 +278,7 @@ export const PropertyInspection = () => {
 
       fetchInspections();
     } catch (error) {
-      console.error("Error deleting inspection:", error);
+      if (import.meta.env.DEV) console.error("Error deleting inspection:", error);
       toast({
         title: "Error",
         description: "Failed to delete inspection",

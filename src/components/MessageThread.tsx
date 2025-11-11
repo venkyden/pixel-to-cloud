@@ -86,7 +86,7 @@ export const MessageThread = ({ recipientId, recipientName, propertyId, property
           .in("id", unreadIds);
       }
     } catch (error) {
-      console.error("Error fetching messages:", error);
+      if (import.meta.env.DEV) console.error("Error fetching messages:", error);
       toast({
         title: "Error",
         description: "Failed to load messages",
@@ -157,7 +157,7 @@ export const MessageThread = ({ recipientId, recipientName, propertyId, property
           variant: "destructive",
         });
       } else {
-        console.error("Error sending message:", error);
+        if (import.meta.env.DEV) console.error("Error sending message:", error);
         toast({
           title: "Error",
           description: "Failed to send message",

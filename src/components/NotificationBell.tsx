@@ -47,7 +47,7 @@ export const NotificationBell = () => {
         .limit(20);
 
       if (error) {
-        console.error('Error fetching notifications:', error);
+        if (import.meta.env.DEV) console.error('Error fetching notifications:', error);
         return;
       }
 
@@ -97,7 +97,7 @@ export const NotificationBell = () => {
       .eq('id', notificationId);
 
     if (error) {
-      console.error('Error marking notification as read:', error);
+      if (import.meta.env.DEV) console.error('Error marking notification as read:', error);
     }
   };
 
@@ -110,7 +110,7 @@ export const NotificationBell = () => {
       .eq('id', notificationId);
 
     if (error) {
-      console.error('Error deleting notification:', error);
+      if (import.meta.env.DEV) console.error('Error deleting notification:', error);
       toast({
         title: "Error",
         description: "Failed to delete notification",
@@ -139,7 +139,7 @@ export const NotificationBell = () => {
       .in('id', unreadIds);
 
     if (error) {
-      console.error('Error marking all as read:', error);
+      if (import.meta.env.DEV) console.error('Error marking all as read:', error);
       toast({
         title: "Error",
         description: "Failed to mark all as read",

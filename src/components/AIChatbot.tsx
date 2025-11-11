@@ -136,7 +136,7 @@ export const AIChatbot = () => {
     } catch (error: any) {
       if (error.name === 'AbortError') return;
       
-      console.error("Chat error:", error);
+      if (import.meta.env.DEV) console.error("Chat error:", error);
       toast.error(language === "fr"
         ? "Erreur lors de la communication avec l'IA"
         : "Error communicating with AI"

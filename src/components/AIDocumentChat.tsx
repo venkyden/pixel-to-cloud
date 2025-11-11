@@ -122,7 +122,7 @@ export const AIDocumentChat = ({ documentName, documentContext }: AIDocumentChat
         }
       }
     } catch (error: any) {
-      console.error("Document chat error:", error);
+      if (import.meta.env.DEV) console.error("Document chat error:", error);
       toast.error(language === 'fr'
         ? 'Erreur lors de l\'analyse du document'
         : 'Error analyzing document'

@@ -76,7 +76,7 @@ export const MaintenanceRequests = () => {
         setFormData(prev => ({ ...prev, property_id: data[0].id }));
       }
     } catch (error) {
-      console.error("Error fetching properties:", error);
+      if (import.meta.env.DEV) console.error("Error fetching properties:", error);
     }
   };
 
@@ -93,7 +93,7 @@ export const MaintenanceRequests = () => {
 
       setIncidents(data || []);
     } catch (error) {
-      console.error("Error fetching incidents:", error);
+      if (import.meta.env.DEV) console.error("Error fetching incidents:", error);
       toast({
         title: "Error",
         description: "Failed to load maintenance requests",
@@ -190,7 +190,7 @@ export const MaintenanceRequests = () => {
         return;
       }
       
-      console.error("Error submitting request:", error);
+      if (import.meta.env.DEV) console.error("Error submitting request:", error);
       toast({
         title: "Error",
         description: "Failed to submit request: " + error.message,

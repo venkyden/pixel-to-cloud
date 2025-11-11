@@ -80,7 +80,7 @@ export default function Profile() {
         });
       }
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      if (import.meta.env.DEV) console.error("Error fetching profile:", error);
       toast.error("Failed to load profile");
     } finally {
       setLoading(false);
@@ -106,7 +106,7 @@ export default function Profile() {
       toast.success(t("common.saveChanges") + " successful");
       fetchProfile();
     } catch (error: any) {
-      console.error("Error updating profile:", error);
+      if (import.meta.env.DEV) console.error("Error updating profile:", error);
       toast.error("Failed to update profile: " + error.message);
     } finally {
       setSaving(false);
@@ -138,7 +138,7 @@ export default function Profile() {
         confirmPassword: "",
       });
     } catch (error: any) {
-      console.error("Error updating password:", error);
+      if (import.meta.env.DEV) console.error("Error updating password:", error);
       toast.error("Failed to update password: " + error.message);
     }
   };

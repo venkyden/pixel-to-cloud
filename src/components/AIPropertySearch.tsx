@@ -52,7 +52,7 @@ export const AIPropertySearch = ({ onSearchResults, properties }: AIPropertySear
         );
       }
     } catch (error: any) {
-      console.error('AI search error:', error);
+      if (import.meta.env.DEV) console.error('AI search error:', error);
       toast.error(language === 'fr'
         ? 'Erreur lors de la recherche IA'
         : 'AI search error'

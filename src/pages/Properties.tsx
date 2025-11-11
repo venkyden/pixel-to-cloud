@@ -124,7 +124,7 @@ export default function Properties() {
       setDisplayProperties(formattedProperties);
     } catch (error: any) {
       toast.error("Failed to load properties");
-      console.error(error);
+      if (import.meta.env.DEV) console.error(error);
     } finally {
       setLoading(false);
     }

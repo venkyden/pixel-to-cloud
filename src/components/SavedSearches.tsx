@@ -45,7 +45,7 @@ export const SavedSearches = ({ onLoadSearch }: SavedSearchesProps) => {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching saved searches:", error);
+      if (import.meta.env.DEV) console.error("Error fetching saved searches:", error);
       return;
     }
 
@@ -70,7 +70,7 @@ export const SavedSearches = ({ onLoadSearch }: SavedSearchesProps) => {
       .eq("id", searchId);
 
     if (error) {
-      console.error("Error deleting search:", error);
+      if (import.meta.env.DEV) console.error("Error deleting search:", error);
       toast({
         title: "Error",
         description: "Failed to delete search",

@@ -108,7 +108,7 @@ export const AdvancedFilters = ({
       setSearchName("");
       onSaveSearch?.();
     } catch (error) {
-      console.error("Error saving search:", error);
+      if (import.meta.env.DEV) console.error("Error saving search:", error);
       toast({
         title: "Error",
         description: "Failed to save search",

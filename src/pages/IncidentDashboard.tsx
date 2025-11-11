@@ -98,7 +98,7 @@ const IncidentDashboard = () => {
       setStats(calculatedStats);
     } catch (error: any) {
       toast.error("Failed to load incidents");
-      console.error(error);
+      if (import.meta.env.DEV) console.error(error);
     } finally {
       setLoading(false);
     }
