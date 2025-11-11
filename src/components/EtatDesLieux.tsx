@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Camera, Upload, Check, X, Clock, Image as ImageIcon, FileText, Calendar } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Room {
   name: string;
@@ -18,21 +19,22 @@ interface Room {
   notes: string;
 }
 
-const DEFAULT_ROOMS = [
-  "Séjour",
-  "Cuisine",
-  "Salle de bain",
-  "Chambre 1",
-  "Chambre 2",
-  "WC",
-  "Couloir",
-  "Balcon/Terrasse"
+const getRoomNames = (t: (key: string) => string) => [
+  t("inspection.rooms.living"),
+  t("inspection.rooms.kitchen"),
+  t("inspection.rooms.bathroom"),
+  t("inspection.rooms.bedroom1"),
+  t("inspection.rooms.bedroom2"),
+  t("inspection.rooms.wc"),
+  t("inspection.rooms.hallway"),
+  t("inspection.rooms.balcony")
 ];
 
 export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: string; type: "check-in" | "check-out" }) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [rooms, setRooms] = useState<Room[]>(
-    DEFAULT_ROOMS.map(name => ({ name, photos: [], condition: "bon" as const, notes: "" }))
+    getRoomNames(t).map(name => ({ name, photos: [], condition: "bon" as const, notes: "" }))
   );
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -92,7 +94,7 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
       return updated;
     });
     
-    toast.success(`${newFiles.length} photo(s) ajoutée(s)`);
+    toast.success(`${newFiles.length} ${t("inspection.photosAdded")}`);
   };
 
   const handleConditionChange = (roomIndex: number, condition: string) => {
@@ -136,7 +138,7 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
           uploadedUrls.push(publicUrl);
         } catch (error: any) {
           console.error("Error uploading photo:", error);
-          toast.error(`Erreur upload: ${photo.name}`);
+          toast.error(`${t("inspection.error")}: ${photo.name}`);
         }
       }
     }
@@ -146,20 +148,20 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
 
   const handleSubmitInspection = async () => {
     if (!user) {
-      toast.error("Vous devez être connecté");
+      toast.error(t("inspection.mustBeLoggedIn"));
       return;
     }
 
     // Validate that at least one photo per room
     const roomsWithoutPhotos = rooms.filter(r => r.photos.length === 0);
     if (roomsWithoutPhotos.length > 0) {
-      toast.error(`Photos manquantes pour: ${roomsWithoutPhotos.map(r => r.name).join(", ")}`);
+      toast.error(`${t("inspection.missingPhotos")} ${roomsWithoutPhotos.map(r => r.name).join(", ")}`);
       return;
     }
 
     try {
       setUploading(true);
-      toast.loading("Upload des photos en cours...");
+      toast.loading(t("inspection.uploadInProgress"));
 
       const photoUrls = await uploadPhotosToStorage();
 
@@ -184,11 +186,11 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
 
       if (error) throw error;
 
-      toast.success("État des lieux enregistré!");
+      toast.success(t("inspection.inspectionSaved"));
       fetchExistingInspection();
     } catch (error: any) {
       console.error("Error submitting inspection:", error);
-      toast.error("Erreur lors de l'enregistrement");
+      toast.error(t("inspection.error"));
     } finally {
       setUploading(false);
     }
@@ -220,16 +222,16 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
 
       if (error) throw error;
 
-      toast.success("Signature enregistrée!");
+      toast.success(t("inspection.signatureSaved"));
       fetchExistingInspection();
     } catch (error: any) {
       console.error("Error signing:", error);
-      toast.error("Erreur lors de la signature");
+      toast.error(t("inspection.error"));
     }
   };
 
   if (loading) {
-    return <Card className="p-8 text-center"><p className="text-muted-foreground">Chargement...</p></Card>;
+    return <Card className="p-8 text-center"><p className="text-muted-foreground">{t("tenantDashboard.loading")}</p></Card>;
   }
 
   if (existingInspection && signingStatus === "both-signed") {
@@ -238,12 +240,12 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>État des Lieux {type === "check-in" ? "d'Entrée" : "de Sortie"}</CardTitle>
-              <CardDescription>Complété et signé par les deux parties</CardDescription>
+              <CardTitle>{t("inspection.title")} {type === "check-in" ? t("inspection.checkIn") : t("inspection.checkOut")}</CardTitle>
+              <CardDescription>{t("inspection.completed")}</CardDescription>
             </div>
             <Badge variant="default" className="bg-success">
               <Check className="w-4 h-4 mr-1" />
-              Validé
+              {t("inspection.validated")}
             </Badge>
           </div>
         </CardHeader>
@@ -253,21 +255,21 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
               <div className="p-4 border rounded-lg">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                   <Calendar className="w-4 h-4" />
-                  Date de création
+                  {t("inspection.creationDate")}
                 </div>
                 <p className="font-medium">{new Date(existingInspection.created_at).toLocaleDateString("fr-FR")}</p>
               </div>
               <div className="p-4 border rounded-lg">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                   <FileText className="w-4 h-4" />
-                  Photos
+                  {t("inspection.photos")}
                 </div>
-                <p className="font-medium">{rooms.reduce((acc, r) => acc + r.photos.length, 0)} photos</p>
+                <p className="font-medium">{rooms.reduce((acc, r) => acc + r.photos.length, 0)} {t("inspection.photos")}</p>
               </div>
             </div>
             <Button variant="outline" onClick={fetchExistingInspection} className="w-full">
               <FileText className="w-4 h-4 mr-2" />
-              Voir le Détail
+              {t("inspection.viewDetails")}
             </Button>
           </div>
         </CardContent>
@@ -278,9 +280,9 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
   return (
     <Card>
       <CardHeader>
-        <CardTitle>État des Lieux {type === "check-in" ? "d'Entrée" : "de Sortie"}</CardTitle>
+        <CardTitle>{t("inspection.title")} {type === "check-in" ? t("inspection.checkIn") : t("inspection.checkOut")}</CardTitle>
         <CardDescription>
-          Photos obligatoires pour chaque pièce. Les deux parties doivent signer.
+          {t("inspection.description")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -289,18 +291,18 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Clock className="w-5 h-5 text-accent" />
-                <span className="font-medium">En attente de signature</span>
+                <span className="font-medium">{t("inspection.awaitingSignature")}</span>
               </div>
               <Badge variant="outline">
-                {signingStatus === "landlord-signed" ? "Propriétaire signé" : "Locataire signé"}
+                {signingStatus === "landlord-signed" ? t("inspection.landlordSigned") : t("inspection.tenantSigned")}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              L'autre partie doit signer pour finaliser l'état des lieux.
+              {t("inspection.otherPartyMustSign")}
             </p>
             <Button onClick={handleSign} className="w-full">
               <Check className="w-4 h-4 mr-2" />
-              Signer Numériquement
+              {t("inspection.signDigitally")}
             </Button>
           </div>
         )}
@@ -316,27 +318,27 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
                     room.condition === "bon" ? "secondary" :
                     room.condition === "moyen" ? "outline" : "destructive"
                   }>
-                    {room.condition}
+                    {t(`inspection.conditions.${room.condition === "bon" ? "good" : room.condition === "moyen" ? "average" : room.condition === "mauvais" ? "poor" : "excellent"}`)}
                   </Badge>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>État de la pièce</Label>
+                  <Label>{t("inspection.roomCondition")}</Label>
                   <Select value={room.condition} onValueChange={(val) => handleConditionChange(roomIndex, val)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="excellent">Excellent</SelectItem>
-                      <SelectItem value="bon">Bon</SelectItem>
-                      <SelectItem value="moyen">Moyen</SelectItem>
-                      <SelectItem value="mauvais">Mauvais</SelectItem>
+                      <SelectItem value="excellent">{t("inspection.conditions.excellent")}</SelectItem>
+                      <SelectItem value="bon">{t("inspection.conditions.good")}</SelectItem>
+                      <SelectItem value="moyen">{t("inspection.conditions.average")}</SelectItem>
+                      <SelectItem value="mauvais">{t("inspection.conditions.poor")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Photos ({room.photos.length})</Label>
+                  <Label>{t("inspection.photos")} ({room.photos.length})</Label>
                   <div className="flex gap-2">
                     <Input
                       type="file"
@@ -363,11 +365,11 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Remarques</Label>
+                  <Label>{t("inspection.remarks")}</Label>
                   <Textarea
                     value={room.notes}
                     onChange={(e) => handleNotesChange(roomIndex, e.target.value)}
-                    placeholder="Observations particulières..."
+                    placeholder={t("inspection.observations")}
                     rows={2}
                   />
                 </div>
@@ -383,17 +385,17 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
           size="lg"
         >
           {uploading ? (
-            <>Upload en cours...</>
+            <>{t("inspection.uploading")}</>
           ) : (
             <>
               <Upload className="w-4 h-4 mr-2" />
-              Enregistrer l'État des Lieux
+              {t("inspection.saveInspection")}
             </>
           )}
         </Button>
 
         <p className="text-xs text-center text-muted-foreground">
-          ⚖️ Conforme à la loi du 6 juillet 1989 - Article 3 (État des lieux contradictoire obligatoire)
+          {t("inspection.legalCompliance")}
         </p>
       </CardContent>
     </Card>

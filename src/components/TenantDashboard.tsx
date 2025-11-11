@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { 
   Home, 
   FileText, 
@@ -35,6 +36,7 @@ interface Application {
 
 export const TenantDashboard = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
@@ -61,7 +63,7 @@ export const TenantDashboard = () => {
       setApplications(data || []);
     } catch (error: any) {
       console.error("Error fetching applications:", error);
-      toast.error("Erreur lors du chargement");
+      toast.error(t("tenantDashboard.loading"));
     } finally {
       setLoading(false);
     }
@@ -69,9 +71,9 @@ export const TenantDashboard = () => {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: any; icon: any; label: string }> = {
-      pending: { variant: "outline", icon: Clock, label: "En attente" },
-      approved: { variant: "default", icon: CheckCircle2, label: "Acceptée" },
-      rejected: { variant: "destructive", icon: AlertCircle, label: "Refusée" }
+      pending: { variant: "outline", icon: Clock, label: t("tenantDashboard.status.pending") },
+      approved: { variant: "default", icon: CheckCircle2, label: t("tenantDashboard.status.approved") },
+      rejected: { variant: "destructive", icon: AlertCircle, label: t("tenantDashboard.status.rejected") }
     };
 
     const config = variants[status] || variants.pending;
@@ -90,7 +92,7 @@ export const TenantDashboard = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Home className="w-5 h-5" />
-          Actions Rapides
+          {t("tenantDashboard.quickActions")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -98,29 +100,29 @@ export const TenantDashboard = () => {
           <Button variant="outline" className="justify-start h-auto py-3" onClick={() => setActiveTab("search")}>
             <Search className="w-4 h-4 mr-2" />
             <div className="text-left">
-              <p className="font-medium text-sm">Chercher</p>
-              <p className="text-xs text-muted-foreground">Nouveaux biens</p>
+              <p className="font-medium text-sm">{t("tenantDashboard.search")}</p>
+              <p className="text-xs text-muted-foreground">{t("tenantDashboard.newProperties")}</p>
             </div>
           </Button>
           <Button variant="outline" className="justify-start h-auto py-3" onClick={() => setActiveTab("applications")}>
             <FileText className="w-4 h-4 mr-2" />
             <div className="text-left">
-              <p className="font-medium text-sm">Candidatures</p>
-              <p className="text-xs text-muted-foreground">{applications.length} en cours</p>
+              <p className="font-medium text-sm">{t("tenantDashboard.applications")}</p>
+              <p className="text-xs text-muted-foreground">{applications.length} {t("tenantDashboard.inProgress")}</p>
             </div>
           </Button>
           <Button variant="outline" className="justify-start h-auto py-3" onClick={() => setActiveTab("messages")}>
             <MessageSquare className="w-4 h-4 mr-2" />
             <div className="text-left">
-              <p className="font-medium text-sm">Messages</p>
-              <p className="text-xs text-muted-foreground">0 nouveaux</p>
+              <p className="font-medium text-sm">{t("tenantDashboard.messages")}</p>
+              <p className="text-xs text-muted-foreground">0 {t("tenantDashboard.newMessages")}</p>
             </div>
           </Button>
           <Button variant="outline" className="justify-start h-auto py-3" onClick={() => setActiveTab("inspection")}>
             <Upload className="w-4 h-4 mr-2" />
             <div className="text-left">
-              <p className="font-medium text-sm">État des Lieux</p>
-              <p className="text-xs text-muted-foreground">Photos requis</p>
+              <p className="font-medium text-sm">{t("tenantDashboard.inspection")}</p>
+              <p className="text-xs text-muted-foreground">{t("tenantDashboard.photosRequired")}</p>
             </div>
           </Button>
         </div>
@@ -143,9 +145,9 @@ export const TenantDashboard = () => {
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-warning" />
-                    Candidatures en Attente
+                    {t("tenantDashboard.pendingApplications")}
                   </CardTitle>
-                  <CardDescription>Réponse sous 7 jours maximum</CardDescription>
+                  <CardDescription>{t("tenantDashboard.responseTime")}</CardDescription>
                 </div>
                 <Badge variant="outline">{pendingApplications.length}</Badge>
               </div>
@@ -157,7 +159,7 @@ export const TenantDashboard = () => {
                     <div>
                       <h4 className="font-semibold text-foreground">{app.property.name}</h4>
                       <p className="text-sm text-muted-foreground">{app.property.location}</p>
-                      <p className="text-sm font-medium text-primary mt-1">{app.property.price}€/mois</p>
+                      <p className="text-sm font-medium text-primary mt-1">{app.property.price}€{t("tenantDashboard.perMonth")}</p>
                     </div>
                     {getStatusBadge(app.status)}
                   </div>
@@ -174,9 +176,9 @@ export const TenantDashboard = () => {
                 <div>
                   <CardTitle className="flex items-center gap-2 text-success">
                     <CheckCircle2 className="w-5 h-5" />
-                    Candidature Acceptée!
+                    {t("tenantDashboard.applicationAccepted")}
                   </CardTitle>
-                  <CardDescription>Prochaine étape: Paiement et état des lieux</CardDescription>
+                  <CardDescription>{t("tenantDashboard.nextSteps")}</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -188,18 +190,18 @@ export const TenantDashboard = () => {
                       <div>
                         <h4 className="font-semibold text-foreground">{app.property.name}</h4>
                         <p className="text-sm text-muted-foreground">{app.property.location}</p>
-                        <p className="text-sm font-medium text-primary mt-1">{app.property.price}€/mois</p>
+                        <p className="text-sm font-medium text-primary mt-1">{app.property.price}€{t("tenantDashboard.perMonth")}</p>
                       </div>
                       {getStatusBadge(app.status)}
                     </div>
                     <div className="flex gap-2">
                       <Button className="flex-1">
                         <Euro className="w-4 h-4 mr-2" />
-                        Payer le Dépôt
+                        {t("tenantDashboard.payDeposit")}
                       </Button>
                       <Button variant="outline" className="flex-1" onClick={() => setActiveTab("inspection")}>
                         <Calendar className="w-4 h-4 mr-2" />
-                        État des Lieux
+                        {t("tenantDashboard.inspection")}
                       </Button>
                     </div>
                   </div>
@@ -213,11 +215,11 @@ export const TenantDashboard = () => {
           <Card>
             <CardContent className="py-12 text-center">
               <Home className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">Aucune candidature</h3>
-              <p className="text-muted-foreground mb-4">Commencez par chercher un logement</p>
+              <h3 className="text-lg font-semibold mb-2">{t("tenantDashboard.noApplications")}</h3>
+              <p className="text-muted-foreground mb-4">{t("tenantDashboard.startSearching")}</p>
               <Button onClick={() => setActiveTab("search")}>
                 <Search className="w-4 h-4 mr-2" />
-                Chercher un Logement
+                {t("tenantDashboard.searchProperty")}
               </Button>
             </CardContent>
           </Card>
@@ -229,12 +231,12 @@ export const TenantDashboard = () => {
   const ApplicationsTab = () => (
     <Card>
       <CardHeader>
-        <CardTitle>Mes Candidatures</CardTitle>
-        <CardDescription>Historique de toutes vos demandes de location</CardDescription>
+        <CardTitle>{t("tenantDashboard.myApplications")}</CardTitle>
+        <CardDescription>{t("tenantDashboard.applicationHistory")}</CardDescription>
       </CardHeader>
       <CardContent>
         {loading ? (
-          <p className="text-center py-8 text-muted-foreground">Chargement...</p>
+          <p className="text-center py-8 text-muted-foreground">{t("tenantDashboard.loading")}</p>
         ) : applications.length > 0 ? (
           <div className="space-y-4">
             {applications.map((app) => (
@@ -247,7 +249,7 @@ export const TenantDashboard = () => {
                   {getStatusBadge(app.status)}
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <p className="font-medium text-primary">{app.property.price}€/mois</p>
+                  <p className="font-medium text-primary">{app.property.price}€{t("tenantDashboard.perMonth")}</p>
                   <p className="text-muted-foreground">
                     {new Date(app.created_at).toLocaleDateString("fr-FR")}
                   </p>
@@ -256,7 +258,7 @@ export const TenantDashboard = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center py-8 text-muted-foreground">Aucune candidature</p>
+          <p className="text-center py-8 text-muted-foreground">{t("tenantDashboard.noApplications")}</p>
         )}
       </CardContent>
     </Card>
@@ -270,9 +272,9 @@ export const TenantDashboard = () => {
         <Card>
           <CardContent className="py-12 text-center">
             <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Aucun logement accepté</h3>
+            <h3 className="text-lg font-semibold mb-2">{t("tenantDashboard.noAcceptedProperty")}</h3>
             <p className="text-muted-foreground">
-              L'état des lieux sera disponible après acceptation de votre candidature
+              {t("tenantDashboard.inspectionAvailable")}
             </p>
           </CardContent>
         </Card>
@@ -286,17 +288,17 @@ export const TenantDashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-foreground">Tableau de Bord Locataire</h2>
-          <p className="text-muted-foreground">Gérez vos candidatures et démarches</p>
+          <h2 className="text-3xl font-bold text-foreground">{t("tenantDashboard.title")}</h2>
+          <p className="text-muted-foreground">{t("tenantDashboard.subtitle")}</p>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="applications">Candidatures</TabsTrigger>
-          <TabsTrigger value="inspection">État des Lieux</TabsTrigger>
-          <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="overview">{t("tenantDashboard.overview")}</TabsTrigger>
+          <TabsTrigger value="applications">{t("tenantDashboard.applications")}</TabsTrigger>
+          <TabsTrigger value="inspection">{t("tenantDashboard.inspection")}</TabsTrigger>
+          <TabsTrigger value="messages">{t("tenantDashboard.messages")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6">
@@ -314,11 +316,11 @@ export const TenantDashboard = () => {
         <TabsContent value="messages" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Messages</CardTitle>
-              <CardDescription>Messagerie avec les propriétaires</CardDescription>
+              <CardTitle>{t("tenantDashboard.messages")}</CardTitle>
+              <CardDescription>{t("tenantDashboard.applicationHistory")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center py-8 text-muted-foreground">Aucun message</p>
+              <p className="text-center py-8 text-muted-foreground">{t("tenantDashboard.noApplications")}</p>
             </CardContent>
           </Card>
         </TabsContent>
