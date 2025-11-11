@@ -29,6 +29,23 @@ export default function Auth() {
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleForgotPassword = async () => {
+    const email = prompt("Enter your email address:");
+    if (!email) return;
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) throw error;
+
+      toast.success("Password reset email sent! Check your inbox.");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send reset email");
+    }
+  };
+
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -163,7 +180,17 @@ export default function Auth() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">{t("common.password")}</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="signin-password">{t("common.password")}</Label>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="p-0 h-auto text-sm"
+                      onClick={handleForgotPassword}
+                    >
+                      Forgot password?
+                    </Button>
+                  </div>
                   <Input
                     id="signin-password"
                     name="password"

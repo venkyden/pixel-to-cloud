@@ -8,17 +8,18 @@ import { VerificationStep } from "@/components/VerificationStep";
 import { PropertyListing } from "@/components/PropertyListing";
 import { ContractPreview } from "@/components/ContractPreview";
 import { ApplicationStatus } from "@/components/ApplicationStatus";
-import { tenants } from "@/data/mockData";
-import { Tenant } from "@/types";
 import { ArrowLeft, CheckCircle2, Users, FileText, MessageSquare, Wrench } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const landlordSteps = ["Verify", "Listing", "Applications", "Compare", "Contract", "Management", "Support"];
 
 const LandlordFlow = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+  const [selectedTenant, setSelectedTenant] = useState<any | null>(null);
+  const [tenantApplications, setTenantApplications] = useState<any[]>([]);
 
   const handleVerification = () => {
     setCurrentStep(2);
@@ -30,7 +31,7 @@ const LandlordFlow = () => {
     toast.success("Listing published! AI matching in progress...");
   };
 
-  const handleTenantSelect = (tenant: Tenant) => {
+  const handleTenantSelect = (tenant: any) => {
     setSelectedTenant(tenant);
     setCurrentStep(4);
     toast.success(`${tenant.name} selected!`);
@@ -69,20 +70,26 @@ const LandlordFlow = () => {
               </div>
               <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
                 <p className="text-sm text-foreground">
-                  <strong>Parallel Processing Active:</strong> All {tenants.length} applications reviewed simultaneously. 
+                  <strong>Parallel Processing Active:</strong> Applications will be reviewed simultaneously. 
                   Top matches shown first based on income verification, rental history, and move-in date compatibility.
                 </p>
               </div>
             </div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tenants.map((tenant) => (
-                <TenantCard
-                  key={tenant.id}
-                  tenant={tenant}
-                  onSelect={handleTenantSelect}
-                />
-              ))}
+              {tenantApplications.length === 0 ? (
+                <p className="text-center text-muted-foreground col-span-3 py-12">
+                  No tenant applications yet. Applications will appear here once tenants apply to your property.
+                </p>
+              ) : (
+                tenantApplications.map((tenant) => (
+                  <TenantCard
+                    key={tenant.id}
+                    tenant={tenant}
+                    onSelect={handleTenantSelect}
+                  />
+                ))
+              )}
             </div>
           </div>
         );

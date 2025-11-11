@@ -27,28 +27,6 @@ export default function Properties() {
   const [selectedForComparison, setSelectedForComparison] = useState<Property[]>([]);
   const [filters, setFilters] = useState<PropertyFilters>({});
 
-  const mockImages = [
-    "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
-    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
-    "https://images.unsplash.com/photo-1564013799919-ab600027ffc6",
-    "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688",
-  ];
-
-  const mockReviews = [
-    {
-      authorName: "Alice Brown",
-      rating: 5,
-      date: "2 weeks ago",
-      comment: "Great location and amenities. The landlord is very responsive!",
-    },
-    {
-      authorName: "Bob Smith",
-      rating: 4,
-      date: "1 month ago",
-      comment: "Nice apartment, but parking can be tricky during peak hours.",
-    },
-  ];
-
   useEffect(() => {
     fetchProperties();
   }, []);
@@ -269,15 +247,17 @@ export default function Properties() {
                     </div>
                   </TabsContent>
                   <TabsContent value="gallery">
-                    <ImageGallery images={mockImages} />
+                    {selectedProperty.images && selectedProperty.images.length > 0 ? (
+                      <ImageGallery images={selectedProperty.images} />
+                    ) : (
+                      <p className="text-center text-muted-foreground py-8">No images available for this property</p>
+                    )}
                   </TabsContent>
                   <TabsContent value="location">
                     <MapView address={selectedProperty.location} />
                   </TabsContent>
                   <TabsContent value="reviews" className="space-y-4">
-                    {mockReviews.map((review, idx) => (
-                      <ReviewCard key={idx} {...review} />
-                    ))}
+                    <p className="text-center text-muted-foreground py-8">No reviews yet for this property</p>
                   </TabsContent>
                 </Tabs>
               </>

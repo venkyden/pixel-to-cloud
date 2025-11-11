@@ -12,16 +12,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { properties, amenityLabels } from "@/data/mockData";
+import { amenityLabels } from "@/data/amenities";
 import { legalChecks } from "@/data/legalChecks";
 import { Property, TenantProfile } from "@/types";
 import { ArrowLeft, ArrowRight, Shield, CheckCircle2, FileText, User } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 const tenantSteps = ["Profile", "Matches", "Details", "Application", "Contract", "Payment", "Status"];
 
 const TenantFlow = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [profile, setProfile] = useState<TenantProfile>({
     budget: "600-900",
@@ -31,11 +35,27 @@ const TenantFlow = () => {
     roomCount: "2"
   });
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [properties, setProperties] = useState<Property[]>([]);
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentStep(2);
+    fetchProperties();
     toast.success("Profile created! Finding matches...");
+  };
+
+  const fetchProperties = async () => {
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*")
+      .limit(50);
+    
+    if (error) {
+      if (import.meta.env.DEV) console.error("Error fetching properties:", error);
+      return;
+    }
+    
+    setProperties((data as any[]) || []);
   };
 
   const handlePropertySelect = (property: Property) => {

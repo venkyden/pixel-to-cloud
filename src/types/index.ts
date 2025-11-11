@@ -1,5 +1,5 @@
 export interface Property {
-  id: number;
+  id: number | string;
   name: string;
   price: number;
   currency: string;
@@ -10,8 +10,9 @@ export interface Property {
   neighborhood_rating: number;
   transport_score: number;
   legal_status: string;
-  match_score: number;
-  match_reason: string;
+  images?: string[];
+  match_score?: number;
+  match_reason?: string;
 }
 
 export interface Tenant {

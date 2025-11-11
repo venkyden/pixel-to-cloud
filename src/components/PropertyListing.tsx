@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { amenityLabels } from "@/data/mockData";
+import { amenityLabels } from "@/data/amenities";
 import { Home, ArrowRight } from "lucide-react";
 
 interface PropertyListingProps {
