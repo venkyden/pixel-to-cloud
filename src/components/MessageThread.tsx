@@ -178,29 +178,33 @@ export const MessageThread = ({ recipientId, recipientName, propertyId, property
   }
 
   return (
-    <Card className="flex flex-col h-[600px]">
-      <div className="p-4 border-b">
+    <Card className="flex flex-col h-[600px] glass-effect border-border/50 shadow-elegant overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      
+      <div className="relative p-4 border-b border-border/50 glass-effect">
         <div className="flex items-center space-x-3">
-          <Avatar>
-            <AvatarFallback>{recipientName.charAt(0)}</AvatarFallback>
+          <Avatar className="ring-2 ring-primary/20">
+            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary font-bold">
+              {recipientName.charAt(0)}
+            </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="font-semibold text-foreground">{recipientName}</h3>
+            <h3 className="font-bold text-foreground">{recipientName}</h3>
             {propertyName && (
-              <p className="text-sm text-muted-foreground">{propertyName}</p>
+              <p className="text-sm text-muted-foreground font-medium">{propertyName}</p>
             )}
           </div>
         </div>
       </div>
 
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4 relative">
         {loading ? (
           <div className="flex items-center justify-center h-full">
-            <Loader2 className="h-6 w-6 animate-spin" />
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground">No messages yet. Start the conversation!</p>
+            <p className="text-muted-foreground font-medium">No messages yet. Start the conversation!</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -209,18 +213,18 @@ export const MessageThread = ({ recipientId, recipientName, propertyId, property
               return (
                 <div
                   key={message.id}
-                  className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
+                  className={`flex ${isOwn ? "justify-end" : "justify-start"} animate-fade-in`}
                 >
                   <div
-                    className={`max-w-[70%] rounded-lg p-3 ${
+                    className={`max-w-[70%] rounded-2xl p-4 shadow-md transition-all duration-300 hover:scale-[1.02] ${
                       isOwn
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-foreground"
+                        ? "bg-gradient-to-r from-primary to-accent text-primary-foreground"
+                        : "glass-effect border border-border/50 text-foreground"
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                     <p
-                      className={`text-xs mt-1 ${
+                      className={`text-xs mt-2 font-medium ${
                         isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
                       }`}
                     >
@@ -235,7 +239,7 @@ export const MessageThread = ({ recipientId, recipientName, propertyId, property
         )}
       </ScrollArea>
 
-      <div className="p-4 border-t">
+      <div className="relative p-4 border-t border-border/50 glass-effect">
         <div className="flex space-x-2">
           <Input
             placeholder="Type a message..."
@@ -243,8 +247,14 @@ export const MessageThread = ({ recipientId, recipientName, propertyId, property
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
             disabled={sending}
+            className="glass-effect border-border/50 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
           />
-          <Button onClick={handleSend} size="icon" disabled={sending || !newMessage.trim()}>
+          <Button 
+            onClick={handleSend} 
+            size="icon" 
+            disabled={sending || !newMessage.trim()}
+            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+          >
             {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </div>

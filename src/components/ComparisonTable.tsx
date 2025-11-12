@@ -44,34 +44,46 @@ export const ComparisonTable = ({ properties }: ComparisonTableProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Property Comparison</CardTitle>
+    <Card className="glass-effect border-border/50 shadow-elegant overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      
+      <CardHeader className="relative">
+        <CardTitle className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-bold text-2xl">
+          Property Comparison
+        </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b">
-                <th className="text-left p-4 font-semibold text-foreground">Feature</th>
+              <tr className="border-b border-border/50">
+                <th className="text-left p-4 font-bold text-foreground">Feature</th>
                 {properties.map((property) => (
-                  <th key={property.id} className="p-4 text-center">
-                    <div className="space-y-2">
-                      <p className="font-semibold text-foreground">{property.name}</p>
-                      <p className="text-sm text-muted-foreground">{property.location}</p>
-                      <Badge>{property.match_score}% Match</Badge>
+                  <th key={property.id} className="p-4 text-center min-w-[200px]">
+                    <div className="space-y-3 p-4 rounded-xl glass-effect border border-border/50">
+                      <p className="font-bold text-foreground">{property.name}</p>
+                      <p className="text-sm text-muted-foreground font-medium">{property.location}</p>
+                      <Badge className="glass-effect bg-gradient-to-r from-success/20 to-success/10 text-success border-success/30">
+                        {property.match_score}% Match
+                      </Badge>
                     </div>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {features.map((feature) => (
-                <tr key={feature} className="border-b">
-                  <td className="p-4 font-medium text-muted-foreground">{feature}</td>
+              {features.map((feature, index) => (
+                <tr 
+                  key={feature} 
+                  className="border-b border-border/50 hover:bg-gradient-to-r hover:from-primary/5 hover:to-accent/5 transition-all duration-300"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <td className="p-4 font-semibold text-muted-foreground">{feature}</td>
                   {properties.map((property) => (
                     <td key={property.id} className="p-4 text-center">
-                      {getFeatureValue(property, feature)}
+                      <div className="flex items-center justify-center">
+                        {getFeatureValue(property, feature)}
+                      </div>
                     </td>
                   ))}
                 </tr>
@@ -80,7 +92,9 @@ export const ComparisonTable = ({ properties }: ComparisonTableProps) => {
                 <td className="p-4"></td>
                 {properties.map((property) => (
                   <td key={property.id} className="p-4">
-                    <Button className="w-full">View Details</Button>
+                    <Button className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105">
+                      View Details
+                    </Button>
                   </td>
                 ))}
               </tr>
