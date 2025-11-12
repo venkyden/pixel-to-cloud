@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,18 @@ export default function Auth() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordReset, setIsPasswordReset] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+
+  useEffect(() => {
+    // Check if user is returning from password reset email
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get('type');
+    
+    if (type === 'recovery') {
+      setIsPasswordReset(true);
+    }
+  }, []);
 
   const handleForgotPassword = async () => {
     const email = prompt("Enter your email address:");
@@ -43,6 +55,32 @@ export default function Auth() {
       toast.success("Password reset email sent! Check your inbox.");
     } catch (error: any) {
       toast.error(error.message || "Failed to send reset email");
+    }
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      if (newPassword.length < 8) {
+        throw new Error("Password must be at least 8 characters");
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      toast.success("Password updated successfully!");
+      setIsPasswordReset(false);
+      setNewPassword("");
+      navigate("/role-selection");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to reset password");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -148,6 +186,45 @@ export default function Auth() {
       setIsLoading(false);
     }
   };
+
+  if (isPasswordReset) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+        <div className="absolute top-4 right-4">
+          <LanguageSwitcher />
+        </div>
+        
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Reset Your Password</CardTitle>
+            <CardDescription>Enter your new password below</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handlePasswordReset} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+                <p className="text-sm text-muted-foreground">
+                  Password must be at least 8 characters
+                </p>
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Updating..." : "Update Password"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
