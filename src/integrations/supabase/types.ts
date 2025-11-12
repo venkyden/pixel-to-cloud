@@ -625,11 +625,14 @@ export type Database = {
       }
       tenant_applications: {
         Row: {
+          bank_statement_url: string | null
           co_signer_income: number | null
           created_at: string
           expires_at: string | null
+          government_id_url: string | null
           id: string
           income: number | null
+          income_proof_url: string | null
           match_score: number | null
           move_in_date: string | null
           profession: string | null
@@ -642,11 +645,14 @@ export type Database = {
           verified: boolean | null
         }
         Insert: {
+          bank_statement_url?: string | null
           co_signer_income?: number | null
           created_at?: string
           expires_at?: string | null
+          government_id_url?: string | null
           id?: string
           income?: number | null
+          income_proof_url?: string | null
           match_score?: number | null
           move_in_date?: string | null
           profession?: string | null
@@ -659,11 +665,14 @@ export type Database = {
           verified?: boolean | null
         }
         Update: {
+          bank_statement_url?: string | null
           co_signer_income?: number | null
           created_at?: string
           expires_at?: string | null
+          government_id_url?: string | null
           id?: string
           income?: number | null
+          income_proof_url?: string | null
           match_score?: number | null
           move_in_date?: string | null
           profession?: string | null

@@ -48,9 +48,24 @@ const applicationSchema = z.object({
     .positive("Income must be positive")
     .min(100, "Income must be at least €100")
     .max(1000000, "Income must be less than €1,000,000"),
-  hasIdDoc: z.boolean().refine((val) => val === true, "ID document is required"),
-  hasIncomeProof: z.boolean().refine((val) => val === true, "Income proof is required"),
-  hasBankStatement: z.boolean().refine((val) => val === true, "Bank statement is required")
+  governmentId: z.instanceof(File)
+    .refine((file) => file.size <= 10485760, "File must be less than 10MB")
+    .refine(
+      (file) => ["application/pdf", "image/jpeg", "image/jpg", "image/png"].includes(file.type),
+      "Only PDF, JPG, and PNG files are allowed"
+    ),
+  incomeProof: z.instanceof(File)
+    .refine((file) => file.size <= 10485760, "File must be less than 10MB")
+    .refine(
+      (file) => ["application/pdf", "image/jpeg", "image/jpg", "image/png"].includes(file.type),
+      "Only PDF, JPG, and PNG files are allowed"
+    ),
+  bankStatement: z.instanceof(File)
+    .refine((file) => file.size <= 10485760, "File must be less than 10MB")
+    .refine(
+      (file) => ["application/pdf", "image/jpeg", "image/jpg", "image/png"].includes(file.type),
+      "Only PDF, JPG, and PNG files are allowed"
+    )
 });
 
 const TenantFlow = () => {
@@ -74,10 +89,13 @@ const TenantFlow = () => {
     email: "",
     phone: "",
     occupation: "",
-    monthlyIncome: "",
-    hasIdDoc: false,
-    hasIncomeProof: false,
-    hasBankStatement: false
+    monthlyIncome: ""
+  });
+  
+  const [applicationDocs, setApplicationDocs] = useState({
+    governmentId: null as File | null,
+    incomeProof: null as File | null,
+    bankStatement: null as File | null
   });
 
   const handleProfileSubmit = (e: React.FormEvent) => {
@@ -106,11 +124,36 @@ const TenantFlow = () => {
     setCurrentStep(3);
   };
 
+  const uploadApplicationFile = async (file: File, userId: string, type: string): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}/application-${type}-${Date.now()}.${fileExt}`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('verification-documents')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+    
+    const { data: { publicUrl } } = supabase.storage
+      .from('verification-documents')
+      .getPublicUrl(fileName);
+    
+    return publicUrl;
+  };
+
   const handleApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!selectedProperty || !user) {
       toast.error("Missing property or user information");
+      return;
+    }
+
+    if (!applicationDocs.governmentId || !applicationDocs.incomeProof || !applicationDocs.bankStatement) {
+      toast.error("Please upload all required documents");
       return;
     }
 
@@ -122,12 +165,20 @@ const TenantFlow = () => {
         phone: applicationForm.phone,
         occupation: applicationForm.occupation,
         monthlyIncome: parseFloat(applicationForm.monthlyIncome),
-        hasIdDoc: applicationForm.hasIdDoc,
-        hasIncomeProof: applicationForm.hasIncomeProof,
-        hasBankStatement: applicationForm.hasBankStatement
+        governmentId: applicationDocs.governmentId,
+        incomeProof: applicationDocs.incomeProof,
+        bankStatement: applicationDocs.bankStatement
       });
 
-      // Submit application to database
+      // Upload documents
+      toast.info("Uploading documents...");
+      const [governmentIdUrl, incomeProofUrl, bankStatementUrl] = await Promise.all([
+        uploadApplicationFile(validatedData.governmentId, user.id, 'government-id'),
+        uploadApplicationFile(validatedData.incomeProof, user.id, 'income-proof'),
+        uploadApplicationFile(validatedData.bankStatement, user.id, 'bank-statement')
+      ]);
+
+      // Submit application to database with document URLs
       const { error } = await supabase
         .from("tenant_applications")
         .insert({
@@ -136,6 +187,9 @@ const TenantFlow = () => {
           profession: validatedData.occupation,
           income: validatedData.monthlyIncome,
           move_in_date: profile.moveInDate || undefined,
+          government_id_url: governmentIdUrl,
+          income_proof_url: incomeProofUrl,
+          bank_statement_url: bankStatementUrl,
           status: "pending" as const
         });
 
@@ -408,32 +462,50 @@ const TenantFlow = () => {
                   />
                 </div>
 
-                <div className="space-y-3 p-4 bg-muted rounded-lg">
+                <div className="space-y-4 p-4 bg-muted rounded-lg">
                   <Label className="text-sm font-medium">Required Documents *</Label>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Checkbox 
-                        id="id-doc"
-                        checked={applicationForm.hasIdDoc}
-                        onCheckedChange={(checked) => setApplicationForm({...applicationForm, hasIdDoc: checked as boolean})}
-                      />
-                      <label htmlFor="id-doc" className="cursor-pointer">Government-issued ID</label>
+                  
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label className="text-sm">Government-issued ID</Label>
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          type="file" 
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => setApplicationDocs({...applicationDocs, governmentId: e.target.files?.[0] || null})}
+                          required
+                        />
+                        {applicationDocs.governmentId && <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />}
+                      </div>
+                      <p className="text-xs text-muted-foreground">Passport, national ID, or driver's license (Max 10MB)</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox 
-                        id="income-proof"
-                        checked={applicationForm.hasIncomeProof}
-                        onCheckedChange={(checked) => setApplicationForm({...applicationForm, hasIncomeProof: checked as boolean})}
-                      />
-                      <label htmlFor="income-proof" className="cursor-pointer">Proof of income (last 3 months)</label>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm">Proof of Income</Label>
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          type="file" 
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => setApplicationDocs({...applicationDocs, incomeProof: e.target.files?.[0] || null})}
+                          required
+                        />
+                        {applicationDocs.incomeProof && <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />}
+                      </div>
+                      <p className="text-xs text-muted-foreground">Last 3 months pay slips or tax returns (Max 10MB)</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox 
-                        id="bank-statement"
-                        checked={applicationForm.hasBankStatement}
-                        onCheckedChange={(checked) => setApplicationForm({...applicationForm, hasBankStatement: checked as boolean})}
-                      />
-                      <label htmlFor="bank-statement" className="cursor-pointer">Bank statements</label>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm">Bank Statement</Label>
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          type="file" 
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => setApplicationDocs({...applicationDocs, bankStatement: e.target.files?.[0] || null})}
+                          required
+                        />
+                        {applicationDocs.bankStatement && <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />}
+                      </div>
+                      <p className="text-xs text-muted-foreground">Last 3 months bank statements (Max 10MB)</p>
                     </div>
                   </div>
                 </div>
