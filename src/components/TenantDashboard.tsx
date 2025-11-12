@@ -90,38 +90,39 @@ export const TenantDashboard = () => {
   };
 
   const QuickActions = () => (
-    <Card className="mb-6">
-      <CardHeader>
+    <Card className="mb-6 glass-effect border-border/50 shadow-elegant overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      <CardHeader className="relative">
         <CardTitle className="flex items-center gap-2">
-          <Home className="w-5 h-5" />
+          <Home className="w-5 h-5 text-primary" />
           {t("tenantDashboard.quickActions")}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <Button variant="outline" className="justify-start h-auto py-3" onClick={() => setActiveTab("search")}>
-            <Search className="w-4 h-4 mr-2" />
+          <Button variant="outline" className="justify-start h-auto py-3 glass-effect border-border/50 hover:bg-primary/5 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => setActiveTab("search")}>
+            <Search className="w-4 h-4 mr-2 text-primary" />
             <div className="text-left">
               <p className="font-medium text-sm">{t("tenantDashboard.search")}</p>
               <p className="text-xs text-muted-foreground">{t("tenantDashboard.newProperties")}</p>
             </div>
           </Button>
-          <Button variant="outline" className="justify-start h-auto py-3" onClick={() => setActiveTab("applications")}>
-            <FileText className="w-4 h-4 mr-2" />
+          <Button variant="outline" className="justify-start h-auto py-3 glass-effect border-border/50 hover:bg-primary/5 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => setActiveTab("applications")}>
+            <FileText className="w-4 h-4 mr-2 text-primary" />
             <div className="text-left">
               <p className="font-medium text-sm">{t("tenantDashboard.applications")}</p>
               <p className="text-xs text-muted-foreground">{applications.length} {t("tenantDashboard.inProgress")}</p>
             </div>
           </Button>
-          <Button variant="outline" className="justify-start h-auto py-3" onClick={() => setActiveTab("messages")}>
-            <MessageSquare className="w-4 h-4 mr-2" />
+          <Button variant="outline" className="justify-start h-auto py-3 glass-effect border-border/50 hover:bg-primary/5 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => setActiveTab("messages")}>
+            <MessageSquare className="w-4 h-4 mr-2 text-primary" />
             <div className="text-left">
               <p className="font-medium text-sm">{t("tenantDashboard.messages")}</p>
               <p className="text-xs text-muted-foreground">0 {t("tenantDashboard.newMessages")}</p>
             </div>
           </Button>
-          <Button variant="outline" className="justify-start h-auto py-3" onClick={() => setActiveTab("inspection")}>
-            <Upload className="w-4 h-4 mr-2" />
+          <Button variant="outline" className="justify-start h-auto py-3 glass-effect border-border/50 hover:bg-primary/5 hover:scale-105 transition-all duration-300 shadow-md" onClick={() => setActiveTab("inspection")}>
+            <Upload className="w-4 h-4 mr-2 text-primary" />
             <div className="text-left">
               <p className="font-medium text-sm">{t("tenantDashboard.inspection")}</p>
               <p className="text-xs text-muted-foreground">{t("tenantDashboard.photosRequired")}</p>

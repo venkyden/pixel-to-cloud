@@ -36,16 +36,17 @@ export const AnalyticsDashboard = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((metric) => (
-          <Card key={metric.title}>
-            <CardContent className="pt-6">
+          <Card key={metric.title} className="glass-effect border-border/50 shadow-elegant overflow-hidden group hover:shadow-glow transition-all duration-300 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <CardContent className="pt-6 relative">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">{metric.title}</p>
-                  <p className="text-3xl font-bold text-foreground">{metric.value}</p>
-                  <p className="text-sm text-success mt-1">{metric.change} {t("common.loading")}</p>
+                  <p className="text-sm text-muted-foreground mb-1 font-medium">{metric.title}</p>
+                  <p className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-fade-in">{metric.value}</p>
+                  <p className="text-sm text-success mt-1 font-medium">{metric.change} {t("common.loading")}</p>
                 </div>
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                  <metric.icon className="w-6 h-6 text-primary" />
+                <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl flex items-center justify-center shadow-md ring-2 ring-primary/10 group-hover:scale-110 transition-transform duration-300">
+                  <metric.icon className="w-7 h-7 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -53,14 +54,18 @@ export const AnalyticsDashboard = () => {
         ))}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("roleSelection.properties")}</CardTitle>
+      <Card className="glass-effect border-border/50 shadow-elegant overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+        <CardHeader className="relative">
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            {t("roleSelection.properties")}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-            <TrendingUp className="h-12 w-12 mr-3" />
-            Chart visualization placeholder
+        <CardContent className="relative">
+          <div className="h-[300px] flex items-center justify-center text-muted-foreground glass-effect rounded-xl border border-border/50 p-6">
+            <TrendingUp className="h-12 w-12 mr-3 text-primary" />
+            <span className="font-medium">Chart visualization placeholder</span>
           </div>
         </CardContent>
       </Card>
