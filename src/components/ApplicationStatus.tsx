@@ -50,29 +50,33 @@ export const ApplicationStatus = ({ steps, currentStage }: ApplicationStatusProp
   };
 
   return (
-    <Card className="p-6">
-      <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-2 text-foreground">Application Timeline</h3>
-        <p className="text-sm text-muted-foreground">
-          Current Stage: <span className="font-medium text-foreground">{currentStage}</span>
+    <Card className="p-6 glass-effect border-border/50 shadow-elegant overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      <div className="relative mb-6">
+        <h3 className="text-xl font-semibold mb-2 text-foreground flex items-center gap-2">
+          <CheckCircle2 className="h-5 w-5 text-primary" />
+          Application Timeline
+        </h3>
+        <p className="text-sm text-muted-foreground font-medium">
+          Current Stage: <span className="font-semibold text-primary">{currentStage}</span>
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="relative space-y-4">
         {steps.map((step, index) => (
-          <div key={index} className="relative">
+          <div key={index} className="relative animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
             {index < steps.length - 1 && (
               <div className={`absolute left-[22px] top-12 w-0.5 h-full -translate-x-1/2 ${
-                step.status === 'completed' ? 'bg-success' : 'bg-border'
+                step.status === 'completed' ? 'bg-gradient-to-b from-success to-success/50' : 'bg-border'
               }`} />
             )}
             
-            <div className={`flex items-start gap-4 p-4 rounded-lg transition-all ${
+            <div className={`flex items-start gap-4 p-4 rounded-xl transition-all duration-300 hover:scale-[1.02] ${
               step.status === 'in-progress' 
-                ? 'bg-warning/5 border border-warning/20' 
+                ? 'glass-effect border border-warning/30 bg-warning/5 shadow-md' 
                 : step.status === 'completed'
-                ? 'bg-success/5 border border-success/20'
-                : 'bg-muted/50 border border-transparent'
+                ? 'glass-effect border border-success/30 bg-success/5 shadow-md'
+                : 'glass-effect border border-border/50'
             }`}>
               <div className="flex-shrink-0 mt-1">
                 {getStatusIcon(step.status)}
