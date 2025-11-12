@@ -22,8 +22,36 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { z } from "zod";
 
 const tenantSteps = ["Profile", "Matches", "Details", "Application", "Contract", "Payment", "Status"];
+
+const applicationSchema = z.object({
+  fullName: z.string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be less than 100 characters"),
+  email: z.string()
+    .trim()
+    .email("Invalid email address")
+    .max(255, "Email must be less than 255 characters"),
+  phone: z.string()
+    .trim()
+    .min(10, "Phone number must be at least 10 characters")
+    .max(20, "Phone number must be less than 20 characters")
+    .regex(/^[+\d\s()-]+$/, "Invalid phone number format"),
+  occupation: z.string()
+    .trim()
+    .min(2, "Occupation must be at least 2 characters")
+    .max(100, "Occupation must be less than 100 characters"),
+  monthlyIncome: z.number()
+    .positive("Income must be positive")
+    .min(100, "Income must be at least €100")
+    .max(1000000, "Income must be less than €1,000,000"),
+  hasIdDoc: z.boolean().refine((val) => val === true, "ID document is required"),
+  hasIncomeProof: z.boolean().refine((val) => val === true, "Income proof is required"),
+  hasBankStatement: z.boolean().refine((val) => val === true, "Bank statement is required")
+});
 
 const TenantFlow = () => {
   const navigate = useNavigate();
@@ -39,6 +67,18 @@ const TenantFlow = () => {
   });
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
+  
+  // Application form state
+  const [applicationForm, setApplicationForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    occupation: "",
+    monthlyIncome: "",
+    hasIdDoc: false,
+    hasIncomeProof: false,
+    hasBankStatement: false
+  });
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,9 +106,53 @@ const TenantFlow = () => {
     setCurrentStep(3);
   };
 
-  const handleApplicationSubmit = () => {
-    setCurrentStep(5);
-    toast.success("Application submitted successfully!");
+  const handleApplicationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedProperty || !user) {
+      toast.error("Missing property or user information");
+      return;
+    }
+
+    try {
+      // Validate form data
+      const validatedData = applicationSchema.parse({
+        fullName: applicationForm.fullName,
+        email: applicationForm.email,
+        phone: applicationForm.phone,
+        occupation: applicationForm.occupation,
+        monthlyIncome: parseFloat(applicationForm.monthlyIncome),
+        hasIdDoc: applicationForm.hasIdDoc,
+        hasIncomeProof: applicationForm.hasIncomeProof,
+        hasBankStatement: applicationForm.hasBankStatement
+      });
+
+      // Submit application to database
+      const { error } = await supabase
+        .from("tenant_applications")
+        .insert({
+          user_id: user.id,
+          property_id: selectedProperty.id as string,
+          profession: validatedData.occupation,
+          income: validatedData.monthlyIncome,
+          move_in_date: profile.moveInDate || undefined,
+          status: "pending" as const
+        });
+
+      if (error) throw error;
+
+      setCurrentStep(5);
+      toast.success("Application submitted successfully!");
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        error.errors.forEach((err) => {
+          toast.error(err.message);
+        });
+      } else {
+        console.error("Application error:", error);
+        toast.error("Failed to submit application. Please try again.");
+      }
+    }
   };
 
   const handleContractReview = () => {
@@ -246,7 +330,7 @@ const TenantFlow = () => {
                 </p>
               </div>
 
-              <Button className="w-full" size="lg" onClick={handleApplicationSubmit}>
+              <Button className="w-full" size="lg" onClick={() => setCurrentStep(4)}>
                 Submit Application
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -268,47 +352,87 @@ const TenantFlow = () => {
                 </div>
               </div>
 
-              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleApplicationSubmit(); }}>
+              <form className="space-y-4" onSubmit={handleApplicationSubmit}>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Full Name</Label>
-                    <Input placeholder="John Doe" required />
+                    <Label>Full Name *</Label>
+                    <Input 
+                      placeholder="John Doe" 
+                      value={applicationForm.fullName}
+                      onChange={(e) => setApplicationForm({...applicationForm, fullName: e.target.value})}
+                      required 
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label>Email</Label>
-                    <Input type="email" placeholder="john@example.com" required />
+                    <Label>Email *</Label>
+                    <Input 
+                      type="email" 
+                      placeholder="john@example.com"
+                      value={applicationForm.email}
+                      onChange={(e) => setApplicationForm({...applicationForm, email: e.target.value})}
+                      required 
+                    />
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Phone Number</Label>
-                    <Input type="tel" placeholder="+33 6 12 34 56 78" required />
+                    <Label>Phone Number *</Label>
+                    <Input 
+                      type="tel" 
+                      placeholder="+33 6 12 34 56 78"
+                      value={applicationForm.phone}
+                      onChange={(e) => setApplicationForm({...applicationForm, phone: e.target.value})}
+                      required 
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label>Occupation</Label>
-                    <Input placeholder="Software Engineer" required />
+                    <Label>Occupation *</Label>
+                    <Input 
+                      placeholder="Software Engineer"
+                      value={applicationForm.occupation}
+                      onChange={(e) => setApplicationForm({...applicationForm, occupation: e.target.value})}
+                      required 
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Monthly Income (€)</Label>
-                  <Input type="number" placeholder="3000" required />
+                  <Label>Monthly Income (€) *</Label>
+                  <Input 
+                    type="number" 
+                    placeholder="3000"
+                    value={applicationForm.monthlyIncome}
+                    onChange={(e) => setApplicationForm({...applicationForm, monthlyIncome: e.target.value})}
+                    required 
+                  />
                 </div>
 
                 <div className="space-y-3 p-4 bg-muted rounded-lg">
-                  <Label className="text-sm font-medium">Required Documents</Label>
+                  <Label className="text-sm font-medium">Required Documents *</Label>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
-                      <Checkbox id="id-doc" />
+                      <Checkbox 
+                        id="id-doc"
+                        checked={applicationForm.hasIdDoc}
+                        onCheckedChange={(checked) => setApplicationForm({...applicationForm, hasIdDoc: checked as boolean})}
+                      />
                       <label htmlFor="id-doc" className="cursor-pointer">Government-issued ID</label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Checkbox id="income-proof" />
+                      <Checkbox 
+                        id="income-proof"
+                        checked={applicationForm.hasIncomeProof}
+                        onCheckedChange={(checked) => setApplicationForm({...applicationForm, hasIncomeProof: checked as boolean})}
+                      />
                       <label htmlFor="income-proof" className="cursor-pointer">Proof of income (last 3 months)</label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Checkbox id="bank-statement" />
+                      <Checkbox 
+                        id="bank-statement"
+                        checked={applicationForm.hasBankStatement}
+                        onCheckedChange={(checked) => setApplicationForm({...applicationForm, hasBankStatement: checked as boolean})}
+                      />
                       <label htmlFor="bank-statement" className="cursor-pointer">Bank statements</label>
                     </div>
                   </div>
@@ -408,62 +532,58 @@ const TenantFlow = () => {
                   title: "Payment Received",
                   status: "completed",
                   date: new Date().toLocaleDateString('en-GB'),
-                  description: "First month's rent + deposit secured in escrow"
+                  description: "First month rent and deposit secured in escrow"
                 },
                 {
                   title: "Landlord Review",
-                  status: "in-progress",
-                  date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'),
-                  description: "Landlord reviewing your application"
+                  status: "pending",
+                  date: "Pending",
+                  description: "Waiting for landlord approval"
                 },
                 {
-                  title: "Move-in Coordination",
+                  title: "Move-in Ready",
                   status: "pending",
-                  date: profile.moveInDate ? new Date(profile.moveInDate).toLocaleDateString('en-GB') : "TBD",
-                  description: "Schedule property inspection and key handover"
+                  date: "Pending",
+                  description: "Final step before moving in"
                 }
               ]}
             />
 
             <Card className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">What happens next?</h3>
-                  <p className="text-sm text-muted-foreground">You'll receive updates via email and SMS</p>
-                </div>
-                <Button onClick={() => navigate('/')} variant="outline">
-                  Return to Home
-                </Button>
-              </div>
+              <Button 
+                className="w-full" 
+                size="lg"
+                onClick={() => navigate('/tenant')}
+              >
+                Go to Dashboard
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
             </Card>
           </div>
         ) : null;
 
       default:
-        return null;
+        return <TenantDashboard />;
     }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-primary">Roomivo</h1>
-              <span className="text-sm text-muted-foreground">👤 Tenant Mode</span>
-            </div>
-            <Button variant="outline" size="sm" onClick={() => navigate('/')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Change Role
-            </Button>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => currentStep > 1 ? setCurrentStep(currentStep - 1) : navigate('/')}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 w-4 h-4" />
+            Back
+          </Button>
+          <ProgressSteps steps={tenantSteps} currentStep={currentStep} />
         </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <TenantDashboard />
-      </main>
+        
+        {renderStep()}
+      </div>
     </div>
   );
 };

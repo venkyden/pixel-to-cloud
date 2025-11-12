@@ -3,9 +3,38 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, CheckCircle2, ArrowRight } from "lucide-react";
+import { Shield, CheckCircle2, ArrowRight, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const verificationSchema = z.object({
+  fullName: z.string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be less than 100 characters"),
+  email: z.string()
+    .trim()
+    .email("Invalid email address")
+    .max(255, "Email must be less than 255 characters"),
+  phone: z.string()
+    .trim()
+    .min(10, "Phone number must be at least 10 characters")
+    .max(20, "Phone number must be less than 20 characters")
+    .regex(/^[+\d\s()-]+$/, "Invalid phone number format"),
+  ownershipDoc: z.instanceof(File)
+    .refine((file) => file.size <= 10485760, "File must be less than 10MB")
+    .refine(
+      (file) => ["application/pdf", "image/jpeg", "image/jpg", "image/png"].includes(file.type),
+      "Only PDF, JPG, and PNG files are allowed"
+    ),
+  governmentId: z.instanceof(File)
+    .refine((file) => file.size <= 10485760, "File must be less than 10MB")
+    .refine(
+      (file) => ["application/pdf", "image/jpeg", "image/jpg", "image/png"].includes(file.type),
+      "Only PDF, JPG, and PNG files are allowed"
+    )
+});
 
 interface VerificationStepProps {
   onVerify: () => void;
@@ -15,24 +44,70 @@ export const VerificationStep = ({ onVerify }: VerificationStepProps) => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [ownershipDoc, setOwnershipDoc] = useState<File | null>(null);
+  const [governmentId, setGovernmentId] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const uploadFile = async (file: File, userId: string, type: string): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}/${type}-${Date.now()}.${fileExt}`;
+    
+    const { error: uploadError, data } = await supabase.storage
+      .from('verification-documents')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+    
+    const { data: { publicUrl } } = supabase.storage
+      .from('verification-documents')
+      .getPublicUrl(fileName);
+    
+    return publicUrl;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!ownershipDoc || !governmentId) {
+      toast.error("Please upload both required documents");
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Validate form data
+      const validatedData = verificationSchema.parse({
+        fullName,
+        email,
+        phone,
+        ownershipDoc,
+        governmentId
+      });
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // For demo, we'll skip file uploads and just save the verification record
+      // Upload files to storage
+      toast.info("Uploading documents...");
+      const [ownershipUrl, idUrl] = await Promise.all([
+        uploadFile(validatedData.ownershipDoc, user.id, 'ownership'),
+        uploadFile(validatedData.governmentId, user.id, 'government-id')
+      ]);
+
+      // Save verification record with document URLs
       const { error } = await supabase
         .from("landlord_verifications")
         .insert({
           user_id: user.id,
-          full_name: fullName,
-          email,
-          phone,
+          full_name: validatedData.fullName,
+          email: validatedData.email,
+          phone: validatedData.phone,
+          ownership_document_url: ownershipUrl,
+          government_id_url: idUrl,
           status: "pending"
         });
 
@@ -41,8 +116,14 @@ export const VerificationStep = ({ onVerify }: VerificationStepProps) => {
       toast.success("Verification submitted! You'll be notified once approved.");
       onVerify();
     } catch (error) {
-      console.error("Verification error:", error);
-      toast.error("Failed to submit verification");
+      if (error instanceof z.ZodError) {
+        error.errors.forEach((err) => {
+          toast.error(err.message);
+        });
+      } else {
+        console.error("Verification error:", error);
+        toast.error("Failed to submit verification. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -117,15 +198,35 @@ export const VerificationStep = ({ onVerify }: VerificationStepProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label>Property Ownership Document</Label>
-          <Input type="file" accept=".pdf,.jpg,.png" />
-          <p className="text-xs text-muted-foreground">Upload proof of ownership or authorization to rent</p>
+          <Label>Property Ownership Document *</Label>
+          <div className="flex items-center gap-2">
+            <Input 
+              type="file" 
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={(e) => setOwnershipDoc(e.target.files?.[0] || null)}
+              required
+            />
+            {ownershipDoc && <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Upload proof of ownership or authorization to rent (Max 10MB, PDF/JPG/PNG)
+          </p>
         </div>
 
         <div className="space-y-2">
-          <Label>Government-Issued ID</Label>
-          <Input type="file" accept=".pdf,.jpg,.png" />
-          <p className="text-xs text-muted-foreground">Passport, national ID, or driver's license</p>
+          <Label>Government-Issued ID *</Label>
+          <div className="flex items-center gap-2">
+            <Input 
+              type="file" 
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={(e) => setGovernmentId(e.target.files?.[0] || null)}
+              required
+            />
+            {governmentId && <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Passport, national ID, or driver's license (Max 10MB, PDF/JPG/PNG)
+          </p>
         </div>
 
         <Button type="submit" className="w-full" size="lg" disabled={loading}>
