@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.80.0';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -55,14 +56,30 @@ serve(async (req) => {
       );
     }
 
-    const { userId, title, message, type, link } = await req.json();
+    // Input validation schema
+    const notificationSchema = z.object({
+      userId: z.string().uuid('Invalid user ID format'),
+      title: z.string().trim().min(1, 'Title is required').max(200, 'Title too long'),
+      message: z.string().trim().min(1, 'Message is required').max(2000, 'Message too long'),
+      type: z.enum(['info', 'warning', 'error', 'success']).default('info'),
+      link: z.string().url('Invalid URL format').optional().or(z.literal(''))
+    });
 
-    if (!userId || !title || !message) {
+    const body = await req.json();
+    
+    // Validate input
+    const validation = notificationSchema.safeParse(body);
+    if (!validation.success) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: userId, title, message' }),
+        JSON.stringify({ 
+          error: 'Invalid input', 
+          details: validation.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const { userId, title, message, type, link } = validation.data;
 
     // Security check: Only allow creating notifications for the authenticated user
     // System notifications should be created via database triggers or service role directly

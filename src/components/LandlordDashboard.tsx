@@ -20,6 +20,8 @@ import {
   Euro
 } from "lucide-react";
 import { format } from "date-fns";
+import { RentReceipt } from "./RentReceipt";
+import { EndOfLeaseDocument } from "./EndOfLeaseDocument";
 
 interface Property {
   id: string;
@@ -287,7 +289,7 @@ export const LandlordDashboard = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="applications" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="applications">
             <Users className="mr-2 h-4 w-4" />
             Applications
@@ -299,6 +301,10 @@ export const LandlordDashboard = () => {
           <TabsTrigger value="maintenance">
             <Wrench className="mr-2 h-4 w-4" />
             Maintenance
+          </TabsTrigger>
+          <TabsTrigger value="documents">
+            <FileText className="mr-2 h-4 w-4" />
+            Documents
           </TabsTrigger>
         </TabsList>
 
@@ -459,6 +465,14 @@ export const LandlordDashboard = () => {
               </Card>
             ))
           )}
+        </TabsContent>
+
+        {/* Documents Tab */}
+        <TabsContent value="documents" className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-6">
+            <RentReceipt />
+            <EndOfLeaseDocument />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

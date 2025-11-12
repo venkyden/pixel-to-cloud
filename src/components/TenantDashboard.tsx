@@ -20,6 +20,8 @@ import {
   Upload
 } from "lucide-react";
 import { EtatDesLieux } from "./EtatDesLieux";
+import { RentReceipt } from "./RentReceipt";
+import { EndOfLeaseDocument } from "./EndOfLeaseDocument";
 
 interface Application {
   id: string;
@@ -294,10 +296,14 @@ export const TenantDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">{t("tenantDashboard.overview")}</TabsTrigger>
           <TabsTrigger value="applications">{t("tenantDashboard.applications")}</TabsTrigger>
           <TabsTrigger value="inspection">{t("tenantDashboard.inspection")}</TabsTrigger>
+          <TabsTrigger value="documents">
+            <FileText className="w-4 h-4 mr-2" />
+            Documents
+          </TabsTrigger>
           <TabsTrigger value="messages">{t("tenantDashboard.messages")}</TabsTrigger>
         </TabsList>
 
@@ -311,6 +317,13 @@ export const TenantDashboard = () => {
 
         <TabsContent value="inspection" className="mt-6">
           <InspectionTab />
+        </TabsContent>
+
+        <TabsContent value="documents" className="mt-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <RentReceipt />
+            <EndOfLeaseDocument />
+          </div>
         </TabsContent>
 
         <TabsContent value="messages" className="mt-6">
