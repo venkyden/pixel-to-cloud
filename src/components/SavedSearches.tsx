@@ -91,30 +91,30 @@ export const SavedSearches = ({ onLoadSearch }: SavedSearchesProps) => {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Bookmark className="h-4 w-4 mr-2" />
+        <Button variant="outline" size="sm" className="glass-effect border-border/50 hover:bg-primary/5 hover:scale-105 transition-all duration-300 shadow-md">
+          <Bookmark className="h-4 w-4 mr-2 text-primary" />
           Saved Searches {searches.length > 0 && `(${searches.length})`}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64">
+      <DropdownMenuContent align="end" className="w-64 glass-effect border-border/50 shadow-elegant">
         {searches.length === 0 ? (
-          <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+          <div className="px-2 py-4 text-center text-sm text-muted-foreground font-medium">
             No saved searches yet
           </div>
         ) : (
           <>
             {searches.map((search, index) => (
               <div key={search.id}>
-                {index > 0 && <DropdownMenuSeparator />}
+                {index > 0 && <DropdownMenuSeparator className="bg-border/50" />}
                 <DropdownMenuItem
-                  className="flex items-center justify-between cursor-pointer"
+                  className="flex items-center justify-between cursor-pointer hover:bg-primary/5 transition-all duration-300 rounded-md"
                   onSelect={() => handleLoadSearch(search)}
                 >
-                  <span className="flex-1">{search.name}</span>
+                  <span className="flex-1 font-medium">{search.name}</span>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6"
+                    className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
                     onClick={(e) => handleDeleteSearch(search.id, search.name, e)}
                   >
                     <Trash2 className="h-3 w-3" />

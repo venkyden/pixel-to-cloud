@@ -240,50 +240,54 @@ export const LandlordDashboard = () => {
     <div className="space-y-6">
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
+        <Card className="p-6 glass-effect border-border/50 shadow-elegant overflow-hidden group hover:shadow-glow transition-all duration-300 hover:scale-105">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Properties</p>
-              <p className="text-2xl font-bold text-foreground">{stats.totalProperties}</p>
+              <p className="text-sm text-muted-foreground font-medium">Properties</p>
+              <p className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent animate-fade-in">{stats.totalProperties}</p>
             </div>
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Home className="w-6 h-6 text-primary" />
+            <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl flex items-center justify-center shadow-md ring-2 ring-primary/10 group-hover:scale-110 transition-transform duration-300">
+              <Home className="w-7 h-7 text-primary" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
+        <Card className="p-6 glass-effect border-border/50 shadow-elegant overflow-hidden group hover:shadow-glow transition-all duration-300 hover:scale-105">
+          <div className="absolute inset-0 bg-gradient-to-br from-warning/10 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Pending Applications</p>
-              <p className="text-2xl font-bold text-foreground">{stats.pendingApplications}</p>
+              <p className="text-sm text-muted-foreground font-medium">Pending Applications</p>
+              <p className="text-3xl font-bold bg-gradient-to-r from-warning to-warning/70 bg-clip-text text-transparent animate-fade-in">{stats.pendingApplications}</p>
             </div>
-            <div className="w-12 h-12 bg-warning/10 rounded-full flex items-center justify-center">
-              <Users className="w-6 h-6 text-warning" />
+            <div className="w-14 h-14 bg-gradient-to-br from-warning/20 to-warning/10 rounded-2xl flex items-center justify-center shadow-md ring-2 ring-warning/10 group-hover:scale-110 transition-transform duration-300">
+              <Users className="w-7 h-7 text-warning" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
+        <Card className="p-6 glass-effect border-border/50 shadow-elegant overflow-hidden group hover:shadow-glow transition-all duration-300 hover:scale-105">
+          <div className="absolute inset-0 bg-gradient-to-br from-destructive/10 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Open Incidents</p>
-              <p className="text-2xl font-bold text-foreground">{stats.openIncidents}</p>
+              <p className="text-sm text-muted-foreground font-medium">Open Incidents</p>
+              <p className="text-3xl font-bold bg-gradient-to-r from-destructive to-destructive/70 bg-clip-text text-transparent animate-fade-in">{stats.openIncidents}</p>
             </div>
-            <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center">
-              <Wrench className="w-6 h-6 text-destructive" />
+            <div className="w-14 h-14 bg-gradient-to-br from-destructive/20 to-destructive/10 rounded-2xl flex items-center justify-center shadow-md ring-2 ring-destructive/10 group-hover:scale-110 transition-transform duration-300">
+              <Wrench className="w-7 h-7 text-destructive" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
+        <Card className="p-6 glass-effect border-border/50 shadow-elegant overflow-hidden group hover:shadow-glow transition-all duration-300 hover:scale-105">
+          <div className="absolute inset-0 bg-gradient-to-br from-success/10 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Monthly Revenue</p>
-              <p className="text-2xl font-bold text-foreground">€{stats.monthlyRevenue}</p>
+              <p className="text-sm text-muted-foreground font-medium">Monthly Revenue</p>
+              <p className="text-3xl font-bold bg-gradient-to-r from-success to-success/70 bg-clip-text text-transparent animate-fade-in">€{stats.monthlyRevenue}</p>
             </div>
-            <div className="w-12 h-12 bg-success/10 rounded-full flex items-center justify-center">
-              <Euro className="w-6 h-6 text-success" />
+            <div className="w-14 h-14 bg-gradient-to-br from-success/20 to-success/10 rounded-2xl flex items-center justify-center shadow-md ring-2 ring-success/10 group-hover:scale-110 transition-transform duration-300">
+              <Euro className="w-7 h-7 text-success" />
             </div>
           </div>
         </Card>
@@ -291,20 +295,20 @@ export const LandlordDashboard = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="applications" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="applications">
+        <TabsList className="grid w-full grid-cols-4 glass-effect border-border/50 p-1">
+          <TabsTrigger value="applications" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground transition-all duration-300">
             <Users className="mr-2 h-4 w-4" />
             Applications
           </TabsTrigger>
-          <TabsTrigger value="properties">
+          <TabsTrigger value="properties" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground transition-all duration-300">
             <Home className="mr-2 h-4 w-4" />
             Properties
           </TabsTrigger>
-          <TabsTrigger value="maintenance">
+          <TabsTrigger value="maintenance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground transition-all duration-300">
             <Wrench className="mr-2 h-4 w-4" />
             Maintenance
           </TabsTrigger>
-          <TabsTrigger value="documents">
+          <TabsTrigger value="documents" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground transition-all duration-300">
             <FileText className="mr-2 h-4 w-4" />
             {t("documents.title")}
           </TabsTrigger>
@@ -313,87 +317,94 @@ export const LandlordDashboard = () => {
         {/* Applications Tab */}
         <TabsContent value="applications" className="space-y-4">
           {applications.length === 0 ? (
-            <Card className="p-12 text-center">
-              <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No applications yet</p>
+            <Card className="p-12 text-center glass-effect border-border/50 shadow-elegant">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+              <div className="relative">
+                <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground font-medium">No applications yet</p>
+              </div>
             </Card>
           ) : (
             applications.map((application) => (
-              <Card key={application.id} className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-foreground">
-                        {application.profiles?.first_name || "Unknown"} {application.profiles?.last_name || ""}
-                      </h3>
-                      <Badge className={getStatusColor(application.status)}>
-                        {application.status}
-                      </Badge>
-                      {application.match_score && (
-                        <Badge variant="outline" className="bg-success/10 text-success border-success/20">
-                          {application.match_score}% Match
+              <Card key={application.id} className="p-6 glass-effect border-border/50 shadow-elegant overflow-hidden group hover:shadow-glow transition-all duration-300 animate-fade-in">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-foreground">
+                          {application.profiles?.first_name || "Unknown"} {application.profiles?.last_name || ""}
+                        </h3>
+                        <Badge className={getStatusColor(application.status)}>
+                          {application.status}
                         </Badge>
-                      )}
+                        {application.match_score && (
+                          <Badge variant="outline" className="bg-gradient-to-r from-success/20 to-success/10 text-success border-success/30 shadow-md">
+                            {application.match_score}% Match
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Property: {application.properties?.name || "Unknown"} (€{application.properties?.price || 0}/month)
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {application.profession || "Unknown"} • €{application.income || 0}/month
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Property: {application.properties?.name || "Unknown"} (€{application.properties?.price || 0}/month)
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {application.profession || "Unknown"} • €{application.income || 0}/month
-                    </p>
                   </div>
-                </div>
 
-                <div className="grid md:grid-cols-3 gap-4 mb-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      Applied: {format(new Date(application.created_at), "MMM dd, yyyy")}
-                    </span>
-                  </div>
-                  {application.expires_at && (
+                  <div className="grid md:grid-cols-3 gap-4 mb-4 text-sm">
                     <div className="flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-muted-foreground" />
+                      <Clock className="w-4 h-4 text-muted-foreground" />
                       <span className="text-muted-foreground">
-                        Expires: {format(new Date(application.expires_at), "MMM dd, yyyy")}
+                        Applied: {format(new Date(application.created_at), "MMM dd, yyyy")}
                       </span>
                     </div>
-                  )}
-                  {application.move_in_date && (
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">
-                        Move-in: {format(new Date(application.move_in_date), "MMM dd, yyyy")}
-                      </span>
+                    {application.expires_at && (
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">
+                          Expires: {format(new Date(application.expires_at), "MMM dd, yyyy")}
+                        </span>
+                      </div>
+                    )}
+                    {application.move_in_date && (
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">
+                          Move-in: {format(new Date(application.move_in_date), "MMM dd, yyyy")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {application.status === "pending" && (
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={() => handleApproveApplication(application.id)}
+                        className="flex-1 bg-gradient-to-r from-success to-success/80 hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg"
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Approve
+                      </Button>
+                      <Button
+                        onClick={() => handleRejectApplication(application.id)}
+                        variant="outline"
+                        className="flex-1 glass-effect border-destructive/30 text-destructive hover:bg-destructive/10 transition-all duration-300"
+                      >
+                        <XCircle className="w-4 h-4 mr-2" />
+                        Reject
+                      </Button>
+                      <Button
+                        onClick={() => navigate(`/messages?user=${application.user_id}`)}
+                        variant="outline"
+                        className="glass-effect border-border/50 hover:bg-primary/5 transition-all duration-300"
+                      >
+                        Message
+                      </Button>
                     </div>
                   )}
                 </div>
-
-                {application.status === "pending" && (
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={() => handleApproveApplication(application.id)}
-                      className="flex-1"
-                    >
-                      <CheckCircle2 className="w-4 h-4 mr-2" />
-                      Approve
-                    </Button>
-                    <Button
-                      onClick={() => handleRejectApplication(application.id)}
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      <XCircle className="w-4 h-4 mr-2" />
-                      Reject
-                    </Button>
-                    <Button
-                      onClick={() => navigate(`/messages?user=${application.user_id}`)}
-                      variant="outline"
-                    >
-                      Message
-                    </Button>
-                  </div>
-                )}
               </Card>
             ))
           )}
@@ -402,30 +413,37 @@ export const LandlordDashboard = () => {
         {/* Properties Tab */}
         <TabsContent value="properties" className="space-y-4">
           {properties.length === 0 ? (
-            <Card className="p-12 text-center">
-              <Home className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground mb-4">No properties listed yet</p>
-              <Button onClick={() => navigate("/landlord")}>
-                Add First Property
-              </Button>
+            <Card className="p-12 text-center glass-effect border-border/50 shadow-elegant">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+              <div className="relative">
+                <Home className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4 font-medium">No properties listed yet</p>
+                <Button onClick={() => navigate("/landlord")} className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg">
+                  Add First Property
+                </Button>
+              </div>
             </Card>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {properties.map((property) => (
-                <Card key={property.id} className="overflow-hidden">
+                <Card key={property.id} className="overflow-hidden glass-effect border-border/50 shadow-elegant group hover:shadow-glow transition-all duration-300 hover:scale-105 animate-fade-in">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   {property.images?.[0] && (
-                    <img
-                      src={property.images[0]}
-                      alt={property.name}
-                      className="w-full h-48 object-cover"
-                    />
+                    <div className="relative overflow-hidden">
+                      <img
+                        src={property.images[0]}
+                        alt={property.name}
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
+                    </div>
                   )}
-                  <div className="p-4">
+                  <div className="relative p-4">
                     <h3 className="font-semibold text-foreground mb-1">{property.name}</h3>
                     <p className="text-sm text-muted-foreground mb-2">{property.location}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-primary">€{property.price}/month</span>
-                      <span className="text-sm text-muted-foreground">{property.rooms} rooms</span>
+                      <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">€{property.price}/month</span>
+                      <span className="text-sm text-muted-foreground font-medium">{property.rooms} rooms</span>
                     </div>
                   </div>
                 </Card>

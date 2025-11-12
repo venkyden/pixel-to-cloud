@@ -63,11 +63,12 @@ export const AIPropertySearch = ({ onSearchResults, properties }: AIPropertySear
   };
 
   return (
-    <Card className="mb-4 border-primary/20">
-      <CardContent className="pt-6">
+    <Card className="mb-4 glass-effect border-primary/30 shadow-elegant overflow-hidden group hover:shadow-glow transition-all duration-300">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
+      <CardContent className="pt-6 relative">
         <div className="flex gap-2">
           <div className="flex-1 relative">
-            <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
+            <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary animate-pulse" />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -77,11 +78,15 @@ export const AIPropertySearch = ({ onSearchResults, properties }: AIPropertySear
                   ? 'Ex: Appartement calme avec balcon près du métro...'
                   : 'E.g: Quiet apartment with balcony near metro...'
               }
-              className="pl-10"
+              className="pl-11 glass-effect border-primary/20 focus:ring-2 focus:ring-primary/30 transition-all duration-300 font-medium"
               disabled={isSearching}
             />
           </div>
-          <Button onClick={handleAISearch} disabled={isSearching || !query.trim()}>
+          <Button 
+            onClick={handleAISearch} 
+            disabled={isSearching || !query.trim()}
+            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+          >
             {isSearching ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -89,7 +94,8 @@ export const AIPropertySearch = ({ onSearchResults, properties }: AIPropertySear
             )}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">
+        <p className="text-xs text-muted-foreground mt-3 font-medium flex items-center gap-1">
+          <Sparkles className="h-3 w-3" />
           {language === 'fr'
             ? 'Décrivez votre logement idéal en langage naturel'
             : 'Describe your ideal property in natural language'}
