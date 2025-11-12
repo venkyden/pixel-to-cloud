@@ -17,33 +17,38 @@ export const ProgressSteps = ({ steps, currentStep }: ProgressStepsProps) => {
           <div key={step} className="flex items-center flex-1 min-w-0">
             <div className="flex flex-col items-center flex-1">
               <div className={`
-                w-10 h-10 rounded-full flex items-center justify-center font-semibold
-                transition-all duration-300
+                w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg
+                transition-all duration-500 shadow-md
                 ${isCompleted 
-                  ? 'bg-success text-white' 
+                  ? 'bg-gradient-to-br from-success to-success/80 text-white shadow-success/30 scale-105' 
                   : isActive 
-                    ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' 
-                    : 'bg-muted text-muted-foreground'
+                    ? 'bg-gradient-to-br from-primary to-accent text-primary-foreground ring-4 ring-primary/30 scale-110 shadow-elegant' 
+                    : 'glass-effect text-muted-foreground border border-border/50'
                 }
               `}>
                 {isCompleted ? (
-                  <Check className="w-5 h-5" />
+                  <Check className="w-6 h-6 animate-in zoom-in duration-300" />
                 ) : (
-                  stepNumber
+                  <span className={isActive ? 'animate-pulse' : ''}>{stepNumber}</span>
                 )}
               </div>
               <div className={`
-                mt-2 text-xs font-medium text-center whitespace-nowrap
-                ${isActive ? 'text-foreground' : 'text-muted-foreground'}
+                mt-3 text-xs font-semibold text-center whitespace-nowrap px-2
+                transition-all duration-300
+                ${isActive ? 'text-foreground scale-105' : 'text-muted-foreground'}
               `}>
                 {step}
               </div>
             </div>
             {index < steps.length - 1 && (
               <div className={`
-                h-0.5 flex-1 mx-2 transition-all duration-300
-                ${isCompleted ? 'bg-success' : 'bg-muted'}
-              `} />
+                h-1 flex-1 mx-4 rounded-full transition-all duration-500 relative overflow-hidden
+                ${isCompleted ? 'bg-gradient-to-r from-success to-success/80' : 'bg-muted'}
+              `}>
+                {isCompleted && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+                )}
+              </div>
             )}
           </div>
         );

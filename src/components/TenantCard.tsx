@@ -13,68 +13,99 @@ export const TenantCard = ({ tenant, onSelect }: TenantCardProps) => {
   const getRiskColor = (risk: string) => {
     switch (risk.toLowerCase()) {
       case 'low':
-        return 'bg-success/10 text-success border-success/20';
+        return 'glass-effect bg-gradient-to-r from-success/20 to-success/10 text-success border-success/30';
       case 'medium':
-        return 'bg-warning/10 text-warning border-warning/20';
+        return 'glass-effect bg-gradient-to-r from-warning/20 to-warning/10 text-warning border-warning/30';
       case 'high':
-        return 'bg-destructive/10 text-destructive border-destructive/20';
+        return 'glass-effect bg-gradient-to-r from-destructive/20 to-destructive/10 text-destructive border-destructive/30';
       default:
-        return 'bg-muted text-muted-foreground';
+        return 'glass-effect bg-muted/50 text-muted-foreground border-border/50';
     }
   };
 
   return (
-    <Card className="p-6 hover:shadow-lg transition-all">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="w-6 h-6 text-primary" />
+    <Card className="group relative overflow-hidden glass-effect border-border/50 hover:shadow-elegant transition-all duration-500 hover:scale-[1.02] cursor-pointer">
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      <div className="relative p-6 space-y-4">
+        {/* Header Section */}
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-3 flex-1">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+              <User className="w-7 h-7 text-primary" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+                  {tenant.name}
+                </h3>
+                {tenant.verified && (
+                  <div className="w-5 h-5 rounded-full bg-success/20 flex items-center justify-center">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-success" />
+                  </div>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground font-medium">
+                {tenant.age} years • {tenant.profession}
+              </p>
+            </div>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold text-foreground">{tenant.name}</h3>
-              {tenant.verified && (
-                <CheckCircle2 className="w-4 h-4 text-success" />
+          <Badge className="glass-effect bg-gradient-to-r from-success/20 to-success/10 text-success border-success/30 hover:scale-105 transition-transform duration-300">
+            <TrendingUp className="w-3 h-3 mr-1" />
+            {tenant.match_score}%
+          </Badge>
+        </div>
+
+        {/* Info Section */}
+        <div className="space-y-3 p-4 rounded-xl glass-effect border border-border/50">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+              <Briefcase className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1">
+              <span className="text-sm font-semibold text-foreground">
+                €{tenant.income}/month
+              </span>
+              {tenant.co_signer_income && (
+                <span className="text-xs text-muted-foreground ml-2">
+                  + €{tenant.co_signer_income} co-signer
+                </span>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">{tenant.age} years • {tenant.profession}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-secondary/20 to-secondary/10 flex items-center justify-center">
+              <Calendar className="w-4 h-4 text-secondary" />
+            </div>
+            <span className="text-sm font-medium text-foreground">
+              Move-in: {tenant.move_in}
+            </span>
           </div>
         </div>
-        <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
-          <TrendingUp className="w-3 h-3 mr-1" />
-          {tenant.match_score}% Match
-        </Badge>
-      </div>
 
-      <div className="space-y-3 mb-4">
-        <div className="flex items-center gap-2 text-sm">
-          <Briefcase className="w-4 h-4 text-muted-foreground" />
-          <span className="text-foreground">€{tenant.income}/month income</span>
-          {tenant.co_signer_income && (
-            <span className="text-muted-foreground text-xs">
-              + €{tenant.co_signer_income} co-signer
-            </span>
-          )}
+        {/* Risk Badge */}
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className={getRiskColor(tenant.risk_level)}>
+            Risk: {tenant.risk_level}
+          </Badge>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span className="text-foreground">Move-in: {tenant.move_in}</span>
+
+        {/* Rental History */}
+        <div className="p-4 rounded-xl glass-effect border border-border/50">
+          <p className="text-sm text-muted-foreground italic leading-relaxed">
+            "{tenant.rental_history}"
+          </p>
         </div>
+
+        {/* Action Button */}
+        <Button 
+          className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105" 
+          onClick={() => onSelect(tenant)}
+        >
+          Select Tenant
+        </Button>
       </div>
-
-      <div className="mb-4">
-        <Badge variant="outline" className={getRiskColor(tenant.risk_level)}>
-          Risk: {tenant.risk_level}
-        </Badge>
-      </div>
-
-      <p className="text-xs text-muted-foreground mb-4 italic">
-        "{tenant.rental_history}"
-      </p>
-
-      <Button className="w-full" onClick={() => onSelect(tenant)}>
-        Select Tenant
-      </Button>
     </Card>
   );
 };
