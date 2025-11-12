@@ -34,7 +34,9 @@
     "marketingConsent": "J'accepte de recevoir des communications marketing (optionnel)",
     "required": "*",
     "accountCreated": "Compte créé avec succès !",
-    "signedIn": "Connexion réussie !"
+    "signedIn": "Connexion réussie !",
+    "continueWith": "Continuer avec",
+    "orDivider": "Ou continuer avec l'e-mail"
   },
   "privacy": {
     "title": "Politique de Confidentialité",
