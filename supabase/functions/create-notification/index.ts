@@ -41,6 +41,20 @@ serve(async (req) => {
       );
     }
 
+    // Verify user has a role assigned (server-side validation)
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (roleError || !roleData) {
+      return new Response(
+        JSON.stringify({ error: 'User role not found. Please complete registration.' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { userId, title, message, type, link } = await req.json();
 
     if (!userId || !title || !message) {
