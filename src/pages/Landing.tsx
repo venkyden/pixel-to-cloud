@@ -56,19 +56,29 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/30 to-background" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse floating" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
       {/* Navigation */}
-      <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <nav className="sticky top-0 z-50 border-b border-border/50 backdrop-blur-xl bg-background/70 supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Home className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold text-foreground">{t("landing.title")}</span>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
+              <Home className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{t("landing.title")}</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate("/auth")}>
+            <Button variant="ghost" onClick={() => navigate("/auth")} className="hover:bg-muted/50 transition-all duration-300">
               {t("landing.login")}
             </Button>
-            <Button onClick={() => navigate("/auth")}>
+            <Button onClick={() => navigate("/auth")} className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg">
               {t("landing.getStarted")}
             </Button>
           </div>
@@ -76,23 +86,28 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="flex-1 flex items-center justify-center py-20 px-4 bg-gradient-to-b from-background to-muted/20">
-        <div className="container mx-auto text-center space-y-8 animate-fade-in">
-          <div className="space-y-4">
+      <section className="flex-1 flex items-center justify-center py-20 px-4 relative">
+        <div className="container mx-auto text-center space-y-8">
+          <div className="space-y-6 animate-fade-in">
+            <div className="inline-block px-4 py-2 rounded-full glass-effect mb-4">
+              <span className="text-sm font-medium text-primary">✨ The Future of Rental Management</span>
+            </div>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground tracking-tight">
               {t("landing.title")}
               <br />
-              <span className="text-primary">{t("landing.tagline")}</span>
+              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
+                {t("landing.tagline")}
+              </span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {t("landing.subtitle")}
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <Button 
               size="lg" 
-              className="text-lg h-14 px-8"
+              className="text-lg h-14 px-8 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-elegant hover:shadow-lg hover:scale-105"
               onClick={() => navigate("/auth")}
             >
               {t("landing.startFree")}
@@ -101,7 +116,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               variant="outline"
-              className="text-lg h-14 px-8"
+              className="text-lg h-14 px-8 glass-effect hover:bg-muted/50 transition-all duration-300 hover:scale-105"
               onClick={() => navigate("/auth")}
             >
               {t("landing.howItWorks")}
@@ -109,17 +124,17 @@ export default function Landing() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12 max-w-4xl mx-auto">
             {stats.map((stat, index) => (
               <div 
                 key={index} 
-                className="space-y-2 animate-fade-in"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="glass-effect p-6 rounded-2xl space-y-2 animate-fade-in hover:scale-105 transition-all duration-300 shadow-md hover:shadow-elegant"
+                style={{ animationDelay: `${0.3 + index * 0.1}s` }}
               >
-                <div className="text-4xl md:text-5xl font-bold text-primary">
+                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                   {stat.value}
                 </div>
-                <div className="text-muted-foreground">{stat.label}</div>
+                <div className="text-muted-foreground font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -127,9 +142,12 @@ export default function Landing() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-20 px-4 relative">
         <div className="container mx-auto space-y-12">
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-4 animate-fade-in">
+            <div className="inline-block px-4 py-2 rounded-full glass-effect mb-2">
+              <span className="text-sm font-medium text-primary">💎 Premium Features</span>
+            </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
               {t("landing.featuresTitle")}
             </h2>
@@ -142,16 +160,16 @@ export default function Landing() {
             {features.map((feature, index) => (
               <Card 
                 key={index}
-                className="p-6 space-y-4 hover-scale cursor-pointer transition-all hover:shadow-lg animate-fade-in"
+                className="p-6 space-y-4 cursor-pointer transition-all duration-300 hover:shadow-elegant animate-fade-in group glass-effect hover:scale-105 border-border/50"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <feature.icon className="h-6 w-6 text-primary" />
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:from-primary/30 group-hover:to-accent/30 transition-all duration-300 shadow-md">
+                  <feature.icon className="h-7 w-7 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground leading-relaxed">
                   {feature.description}
                 </p>
               </Card>
@@ -161,31 +179,34 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-background to-primary/5">
+      <section className="py-20 px-4 relative">
         <div className="container mx-auto">
-          <Card className="p-12 text-center space-y-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
-              {t("landing.ctaTitle")}
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t("landing.ctaSubtitle")}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-              <Button 
-                size="lg" 
-                className="text-lg h-14 px-8"
-                onClick={() => navigate("/auth")}
-              >
-                {t("landing.createAccount")}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+          <Card className="p-12 md:p-16 text-center space-y-8 glass-effect border-primary/20 shadow-elegant relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 animate-gradient" />
+            <div className="relative z-10 space-y-6">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
+                {t("landing.ctaTitle")}
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                {t("landing.ctaSubtitle")}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+                <Button 
+                  size="lg" 
+                  className="text-lg h-14 px-8 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-elegant hover:shadow-lg hover:scale-105"
+                  onClick={() => navigate("/auth")}
+                >
+                  {t("landing.createAccount")}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
             </div>
           </Card>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-muted/30 py-12 px-4">
+      <footer className="border-t border-border/50 backdrop-blur-xl bg-background/70 py-12 px-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-4">

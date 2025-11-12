@@ -45,29 +45,41 @@ export default function RoleSelection() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/30 to-background" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse floating" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
       {/* Header */}
-      <nav className="border-b border-border bg-background/95 backdrop-blur">
+      <nav className="sticky top-0 z-50 border-b border-border/50 backdrop-blur-xl bg-background/70">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <button onClick={() => navigate("/")} className="flex items-center gap-2">
-            <Home className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold text-foreground">Roomivo</span>
+          <button onClick={() => navigate("/")} className="flex items-center gap-2 transition-transform hover:scale-105">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
+              <Home className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Roomivo</span>
           </button>
-          <Button variant="ghost" onClick={() => navigate("/profile")}>
+          <Button variant="ghost" onClick={() => navigate("/profile")} className="hover:bg-muted/50 transition-all duration-300">
             {t("roleSelection.myProfile")}
           </Button>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <main className="flex-1 container mx-auto px-4 py-12 relative">
         <div className="max-w-5xl mx-auto space-y-8">
           {/* Hero Section */}
-          <div className="text-center space-y-4 animate-fade-in">
+          <div className="text-center space-y-6 animate-fade-in">
+            <div className="inline-block px-4 py-2 rounded-full glass-effect mb-2">
+              <span className="text-sm font-medium text-primary">🎯 Choose Your Path</span>
+            </div>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground">
               {t("roleSelection.title")}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {t("roleSelection.subtitle")}
             </p>
           </div>
@@ -75,9 +87,9 @@ export default function RoleSelection() {
           {/* Role Cards */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* Tenant Card */}
-            <Card className="hover-scale cursor-pointer transition-all hover:shadow-xl animate-fade-in group">
+            <Card className="cursor-pointer transition-all duration-300 hover:shadow-elegant animate-fade-in group glass-effect border-border/50 hover:scale-105">
               <CardHeader className="text-center pb-4">
-                <div className="w-20 h-20 rounded-full bg-primary/10 mx-auto flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 mx-auto flex items-center justify-center mb-4 group-hover:from-primary/30 group-hover:to-accent/30 transition-all duration-300 shadow-md">
                   <Users className="w-10 h-10 text-primary" />
                 </div>
                 <CardTitle className="text-2xl">{t("roleSelection.tenantTitle")}</CardTitle>
@@ -111,7 +123,7 @@ export default function RoleSelection() {
                 </div>
                 <Button 
                   onClick={() => handleRoleSelection("tenant")}
-                  className="w-full" 
+                  className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
                   size="lg"
                 >
                   {t("roleSelection.tenantCta")}
@@ -121,9 +133,9 @@ export default function RoleSelection() {
             </Card>
 
             {/* Landlord Card */}
-            <Card className="hover-scale cursor-pointer transition-all hover:shadow-xl animate-fade-in group" style={{ animationDelay: "0.1s" }}>
+            <Card className="cursor-pointer transition-all duration-300 hover:shadow-elegant animate-fade-in group glass-effect border-border/50 hover:scale-105" style={{ animationDelay: "0.1s" }}>
               <CardHeader className="text-center pb-4">
-                <div className="w-20 h-20 rounded-full bg-secondary/10 mx-auto flex items-center justify-center mb-4 group-hover:bg-secondary/20 transition-colors">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/10 mx-auto flex items-center justify-center mb-4 group-hover:from-secondary/30 group-hover:to-secondary/20 transition-all duration-300 shadow-md">
                   <Key className="w-10 h-10 text-secondary" />
                 </div>
                 <CardTitle className="text-2xl">{t("roleSelection.landlordTitle")}</CardTitle>
@@ -157,9 +169,8 @@ export default function RoleSelection() {
                 </div>
                 <Button 
                   onClick={() => handleRoleSelection("landlord")}
-                  className="w-full" 
+                  className="w-full bg-gradient-to-r from-secondary to-secondary/80 hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
                   size="lg"
-                  variant="secondary"
                 >
                   {t("roleSelection.landlordCta")}
                   <ArrowRight className="w-4 h-4 ml-2" />

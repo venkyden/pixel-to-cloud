@@ -22,25 +22,31 @@ export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 backdrop-blur-xl bg-background/70 shadow-sm">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
-          <Home className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold text-foreground">Roomivo</span>
+        <Link to="/" className="flex items-center space-x-2 transition-transform hover:scale-105">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
+            <Home className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Roomivo</span>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6">
-          <Link to="/properties" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/properties" className="text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative group">
             {t("header.properties")}
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative group">
             {t("header.dashboard")}
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link to="/incidents" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/incidents" className="text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative group">
             {t("header.incidents")}
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link to="/messages" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/messages" className="text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative group">
             {t("header.messages")}
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full"></span>
           </Link>
         </nav>
 
@@ -54,7 +60,7 @@ export const Header = () => {
                 <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 glass-effect border-border/50 shadow-elegant">
               <DropdownMenuLabel>{t("header.myAccount")}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate("/profile")}>
@@ -84,7 +90,7 @@ export const Header = () => {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t bg-background">
+        <div className="md:hidden border-t border-border/50 backdrop-blur-xl bg-background/90">
           <nav className="container py-4 flex flex-col space-y-3">
             <Link to="/properties" className="text-sm font-medium text-muted-foreground hover:text-foreground">
               {t("header.properties")}
