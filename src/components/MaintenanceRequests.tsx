@@ -202,21 +202,22 @@ export const MaintenanceRequests = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="glass-effect border-border/50 shadow-elegant overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      <CardHeader className="relative">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Wrench className="h-5 w-5" />
+            <Wrench className="h-5 w-5 text-primary" />
             Maintenance Requests
           </CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button disabled={properties.length === 0}>
+              <Button disabled={properties.length === 0} className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg">
                 <Plus className="mr-2 h-4 w-4" />
                 New Request
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="glass-effect border-border/50 shadow-elegant">
               <DialogHeader>
                 <DialogTitle>Submit Maintenance Request</DialogTitle>
               </DialogHeader>
@@ -284,21 +285,24 @@ export const MaintenanceRequests = () => {
           </Dialog>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin" />
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : incidents.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">
-            {properties.length === 0 
-              ? "You need to add properties first to create maintenance requests"
-              : "No maintenance requests yet"}
-          </p>
+          <div className="text-center glass-effect rounded-xl border border-border/50 p-8">
+            <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground font-medium">
+              {properties.length === 0 
+                ? "You need to add properties first to create maintenance requests"
+                : "No maintenance requests yet"}
+            </p>
+          </div>
         ) : (
           <div className="space-y-4">
             {incidents.map((incident) => (
-              <div key={incident.id} className="p-4 border rounded-lg space-y-2">
+              <div key={incident.id} className="p-4 glass-effect border border-border/50 rounded-xl space-y-2 hover:shadow-elegant hover:scale-[1.02] transition-all duration-300 animate-fade-in">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <h4 className="font-semibold text-foreground">{incident.title}</h4>

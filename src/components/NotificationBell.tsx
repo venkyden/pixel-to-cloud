@@ -172,30 +172,33 @@ export const NotificationBell = () => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative hover:bg-primary/10 transition-all duration-300">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-gradient-to-r from-destructive to-destructive/80 shadow-md animate-pulse"
             >
               {unreadCount}
             </Badge>
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
+      <PopoverContent className="w-80 glass-effect border-border/50 shadow-elegant" align="end">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-foreground">Notifications</h3>
+          <h3 className="font-semibold text-foreground flex items-center gap-2">
+            <Bell className="h-4 w-4 text-primary" />
+            Notifications
+          </h3>
           <div className="flex gap-2">
             {unreadCount > 0 && (
               <>
-                <Badge variant="secondary">{unreadCount} new</Badge>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">{unreadCount} new</Badge>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={markAllAsRead}
-                  className="h-6 text-xs"
+                  className="h-6 text-xs hover:bg-primary/10 hover:text-primary transition-all duration-300"
                 >
                   Mark all read
                 </Button>
@@ -205,8 +208,9 @@ export const NotificationBell = () => {
         </div>
         <ScrollArea className="h-[400px]">
           {notifications.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground text-sm">
-              No notifications yet
+            <div className="text-center py-8 glass-effect rounded-xl border border-border/50 p-6">
+              <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+              <p className="text-sm text-muted-foreground font-medium">No notifications yet</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -214,8 +218,8 @@ export const NotificationBell = () => {
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`p-3 rounded-lg border transition-colors cursor-pointer hover:bg-muted/50 ${
-                    !notification.read ? "bg-muted/20 border-primary/20" : ""
+                  className={`p-3 rounded-lg border transition-all duration-300 cursor-pointer hover:shadow-md hover:scale-[1.02] animate-fade-in ${
+                    !notification.read ? "glass-effect border-primary/30 bg-primary/5" : "border-border/50"
                   }`}
                 >
                   <div className="flex items-start space-x-3">
