@@ -138,13 +138,20 @@ export default function Properties() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/30 to-background" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse floating" />
+        <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }} />
+      </div>
+
       <Header />
-      <main className="flex-1 container py-8">
-        <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 container py-8 relative">
+        <div className="flex items-center justify-between mb-8 animate-fade-in">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Available Properties</h1>
-            <p className="text-muted-foreground">{displayProperties.length} properties found</p>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">Available Properties</h1>
+            <p className="text-muted-foreground text-lg">{displayProperties.length} properties found</p>
           </div>
           <div className="flex gap-2">
             <SavedSearches onLoadSearch={setFilters} />
@@ -156,6 +163,7 @@ export default function Properties() {
             <Button
               variant={compareMode ? "default" : "outline"}
               onClick={() => setCompareMode(!compareMode)}
+              className="glass-effect hover:scale-105 transition-all duration-300"
             >
               <GitCompare className="mr-2 h-4 w-4" />
               Compare ({selectedForComparison.length})
@@ -164,41 +172,49 @@ export default function Properties() {
         </div>
 
         {compareMode && selectedForComparison.length > 1 && (
-          <div className="mb-6">
+          <div className="mb-6 animate-fade-in">
             <ComparisonTable properties={selectedForComparison} />
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-1">
-            <FilterSidebar />
+            <div className="glass-effect rounded-2xl p-6 sticky top-24">
+              <FilterSidebar />
+            </div>
           </div>
 
           <div className="lg:col-span-3">
-            <AIPropertySearch 
-              properties={properties} 
-              onSearchResults={handleAISearchResults}
-            />
+            <div className="mb-6">
+              <AIPropertySearch 
+                properties={properties} 
+                onSearchResults={handleAISearchResults}
+              />
+            </div>
             {displayProperties.length === 0 ? (
-              <p className="text-muted-foreground">No properties available yet.</p>
+              <div className="glass-effect rounded-2xl p-12 text-center">
+                <p className="text-muted-foreground text-lg">No properties available yet.</p>
+              </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {displayProperties.map((property) => (
-                  <div key={property.id} className="relative">
+                  <div key={property.id} className="relative animate-fade-in group">
                     {compareMode && (
                       <div className="absolute top-4 right-4 z-10">
                         <input
                           type="checkbox"
                           checked={!!selectedForComparison.find((p) => p.id === property.id)}
                           onChange={() => toggleCompareSelection(property)}
-                          className="w-5 h-5"
+                          className="w-5 h-5 rounded glass-effect"
                         />
                       </div>
                     )}
-                    <PropertyCard
-                      property={property}
-                      onSelect={() => !compareMode && setSelectedProperty(property)}
-                    />
+                    <div className="glass-effect rounded-2xl overflow-hidden hover:shadow-elegant transition-all duration-300 hover:scale-105">
+                      <PropertyCard
+                        property={property}
+                        onSelect={() => !compareMode && setSelectedProperty(property)}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -207,18 +223,18 @@ export default function Properties() {
         </div>
 
         <Dialog open={!!selectedProperty} onOpenChange={() => setSelectedProperty(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass-effect border-border/50">
             {selectedProperty && (
               <>
                 <DialogHeader>
-                  <DialogTitle>{selectedProperty.name}</DialogTitle>
+                  <DialogTitle className="text-2xl font-bold">{selectedProperty.name}</DialogTitle>
                 </DialogHeader>
                 <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="gallery">Gallery</TabsTrigger>
-                    <TabsTrigger value="location">Location</TabsTrigger>
-                    <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-4 glass-effect p-1">
+                    <TabsTrigger value="overview" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">Overview</TabsTrigger>
+                    <TabsTrigger value="gallery" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">Gallery</TabsTrigger>
+                    <TabsTrigger value="location" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">Location</TabsTrigger>
+                    <TabsTrigger value="reviews" className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">Reviews</TabsTrigger>
                   </TabsList>
                   <TabsContent value="overview" className="space-y-4">
                     <div>

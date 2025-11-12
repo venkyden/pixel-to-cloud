@@ -135,18 +135,25 @@ export default function Messages() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/30 to-background" />
+        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse floating" />
+        <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
       <Header />
-      <main className="flex-1 container py-8">
+      <main className="flex-1 container py-8 relative">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
-          <Card className="lg:col-span-1 flex flex-col">
-            <div className="p-4 border-b">
-              <h2 className="text-xl font-bold text-foreground mb-4">Messages</h2>
+          <Card className="lg:col-span-1 flex flex-col glass-effect border-border/50 shadow-elegant animate-fade-in">
+            <div className="p-6 border-b border-border/50">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">Messages</h2>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
                   placeholder="Search conversations..." 
-                  className="pl-10"
+                  className="pl-10 glass-effect border-border/50 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -155,24 +162,28 @@ export default function Messages() {
             <div className="flex-1 overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center h-32">
-                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 </div>
               ) : filteredConversations.length === 0 ? (
-                <div className="p-4 text-center text-muted-foreground">
-                  {searchTerm ? "No conversations found" : "No messages yet"}
+                <div className="p-6 text-center">
+                  <p className="text-muted-foreground text-lg">
+                    {searchTerm ? "No conversations found" : "No messages yet"}
+                  </p>
                 </div>
               ) : (
                 filteredConversations.map((conversation) => (
                   <div
                     key={conversation.id}
-                    className={`p-4 border-b cursor-pointer transition-colors hover:bg-muted/50 ${
-                      selectedConversation?.id === conversation.id ? "bg-muted" : ""
+                    className={`p-4 border-b border-border/50 cursor-pointer transition-all duration-300 hover:bg-muted/50 ${
+                      selectedConversation?.id === conversation.id ? "bg-muted/70" : ""
                     }`}
                     onClick={() => setSelectedConversation(conversation)}
                   >
                     <div className="flex items-start space-x-3">
-                      <Avatar>
-                        <AvatarFallback>{conversation.other_user_name.charAt(0)}</AvatarFallback>
+                      <Avatar className="ring-2 ring-primary/20">
+                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20">
+                          {conversation.other_user_name.charAt(0)}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
@@ -187,7 +198,7 @@ export default function Messages() {
                         <div className="flex items-center justify-between">
                           <p className="text-sm text-muted-foreground truncate">{conversation.last_message}</p>
                           {conversation.unread_count > 0 && (
-                            <Badge variant="default" className="ml-2">
+                            <Badge variant="default" className="ml-2 bg-gradient-to-r from-primary to-accent">
                               {conversation.unread_count}
                             </Badge>
                           )}
@@ -200,17 +211,19 @@ export default function Messages() {
             </div>
           </Card>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: '0.1s' }}>
             {selectedConversation ? (
-              <MessageThread
-                recipientId={selectedConversation.other_user_id}
-                recipientName={selectedConversation.other_user_name}
-                propertyId={selectedConversation.property_id}
-                propertyName={selectedConversation.property_name}
-              />
+              <div className="glass-effect rounded-2xl border-border/50 shadow-elegant">
+                <MessageThread
+                  recipientId={selectedConversation.other_user_id}
+                  recipientName={selectedConversation.other_user_name}
+                  propertyId={selectedConversation.property_id}
+                  propertyName={selectedConversation.property_name}
+                />
+              </div>
             ) : (
-              <Card className="flex items-center justify-center h-[600px]">
-                <p className="text-muted-foreground">Select a conversation to start messaging</p>
+              <Card className="flex items-center justify-center h-[600px] glass-effect border-border/50 shadow-elegant">
+                <p className="text-muted-foreground text-lg">Select a conversation to start messaging</p>
               </Card>
             )}
           </div>

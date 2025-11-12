@@ -192,27 +192,34 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/30 to-background" />
+        <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse floating" />
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
       <Header />
-      <main className="flex-1 container py-8">
+      <main className="flex-1 container py-8 relative">
         <div className="max-w-4xl mx-auto space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">{t("profile.title")}</h1>
-            <p className="text-muted-foreground">{t("profile.subtitle")}</p>
+          <div className="animate-fade-in">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">{t("profile.title")}</h1>
+            <p className="text-muted-foreground text-lg">{t("profile.subtitle")}</p>
           </div>
 
-          <Card>
+          <Card className="glass-effect border-border/50 shadow-elegant animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <CardHeader>
-              <CardTitle>{t("profile.personalInfo")}</CardTitle>
+              <CardTitle className="text-2xl">{t("profile.personalInfo")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center space-x-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarFallback className="text-2xl">
+                <Avatar className="h-24 w-24 ring-4 ring-primary/20">
+                  <AvatarFallback className="text-2xl bg-gradient-to-br from-primary/20 to-accent/20">
                     {formData.first_name?.[0]}{formData.last_name?.[0]}
                   </AvatarFallback>
                 </Avatar>
-                <Button variant="outline">{t("profile.changePhoto")}</Button>
+                <Button variant="outline" className="glass-effect hover:scale-105 transition-all duration-300">{t("profile.changePhoto")}</Button>
               </div>
 
               {loading ? (
@@ -273,7 +280,7 @@ export default function Profile() {
                   </div>
 
                   <Button 
-                    className="w-full md:w-auto" 
+                    className="w-full md:w-auto bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
                     onClick={handleSaveProfile}
                     disabled={saving}
                   >
@@ -285,9 +292,9 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-effect border-border/50 shadow-elegant animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <CardHeader>
-              <CardTitle>{t("profile.security")}</CardTitle>
+              <CardTitle className="text-2xl">{t("profile.security")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -327,11 +334,11 @@ export default function Profile() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-effect border-border/50 shadow-elegant animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Shield className="w-5 h-5 text-primary" />
-                <CardTitle>{t("profile.gdprManagement")}</CardTitle>
+                <CardTitle className="text-2xl">{t("profile.gdprManagement")}</CardTitle>
               </div>
               <CardDescription>
                 {t("profile.gdprDescription")}
