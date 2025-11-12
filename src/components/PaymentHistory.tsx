@@ -14,6 +14,7 @@ import { Download, CreditCard, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Payment {
   id: string;
@@ -30,6 +31,7 @@ export const PaymentHistory = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (user) {
@@ -72,8 +74,8 @@ export const PaymentHistory = () => {
 
   const handleDownloadReceipt = (paymentId: string) => {
     toast({
-      title: "Download Started",
-      description: "Your receipt is being downloaded",
+      title: t("payment.downloadStarted"),
+      description: t("payment.downloadMessage"),
     });
     // TODO: Implement actual receipt download
   };
@@ -82,7 +84,7 @@ export const PaymentHistory = () => {
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">Please log in to view payment history</p>
+          <p className="text-center text-muted-foreground">{t("payment.loginRequired")}</p>
         </CardContent>
       </Card>
     );
@@ -93,7 +95,7 @@ export const PaymentHistory = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CreditCard className="h-5 w-5" />
-          Payment History
+          {t("payment.title")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -102,16 +104,16 @@ export const PaymentHistory = () => {
             <Loader2 className="h-6 w-6 animate-spin" />
           </div>
         ) : payments.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">No payment history available</p>
+          <p className="text-center text-muted-foreground py-8">{t("payment.noHistory")}</p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Receipt</TableHead>
+                <TableHead>{t("payment.date")}</TableHead>
+                <TableHead>{t("payment.description")}</TableHead>
+                <TableHead>{t("payment.amount")}</TableHead>
+                <TableHead>{t("payment.status")}</TableHead>
+                <TableHead>{t("payment.receipt")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -120,9 +122,9 @@ export const PaymentHistory = () => {
                   <TableCell>
                     {payment.payment_date 
                       ? new Date(payment.payment_date).toLocaleDateString()
-                      : 'N/A'}
+                      : "N/A"}
                   </TableCell>
-                  <TableCell>{payment.description || 'Payment'}</TableCell>
+                  <TableCell>{payment.description || t("payment.defaultDescription")}</TableCell>
                   <TableCell className="font-semibold">
                     {payment.currency}{Number(payment.amount).toFixed(2)}
                   </TableCell>

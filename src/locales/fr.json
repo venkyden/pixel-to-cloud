@@ -417,5 +417,122 @@
       "generatedSuccess": "Le document de fin de bail a été créé avec succès.",
       "legalCompliance": "Document conforme aux Articles 12, 15 et 22 de la loi n°89-462 du 6 juillet 1989"
     }
+  },
+  "contract": {
+    "title": "Contrat de Location",
+    "subtitle": "Conforme Loi du 6 juillet 1989",
+    "heading": "BAIL D'HABITATION (Loi n°89-462 du 6 juillet 1989)",
+    "landlord": "Le Bailleur :",
+    "landlordPlaceholder": "[Nom du propriétaire]",
+    "tenant": "Le Locataire :",
+    "tenantPlaceholder": "[Nom du locataire]",
+    "property": "Le Logement :",
+    "monthlyRent": "Loyer mensuel (hors charges) :",
+    "deposit": "Dépôt de garantie :",
+    "depositCap": "(plafonné à 1 mois de loyer - Art. 22 loi 1989)",
+    "startDate": "Date d'effet du bail :",
+    "durationTitle": "Durée et renouvellement :",
+    "duration1": "Durée : 3 ans minimum (bailleur personne physique) - Art. 10 loi 1989",
+    "duration2": "Tacite reconduction sauf congé dans les formes légales",
+    "duration3": "Préavis locataire : 3 mois (1 mois en zone tendue) - Art. 12",
+    "duration4": "Préavis bailleur : 6 mois pour motif légitime uniquement - Art. 15",
+    "tenantObligationsTitle": "Obligations du locataire :",
+    "tenantObligation1": "Assurance habitation obligatoire (risques locatifs) - Art. 7",
+    "tenantObligation2": "Paiement du loyer et des charges au 1er de chaque mois",
+    "tenantObligation3": "Entretien courant et réparations locatives - Art. 7",
+    "tenantObligation4": "Jouir paisiblement du logement (bon père de famille)",
+    "landlordObligationsTitle": "Obligations du bailleur :",
+    "landlordObligation1": "Délivrer un logement décent (décret n°2002-120) - Art. 6",
+    "landlordObligation2": "Assurer les réparations autres que locatives - Art. 6",
+    "landlordObligation3": "Ne pas s'opposer aux aménagements du locataire",
+    "landlordObligation4": "Respecter le droit au maintien dans les lieux",
+    "diagnosticsTitle": "Diagnostics techniques annexés :",
+    "diagnostic1": "Diagnostic de Performance Énergétique (DPE) - Obligatoire",
+    "diagnostic2": "Constat de Risque d'Exposition au Plomb (CREP) si avant 1949",
+    "diagnostic3": "État d'amiante si permis avant 1997",
+    "diagnostic4": "État des installations gaz et électricité si plus de 15 ans",
+    "diagnostic5": "État des Risques Naturels et Technologiques (ERNT)",
+    "compliance": "⚖️ Bail conforme à la loi n°89-462 du 6 juillet 1989, à la loi ALUR, et au décret n°87-713 fixant la liste des clauses obligatoires et interdites.",
+    "signElectronically": "Signer électroniquement",
+    "downloadPDF": "Télécharger PDF",
+    "electronicSignatureNote": "La signature électronique a la même valeur juridique qu'une signature manuscrite (Règlement eIDAS)"
+  },
+  "property": {
+    "perMonth": "par mois",
+    "rooms": "pièces",
+    "viewDetails": "Voir Détails",
+    "match": "Compatible",
+    "verified": "Vérifié",
+    "pending": "En attente",
+    "rejected": "Refusé"
+  },
+  "messages": {
+    "invalidMessage": "Message invalide",
+    "messageTooLong": "Message trop long",
+    "sendMessage": "Envoyer le message"
+  },
+  "maintenance": {
+    "authRequired": "Authentification requise",
+    "mustBeLoggedIn": "Vous devez être connecté pour soumettre une demande",
+    "invalidProperty": "Propriété invalide",
+    "requestSubmitted": "Demande Soumise",
+    "requestSuccess": "Votre demande de maintenance a été soumise avec succès",
+    "validationError": "Erreur de validation",
+    "selectProperty": "Sélectionner une propriété",
+    "recordingStarted": "Enregistrement démarré",
+    "missingInfo": "Informations manquantes",
+    "fillAllFields": "Veuillez remplir tous les champs requis",
+    "uploadSuccessful": "Téléchargement réussi",
+    "uploadFailed": "Échec du téléchargement"
+  },
+  "invoice": {
+    "title": "Générer une Facture",
+    "generated": "Facture Générée",
+    "success": "Votre facture a été créée et est prête à télécharger.",
+    "selectProperty": "Sélectionner une propriété"
+  },
+  "payment": {
+    "downloadStarted": "Téléchargement Démarré",
+    "downloadMessage": "Votre historique de paiement est en cours de téléchargement",
+    "title": "Historique des Paiements",
+    "loginRequired": "Veuillez vous connecter pour voir l'historique des paiements",
+    "noHistory": "Aucun historique de paiement disponible",
+    "date": "Date",
+    "description": "Description",
+    "amount": "Montant",
+    "status": "Statut",
+    "receipt": "Reçu",
+    "defaultDescription": "Paiement"
+  },
+  "savedSearches": {
+    "loaded": "Recherche chargée",
+    "deleted": "Recherche supprimée"
+  },
+  "verification": {
+    "notAuthenticated": "Non authentifié",
+    "namePlaceholder": "Jean Dupont",
+    "submitting": "Envoi en cours...",
+    "completeVerification": "Terminer la Vérification"
+  },
+  "analytics": {
+    "totalRevenue": "Revenu Total",
+    "activeTenants": "Locataires Actifs",
+    "occupancyRate": "Taux d'Occupation"
+  },
+  "comparison": {
+    "petFriendly": "Animaux Acceptés"
+  },
+  "contactForm": {
+    "validationError": "Erreur de Validation"
+  },
+  "filter": {
+    "petFriendly": "Animaux Acceptés",
+    "parking": "Parking",
+    "gym": "Salle de Sport",
+    "pool": "Piscine",
+    "laundry": "Buanderie"
+  },
+  "landlord": {
+    "applicationRejected": "Candidature refusée"
   }
 }

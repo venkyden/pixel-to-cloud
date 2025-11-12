@@ -27,14 +27,14 @@ export const PropertyCard = ({ property, onSelect }: PropertyCardProps) => {
           <div className="text-2xl font-bold text-primary">
             {property.currency}{property.price}
           </div>
-          <div className="text-xs text-muted-foreground">per month</div>
+          <div className="text-xs text-muted-foreground">{t("property.perMonth")}</div>
         </div>
       </div>
 
       <div className="mb-4">
         <Badge variant="secondary" className="bg-success/10 text-success border-success/20">
           <TrendingUp className="w-3 h-3 mr-1" />
-          {property.match_score}% Match
+          {property.match_score}% {t("property.match")}
         </Badge>
       </div>
 
@@ -43,7 +43,7 @@ export const PropertyCard = ({ property, onSelect }: PropertyCardProps) => {
       <div className="flex flex-wrap gap-2 mb-4">
         <Badge variant="outline" className="text-xs">
           <Home className="w-3 h-3 mr-1" />
-          {property.rooms} rooms
+          {property.rooms} {t("property.rooms")}
         </Badge>
         {property.amenities.map((amenity) => (
           <Badge key={amenity} variant="outline" className="text-xs">
@@ -57,7 +57,7 @@ export const PropertyCard = ({ property, onSelect }: PropertyCardProps) => {
           <Shield className="w-4 h-4 text-success" />
           <span className="text-xs text-success font-medium">{property.legal_status}</span>
         </div>
-        <Button onClick={() => onSelect(property)}>View Details</Button>
+        <Button onClick={() => onSelect(property)}>{t("property.viewDetails")}</Button>
       </div>
     </Card>
   );

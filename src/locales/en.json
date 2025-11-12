@@ -417,5 +417,122 @@
       "generatedSuccess": "The end of lease document has been created successfully.",
       "legalCompliance": "Document compliant with Articles 12, 15 and 22 of Law No. 89-462 of July 6, 1989"
     }
+  },
+  "contract": {
+    "title": "Rental Contract",
+    "subtitle": "Compliant with Law of July 6, 1989",
+    "heading": "RESIDENTIAL LEASE (Law No. 89-462 of July 6, 1989)",
+    "landlord": "The Landlord:",
+    "landlordPlaceholder": "[Landlord name]",
+    "tenant": "The Tenant:",
+    "tenantPlaceholder": "[Tenant name]",
+    "property": "The Property:",
+    "monthlyRent": "Monthly rent (excluding charges):",
+    "deposit": "Security deposit:",
+    "depositCap": "(capped at 1 month rent - Art. 22 law 1989)",
+    "startDate": "Lease effective date:",
+    "durationTitle": "Duration and renewal:",
+    "duration1": "Duration: 3 years minimum (individual landlord) - Art. 10 law 1989",
+    "duration2": "Automatic renewal unless notice in legal form",
+    "duration3": "Tenant notice: 3 months (1 month in tense zone) - Art. 12",
+    "duration4": "Landlord notice: 6 months for legitimate reason only - Art. 15",
+    "tenantObligationsTitle": "Tenant obligations:",
+    "tenantObligation1": "Mandatory home insurance (rental risks) - Art. 7",
+    "tenantObligation2": "Payment of rent and charges on the 1st of each month",
+    "tenantObligation3": "Current maintenance and tenant repairs - Art. 7",
+    "tenantObligation4": "Peaceful enjoyment of the property (good father of family)",
+    "landlordObligationsTitle": "Landlord obligations:",
+    "landlordObligation1": "Deliver decent housing (decree no. 2002-120) - Art. 6",
+    "landlordObligation2": "Ensure repairs other than tenant repairs - Art. 6",
+    "landlordObligation3": "Not oppose tenant improvements",
+    "landlordObligation4": "Respect right to remain in the premises",
+    "diagnosticsTitle": "Attached technical diagnostics:",
+    "diagnostic1": "Energy Performance Diagnosis (DPE) - Mandatory",
+    "diagnostic2": "Lead Exposure Risk Assessment (CREP) if before 1949",
+    "diagnostic3": "Asbestos report if permit before 1997",
+    "diagnostic4": "Gas and electrical installations if over 15 years",
+    "diagnostic5": "Natural and Technological Risk Assessment (ERNT)",
+    "compliance": "⚖️ Contract compliant with Law No. 89-462 of July 6, 1989, ALUR law, and Decree No. 87-713 establishing the list of mandatory and prohibited clauses.",
+    "signElectronically": "Sign Electronically",
+    "downloadPDF": "Download PDF",
+    "electronicSignatureNote": "Electronic signature has the same legal value as handwritten signature (eIDAS Regulation)"
+  },
+  "property": {
+    "perMonth": "per month",
+    "rooms": "rooms",
+    "viewDetails": "View Details",
+    "match": "Match",
+    "verified": "Verified",
+    "pending": "Pending",
+    "rejected": "Rejected"
+  },
+  "messages": {
+    "invalidMessage": "Invalid message",
+    "messageTooLong": "Message too long",
+    "sendMessage": "Send message"
+  },
+  "maintenance": {
+    "authRequired": "Authentication required",
+    "mustBeLoggedIn": "You must be logged in to submit a request",
+    "invalidProperty": "Invalid property",
+    "requestSubmitted": "Request Submitted",
+    "requestSuccess": "Your maintenance request has been submitted successfully",
+    "validationError": "Validation error",
+    "selectProperty": "Select property",
+    "recordingStarted": "Recording started",
+    "missingInfo": "Missing information",
+    "fillAllFields": "Please fill in all required fields",
+    "uploadSuccessful": "Upload successful",
+    "uploadFailed": "Upload failed"
+  },
+  "invoice": {
+    "title": "Generate Invoice",
+    "generated": "Invoice Generated",
+    "success": "Your invoice has been created and is ready to download.",
+    "selectProperty": "Select property"
+  },
+  "payment": {
+    "downloadStarted": "Download Started",
+    "downloadMessage": "Your payment history is being downloaded",
+    "title": "Payment History",
+    "loginRequired": "Please log in to view payment history",
+    "noHistory": "No payment history available",
+    "date": "Date",
+    "description": "Description",
+    "amount": "Amount",
+    "status": "Status",
+    "receipt": "Receipt",
+    "defaultDescription": "Payment"
+  },
+  "savedSearches": {
+    "loaded": "Search loaded",
+    "deleted": "Search deleted"
+  },
+  "verification": {
+    "notAuthenticated": "Not authenticated",
+    "namePlaceholder": "John Smith",
+    "submitting": "Submitting...",
+    "completeVerification": "Complete Verification"
+  },
+  "analytics": {
+    "totalRevenue": "Total Revenue",
+    "activeTenants": "Active Tenants",
+    "occupancyRate": "Occupancy Rate"
+  },
+  "comparison": {
+    "petFriendly": "Pet Friendly"
+  },
+  "contactForm": {
+    "validationError": "Validation Error"
+  },
+  "filter": {
+    "petFriendly": "Pet Friendly",
+    "parking": "Parking",
+    "gym": "Gym",
+    "pool": "Pool",
+    "laundry": "Laundry"
+  },
+  "landlord": {
+    "applicationRejected": "Application rejected"
   }
 }

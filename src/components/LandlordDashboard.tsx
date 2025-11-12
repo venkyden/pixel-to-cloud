@@ -186,7 +186,7 @@ export const LandlordDashboard = () => {
 
       if (error) throw error;
 
-      toast.success("Application rejected");
+      toast.success(t("landlord.applicationRejected"));
       fetchDashboardData();
     } catch (error) {
       console.error("Error rejecting application:", error);

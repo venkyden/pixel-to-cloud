@@ -5,14 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { FileText, Download } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const InvoiceGenerator = () => {
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleGenerateInvoice = () => {
     toast({
-      title: "Invoice Generated",
-      description: "Your invoice has been created and is ready to download.",
+      title: t("invoice.generated"),
+      description: t("invoice.success"),
     });
   };
 
@@ -21,18 +23,18 @@ export const InvoiceGenerator = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-5 w-5" />
-          Generate Invoice
+          {t("invoice.title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>Invoice Date</Label>
+          <Label>{t("documents.rentReceipt.period")}</Label>
           <Input type="date" />
         </div>
 
         <div className="space-y-2">
-          <Label>Property</Label>
-          <Input placeholder="Select property" />
+          <Label>{t("documents.rentReceipt.propertyAddress")}</Label>
+          <Input placeholder={t("invoice.selectProperty")} />
         </div>
 
         <Separator />
