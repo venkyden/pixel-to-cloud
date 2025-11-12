@@ -21,42 +21,46 @@ export const DocumentVault = () => {
 
   return (
     <>
-    <Card>
-      <CardHeader>
+    <Card className="glass-effect border-border/50 shadow-elegant overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      <CardHeader className="relative">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
+            <FileText className="h-5 w-5 text-primary" />
             Document Vault
           </CardTitle>
-          <Button>
+          <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg">
             <Upload className="mr-2 h-4 w-4" />
             Upload
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         <div className="space-y-3">
           {documents.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">No documents uploaded yet</p>
+            <div className="text-center glass-effect rounded-xl p-8 border border-border/50">
+              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground font-medium">No documents uploaded yet</p>
+            </div>
           ) : (
             documents.map((doc) => (
               <div
                 key={doc.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between p-4 glass-effect border border-border/50 rounded-lg hover:shadow-elegant hover:scale-[1.02] transition-all duration-300 animate-fade-in"
               >
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-primary" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl flex items-center justify-center shadow-md ring-2 ring-primary/10">
+                    <FileText className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">{doc.name}</p>
+                    <p className="font-semibold text-foreground">{doc.name}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-muted-foreground">{doc.size}</span>
+                      <span className="text-xs text-muted-foreground font-medium">{doc.size}</span>
                       <span className="text-xs text-muted-foreground">•</span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground font-medium">
                         {new Date(doc.uploadDate).toLocaleDateString()}
                       </span>
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
                         {doc.category}
                       </Badge>
                     </div>
@@ -67,13 +71,14 @@ export const DocumentVault = () => {
                     variant="ghost" 
                     size="sm"
                     onClick={() => setSelectedDoc(doc)}
+                    className="hover:bg-primary/10 hover:text-primary transition-all duration-300"
                   >
                     <MessageSquare className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="hover:bg-primary/10 hover:text-primary transition-all duration-300">
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="hover:bg-primary/10 hover:text-primary transition-all duration-300">
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>

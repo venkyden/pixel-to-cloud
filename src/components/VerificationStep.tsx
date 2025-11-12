@@ -130,18 +130,19 @@ export const VerificationStep = ({ onVerify }: VerificationStepProps) => {
   };
 
   return (
-    <Card className="p-8 max-w-2xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-          <Shield className="w-6 h-6 text-primary" />
+    <Card className="p-8 max-w-2xl mx-auto glass-effect border-border/50 shadow-elegant overflow-hidden animate-fade-in">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      <div className="relative flex items-center gap-3 mb-6">
+        <div className="w-14 h-14 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl flex items-center justify-center shadow-md ring-2 ring-primary/10">
+          <Shield className="w-7 h-7 text-primary" />
         </div>
         <div>
           <h2 className="text-2xl font-bold text-foreground">Landlord Verification</h2>
-          <p className="text-sm text-muted-foreground">Verify your identity to ensure tenant trust</p>
+          <p className="text-sm text-muted-foreground font-medium">Verify your identity to ensure tenant trust</p>
         </div>
       </div>
 
-      <div className="mb-6 p-4 bg-accent/5 rounded-lg border border-accent/20">
+      <div className="relative mb-6 p-4 glass-effect rounded-xl border border-primary/20 shadow-md">
         <h3 className="font-semibold mb-2 text-foreground">Why Verification Matters</h3>
         <ul className="space-y-2 text-sm text-muted-foreground">
           <li className="flex items-start gap-2">
@@ -229,7 +230,7 @@ export const VerificationStep = ({ onVerify }: VerificationStepProps) => {
           </p>
         </div>
 
-        <Button type="submit" className="w-full" size="lg" disabled={loading}>
+        <Button type="submit" className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" size="lg" disabled={loading}>
           {loading ? "Submitting..." : "Complete Verification"}
           <ArrowRight className="ml-2 w-4 h-4" />
         </Button>

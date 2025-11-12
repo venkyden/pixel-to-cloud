@@ -157,7 +157,7 @@ export const AIChatbot = () => {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:scale-110 transition-transform"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-gradient-to-r from-primary to-accent shadow-elegant hover:scale-110 hover:shadow-glow transition-all duration-300"
         size="icon"
       >
         <Bot className="h-6 w-6" />
@@ -167,12 +167,13 @@ export const AIChatbot = () => {
 
   return (
     <Card 
-      className={`fixed bottom-6 right-6 shadow-2xl transition-all ${
+      className={`fixed bottom-6 right-6 glass-effect border-border/50 shadow-elegant transition-all duration-300 ${
         isMinimized ? "w-80 h-16" : "w-96 h-[600px]"
-      } flex flex-col`}
+      } flex flex-col overflow-hidden`}
     >
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground rounded-t-lg">
+      <div className="relative flex items-center justify-between p-4 border-b border-border/50 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-t-lg shadow-md">
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5" />
           <span className="font-semibold">
@@ -183,7 +184,7 @@ export const AIChatbot = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20 transition-all duration-300"
             onClick={() => setIsMinimized(!isMinimized)}
           >
             {isMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
@@ -191,7 +192,7 @@ export const AIChatbot = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20"
+            className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20 transition-all duration-300"
             onClick={() => setIsOpen(false)}
           >
             <X className="h-4 w-4" />
@@ -202,11 +203,11 @@ export const AIChatbot = () => {
       {!isMinimized && (
         <>
           {/* Messages */}
-          <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+          <ScrollArea className="flex-1 p-4 relative" ref={scrollRef}>
             {messages.length === 0 && (
-              <div className="text-center text-muted-foreground py-8">
-                <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="text-sm">
+              <div className="text-center text-muted-foreground py-8 glass-effect rounded-xl p-6 border border-border/50">
+                <Bot className="h-12 w-12 mx-auto mb-4 text-primary opacity-70" />
+                <p className="text-sm font-medium">
                   {language === "fr"
                     ? "Bonjour ! Je suis votre assistant Roomivo. Comment puis-je vous aider aujourd'hui ?"
                     : "Hello! I'm your Roomivo assistant. How can I help you today?"}
@@ -217,29 +218,29 @@ export const AIChatbot = () => {
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`mb-4 flex ${
+                className={`mb-4 flex animate-fade-in ${
                   message.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                  className={`max-w-[80%] rounded-2xl px-4 py-2 shadow-md transition-all duration-300 hover:scale-[1.02] ${
                     message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "bg-gradient-to-r from-primary to-accent text-primary-foreground"
+                      : "glass-effect border border-border/50"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                 </div>
               </div>
             ))}
             
             {isLoading && (
-              <div className="flex justify-start mb-4">
-                <div className="bg-muted rounded-lg px-4 py-2">
+              <div className="flex justify-start mb-4 animate-fade-in">
+                <div className="glass-effect rounded-2xl px-4 py-2 border border-border/50">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce [animation-delay:0.2s]" />
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce [animation-delay:0.4s]" />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0.4s]" />
                   </div>
                 </div>
               </div>
@@ -247,7 +248,7 @@ export const AIChatbot = () => {
           </ScrollArea>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="p-4 border-t">
+          <form onSubmit={handleSubmit} className="relative p-4 border-t border-border/50 glass-effect">
             <div className="flex gap-2">
               <Input
                 value={input}
@@ -258,9 +259,14 @@ export const AIChatbot = () => {
                     : "Ask your question..."
                 }
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 glass-effect border-border/50 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
               />
-              <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+              <Button 
+                type="submit" 
+                size="icon" 
+                disabled={isLoading || !input.trim()}
+                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+              >
                 <Send className="h-4 w-4" />
               </Button>
             </div>
