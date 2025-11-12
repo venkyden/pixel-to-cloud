@@ -8,53 +8,69 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Roomivo Design System - Teal & Brown Theme */
-    --background: 44 43% 98%;        /* cream-50 */
-    --foreground: 194 51% 15%;       /* slate-900 */
+    /* Roomivo Design System - Enhanced Elegant Theme */
+    --background: 44 43% 98%;
+    --foreground: 194 51% 15%;
 
-    --card: 60 100% 99%;             /* cream-100 */
+    --card: 0 0% 100%;
     --card-foreground: 194 51% 15%;
 
-    --popover: 60 100% 99%;
+    --popover: 0 0% 100%;
     --popover-foreground: 194 51% 15%;
 
-    --primary: 188 62% 34%;          /* teal-500 */
+    --primary: 188 62% 34%;
     --primary-foreground: 44 43% 98%;
 
-    --secondary: 30 19% 30%;         /* brown-600 */
+    --secondary: 30 19% 30%;
     --secondary-foreground: 44 43% 98%;
 
-    --muted: 210 17% 91%;            /* gray-200 */
-    --muted-foreground: 194 11% 43%; /* slate-500 */
+    --muted: 210 17% 96%;
+    --muted-foreground: 194 11% 43%;
 
-    --accent: 188 59% 45%;           /* teal-400 */
+    --accent: 188 59% 45%;
     --accent-foreground: 44 43% 98%;
 
-    --destructive: 350 82% 42%;      /* red-500 */
+    --destructive: 350 82% 42%;
     --destructive-foreground: 44 43% 98%;
 
-    --success: 188 62% 34%;          /* teal-500 */
-    --warning: 19 56% 42%;           /* orange-500 */
+    --success: 188 62% 34%;
+    --warning: 19 56% 42%;
     --info: 194 11% 43%;
 
-    --border: 30 19% 30% / 0.2;      /* brown with opacity */
-    --input: 30 19% 30% / 0.2;
+    --border: 30 19% 30% / 0.1;
+    --input: 30 19% 30% / 0.15;
     --ring: 188 62% 34%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Enhanced Design Tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(188 62% 34%), hsl(188 59% 45%));
+    --gradient-subtle: linear-gradient(180deg, hsl(44 43% 98%), hsl(210 17% 96%));
+    --gradient-overlay: linear-gradient(135deg, hsl(188 62% 34% / 0.05), hsl(188 59% 45% / 0.02));
+    
+    --shadow-sm: 0 1px 2px hsl(194 51% 15% / 0.05);
+    --shadow-md: 0 4px 12px hsl(194 51% 15% / 0.08);
+    --shadow-lg: 0 12px 32px hsl(194 51% 15% / 0.12);
+    --shadow-elegant: 0 8px 24px hsl(188 62% 34% / 0.15);
+    
+    --blur-sm: 8px;
+    --blur-md: 16px;
+    
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   .dark {
-    --background: 180 3% 12%;        /* charcoal-700 */
-    --foreground: 0 0% 96%;          /* gray-200 */
+    --background: 180 3% 12%;
+    --foreground: 0 0% 96%;
 
-    --card: 180 3% 15%;              /* charcoal-800 */
+    --card: 180 3% 15%;
     --card-foreground: 0 0% 96%;
 
     --popover: 180 3% 15%;
     --popover-foreground: 0 0% 96%;
 
-    --primary: 187 60% 49%;          /* teal-300 */
+    --primary: 187 60% 49%;
     --primary-foreground: 194 51% 15%;
 
     --secondary: 180 2% 23%;
@@ -66,7 +82,7 @@ All colors MUST be HSL.
     --accent: 187 60% 49%;
     --accent-foreground: 194 51% 15%;
 
-    --destructive: 0 71% 66%;        /* red-400 */
+    --destructive: 0 71% 66%;
     --destructive-foreground: 0 0% 96%;
 
     --success: 187 60% 49%;
@@ -76,6 +92,15 @@ All colors MUST be HSL.
     --border: 180 2% 23%;
     --input: 180 2% 23%;
     --ring: 187 60% 49%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(187 60% 49%), hsl(187 60% 60%));
+    --gradient-subtle: linear-gradient(180deg, hsl(180 3% 12%), hsl(180 2% 23%));
+    --gradient-overlay: linear-gradient(135deg, hsl(187 60% 49% / 0.1), hsl(187 60% 60% / 0.05));
+    
+    --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.2);
+    --shadow-md: 0 4px 12px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 12px 32px hsl(0 0% 0% / 0.4);
+    --shadow-elegant: 0 8px 24px hsl(187 60% 49% / 0.2);
   }
 }
 
@@ -86,5 +111,53 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(var(--blur-sm));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .dark .glass-effect {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .gradient-border {
+    position: relative;
+  }
+  
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-primary);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 8s ease infinite;
+  }
+  
+  @keyframes gradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  .floating {
+    animation: floating 3s ease-in-out infinite;
+  }
+  
+  @keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
 }

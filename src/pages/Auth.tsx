@@ -204,69 +204,111 @@ export default function Auth() {
 
   if (isPasswordReset) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-        <div className="absolute top-4 right-4">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/30 to-background">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+
+        <div className="absolute top-6 right-6 z-10">
           <LanguageSwitcher />
         </div>
-        
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Reset Your Password</CardTitle>
-            <CardDescription>Enter your new password below</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordReset} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input
-                  id="new-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  minLength={8}
-                />
-                <p className="text-sm text-muted-foreground">
-                  Password must be at least 8 characters
-                </p>
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Update Password"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+
+        <div className="relative min-h-screen flex items-center justify-center p-4">
+          <Card className="w-full max-w-md backdrop-blur-xl bg-card/80 border-border/50 shadow-elegant">
+            <CardHeader className="space-y-1 text-center">
+              <CardTitle className="text-2xl font-semibold">Reset Your Password</CardTitle>
+              <CardDescription>Enter your new password below</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handlePasswordReset} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="new-password" className="text-sm font-medium">New Password</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Password must be at least 8 characters
+                  </p>
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Updating..." : "Update Password"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/30 to-background">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
+      <div className="absolute top-6 right-6 z-10">
         <LanguageSwitcher />
       </div>
-      
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{t("auth.welcome")}</CardTitle>
-          <CardDescription>{t("auth.signInDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">{t("common.signIn")}</TabsTrigger>
-              <TabsTrigger value="signup">{t("common.signUp")}</TabsTrigger>
+
+      <div className="relative min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {/* Logo/Brand Section */}
+          <div className="text-center mb-8 floating">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent mb-4 shadow-lg">
+              <span className="text-3xl font-bold text-primary-foreground">R</span>
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+              {t("auth.welcome")}
+            </h1>
+            <p className="text-muted-foreground">{t("auth.signInDescription")}</p>
+          </div>
+
+          <Card className="backdrop-blur-xl bg-card/80 border-border/50 shadow-elegant transition-all duration-500 hover:shadow-lg">
+            <CardHeader className="space-y-1 pb-4">
+              <CardTitle className="text-2xl font-semibold text-center">Get Started</CardTitle>
+              <CardDescription className="text-center">Choose your preferred method</CardDescription>
+            </CardHeader>
+            <CardContent>
+          <Tabs defaultValue="signin" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1">
+              <TabsTrigger 
+                value="signin"
+                className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300"
+              >
+                {t("common.signIn")}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="signup"
+                className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300"
+              >
+                {t("common.signUp")}
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin">
+            <TabsContent value="signin" className="space-y-6">
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-3">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => handleSocialLogin('google')}
-                    className="w-full"
+                    className="w-full hover:scale-105 transition-transform duration-300 hover:border-primary/50"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -279,7 +321,7 @@ export default function Auth() {
                     type="button"
                     variant="outline"
                     onClick={() => handleSocialLogin('facebook')}
-                    className="w-full"
+                    className="w-full hover:scale-105 transition-transform duration-300 hover:border-primary/50"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -289,7 +331,7 @@ export default function Auth() {
                     type="button"
                     variant="outline"
                     onClick={() => handleSocialLogin('apple')}
-                    className="w-full"
+                    className="w-full hover:scale-105 transition-transform duration-300 hover:border-primary/50"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
@@ -309,24 +351,25 @@ export default function Auth() {
                 </div>
               </div>
 
-              <form onSubmit={handleSignIn} className="space-y-4 mt-4">
+              <form onSubmit={handleSignIn} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">{t("common.email")}</Label>
+                  <Label htmlFor="signin-email" className="text-sm font-medium">{t("common.email")}</Label>
                   <Input
                     id="signin-email"
                     name="email"
                     type="email"
                     placeholder="you@example.com"
                     required
+                    className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="signin-password">{t("common.password")}</Label>
+                    <Label htmlFor="signin-password" className="text-sm font-medium">{t("common.password")}</Label>
                     <Button
                       type="button"
                       variant="link"
-                      className="p-0 h-auto text-sm"
+                      className="p-0 h-auto text-sm hover:text-primary transition-colors"
                       onClick={handleForgotPassword}
                     >
                       Forgot password?
@@ -338,22 +381,27 @@ export default function Auth() {
                     type="password"
                     placeholder="••••••••"
                     required
+                    className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
+                  disabled={isLoading}
+                >
                   {isLoading ? t("auth.signingIn") : t("common.signIn")}
                 </Button>
               </form>
             </TabsContent>
 
-            <TabsContent value="signup">
+            <TabsContent value="signup" className="space-y-6">
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-3">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => handleSocialLogin('google')}
-                    className="w-full"
+                    className="w-full hover:scale-105 transition-transform duration-300 hover:border-primary/50"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -366,7 +414,7 @@ export default function Auth() {
                     type="button"
                     variant="outline"
                     onClick={() => handleSocialLogin('facebook')}
-                    className="w-full"
+                    className="w-full hover:scale-105 transition-transform duration-300 hover:border-primary/50"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -376,7 +424,7 @@ export default function Auth() {
                     type="button"
                     variant="outline"
                     onClick={() => handleSocialLogin('apple')}
-                    className="w-full"
+                    className="w-full hover:scale-105 transition-transform duration-300 hover:border-primary/50"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
@@ -396,41 +444,44 @@ export default function Auth() {
                 </div>
               </div>
 
-              <form onSubmit={handleSignUp} className="space-y-4 mt-4">
+              <form onSubmit={handleSignUp} className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">{t("common.firstName")}</Label>
+                    <Label htmlFor="firstName" className="text-sm font-medium">{t("common.firstName")}</Label>
                     <Input
                       id="firstName"
                       name="firstName"
                       type="text"
                       placeholder="John"
                       required
+                      className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">{t("common.lastName")}</Label>
+                    <Label htmlFor="lastName" className="text-sm font-medium">{t("common.lastName")}</Label>
                     <Input
                       id="lastName"
                       name="lastName"
                       type="text"
                       placeholder="Doe"
                       required
+                      className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">{t("common.email")}</Label>
+                  <Label htmlFor="signup-email" className="text-sm font-medium">{t("common.email")}</Label>
                   <Input
                     id="signup-email"
                     name="email"
                     type="email"
                     placeholder="you@example.com"
                     required
+                    className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">{t("common.password")}</Label>
+                  <Label htmlFor="signup-password" className="text-sm font-medium">{t("common.password")}</Label>
                   <Input
                     id="signup-password"
                     name="password"
@@ -438,14 +489,15 @@ export default function Auth() {
                     placeholder="••••••••"
                     required
                     minLength={6}
+                    className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="role">{t("auth.iAmA")}</Label>
+                  <Label htmlFor="role" className="text-sm font-medium">{t("auth.iAmA")}</Label>
                   <select
                     id="role"
                     name="role"
-                    className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                    className="w-full h-11 px-3 rounded-md border border-input bg-background transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:outline-none"
                     required
                   >
                     <option value="tenant">{t("auth.tenant")}</option>
@@ -500,7 +552,11 @@ export default function Auth() {
                   </div>
                 </div>
                 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
+                  disabled={isLoading}
+                >
                   {isLoading ? t("auth.creatingAccount") : t("auth.createAccount")}
                 </Button>
               </form>
@@ -508,6 +564,8 @@ export default function Auth() {
           </Tabs>
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
   );
 }
