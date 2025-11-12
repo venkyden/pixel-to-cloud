@@ -48,57 +48,72 @@ export const ContactForm = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Mail className="h-5 w-5" />
-          Contact Support
+    <Card className="glass-effect border-border/50 shadow-elegant overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      
+      <CardHeader className="relative">
+        <CardTitle className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+            <Mail className="h-5 w-5 text-primary" />
+          </div>
+          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent font-bold">
+            Contact Support
+          </span>
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="ml-13 text-muted-foreground font-medium">
           Have questions? We're here to help.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <CardContent className="relative">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="text-foreground font-semibold">Name</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
+              className="glass-effect border-border/50 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-foreground font-semibold">Email</Label>
             <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
+              className="glass-effect border-border/50 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="subject">Subject</Label>
+            <Label htmlFor="subject" className="text-foreground font-semibold">Subject</Label>
             <Input
               id="subject"
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
               required
+              className="glass-effect border-border/50 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
+            <Label htmlFor="message" className="text-foreground font-semibold">Message</Label>
             <Textarea
               id="message"
               rows={4}
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               required
+              className="glass-effect border-border/50 focus:ring-2 focus:ring-primary/30 transition-all duration-300 resize-none"
             />
           </div>
-          <Button type="submit" className="w-full">Send Message</Button>
+          <Button 
+            type="submit" 
+            className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"
+          >
+            Send Message
+          </Button>
         </form>
       </CardContent>
     </Card>
