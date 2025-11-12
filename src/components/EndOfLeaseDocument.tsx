@@ -10,9 +10,11 @@ import { FileText, Download, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const EndOfLeaseDocument = () => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     tenantName: "",
     landlordName: "",
@@ -28,16 +30,16 @@ export const EndOfLeaseDocument = () => {
   const handleGenerate = () => {
     if (!formData.tenantName || !formData.endDate) {
       toast({
-        title: "Champs requis",
-        description: "Veuillez remplir tous les champs obligatoires.",
+        title: t("documents.endOfLease.requiredFields"),
+        description: t("documents.endOfLease.fillRequired"),
         variant: "destructive"
       });
       return;
     }
 
     toast({
-      title: "Document généré",
-      description: "Le document de fin de bail a été créé avec succès.",
+      title: t("documents.endOfLease.generated"),
+      description: t("documents.endOfLease.generatedSuccess"),
     });
   };
 
@@ -47,10 +49,10 @@ export const EndOfLeaseDocument = () => {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Fin de Bail
+            {t("documents.endOfLease.title")}
           </CardTitle>
           <Badge className="bg-warning/10 text-warning border-warning/20">
-            Art. 12-15 Loi 1989
+            {t("documents.endOfLease.subtitle")}
           </Badge>
         </div>
       </CardHeader>
@@ -58,13 +60,12 @@ export const EndOfLeaseDocument = () => {
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="text-xs">
-            <strong>Préavis légal:</strong> 3 mois pour le locataire (1 mois en zone tendue - Art. 12). 
-            6 mois pour le bailleur avec motif légitime (Art. 15).
+            <strong>{t("documents.endOfLease.legalNote")}</strong>
           </AlertDescription>
         </Alert>
 
         <div className="space-y-2">
-          <Label>Type de congé</Label>
+          <Label>{t("documents.endOfLease.noticeType")}</Label>
           <RadioGroup 
             value={formData.noticePeriod} 
             onValueChange={(value) => setFormData({...formData, noticePeriod: value})}
@@ -72,13 +73,13 @@ export const EndOfLeaseDocument = () => {
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="3" id="normal" />
               <Label htmlFor="normal" className="font-normal">
-                Préavis normal (3 mois)
+                {t("documents.endOfLease.normalNotice")}
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="1" id="reduced" />
               <Label htmlFor="reduced" className="font-normal">
-                Préavis réduit (1 mois - zone tendue, mutation, perte emploi, 60+ ans)
+                {t("documents.endOfLease.reducedNotice")}
               </Label>
             </div>
           </RadioGroup>
@@ -87,7 +88,7 @@ export const EndOfLeaseDocument = () => {
         <Separator />
 
         <div className="space-y-2">
-          <Label htmlFor="tenantName">Nom du Locataire *</Label>
+          <Label htmlFor="tenantName">{t("documents.endOfLease.tenantName")} *</Label>
           <Input 
             id="tenantName"
             placeholder="Jean Dupont"
@@ -97,7 +98,7 @@ export const EndOfLeaseDocument = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="landlordName">Nom du Bailleur</Label>
+          <Label htmlFor="landlordName">{t("documents.endOfLease.landlordName")}</Label>
           <Input 
             id="landlordName"
             placeholder="Marie Martin"
@@ -107,7 +108,7 @@ export const EndOfLeaseDocument = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="propertyAddress">Adresse du Logement</Label>
+          <Label htmlFor="propertyAddress">{t("documents.endOfLease.propertyAddress")}</Label>
           <Input 
             id="propertyAddress"
             placeholder="123 Rue de la Paix, 75001 Paris"
@@ -120,7 +121,7 @@ export const EndOfLeaseDocument = () => {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="leaseStartDate">Date début du bail</Label>
+            <Label htmlFor="leaseStartDate">{t("documents.endOfLease.leaseStartDate")}</Label>
             <Input 
               id="leaseStartDate"
               type="date"
@@ -130,7 +131,7 @@ export const EndOfLeaseDocument = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="noticeDate">Date de notification *</Label>
+            <Label htmlFor="noticeDate">{t("documents.endOfLease.noticeDate")} *</Label>
             <Input 
               id="noticeDate"
               type="date"
@@ -141,7 +142,7 @@ export const EndOfLeaseDocument = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="endDate">Date de fin du bail *</Label>
+          <Label htmlFor="endDate">{t("documents.endOfLease.endDate")} *</Label>
           <Input 
             id="endDate"
             type="date"
@@ -149,12 +150,12 @@ export const EndOfLeaseDocument = () => {
             onChange={(e) => setFormData({...formData, endDate: e.target.value})}
           />
           <p className="text-xs text-muted-foreground">
-            Date effective de libération du logement
+            {t("documents.endOfLease.endDateNote")}
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="depositAmount">Montant du dépôt de garantie (€)</Label>
+          <Label htmlFor="depositAmount">{t("documents.endOfLease.depositAmount")}</Label>
           <Input 
             id="depositAmount"
             type="number"
@@ -163,15 +164,15 @@ export const EndOfLeaseDocument = () => {
             onChange={(e) => setFormData({...formData, depositAmount: e.target.value})}
           />
           <p className="text-xs text-muted-foreground">
-            À restituer dans les 2 mois (Art. 22)
+            {t("documents.endOfLease.depositNote")}
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="reason">Motif du départ (optionnel)</Label>
+          <Label htmlFor="reason">{t("documents.endOfLease.reason")}</Label>
           <Textarea 
             id="reason"
-            placeholder="Mutation professionnelle, achat d'un bien..."
+            placeholder={t("documents.endOfLease.reasonPlaceholder")}
             value={formData.reason}
             onChange={(e) => setFormData({...formData, reason: e.target.value})}
             rows={3}
@@ -181,28 +182,28 @@ export const EndOfLeaseDocument = () => {
         <Separator />
 
         <div className="bg-accent/5 p-4 rounded-lg space-y-2">
-          <h4 className="font-semibold text-sm">Prochaines étapes :</h4>
+          <h4 className="font-semibold text-sm">{t("documents.endOfLease.nextSteps")}</h4>
           <ul className="list-disc list-inside space-y-1 text-xs text-muted-foreground">
-            <li>État des lieux de sortie à réaliser</li>
-            <li>Restitution des clés le jour du départ</li>
-            <li>Restitution du dépôt de garantie (2 mois max)</li>
-            <li>Solde de tout compte (eau, électricité, gaz)</li>
+            <li>{t("documents.endOfLease.checkOut")}</li>
+            <li>{t("documents.endOfLease.returnKeys")}</li>
+            <li>{t("documents.endOfLease.returnDeposit")}</li>
+            <li>{t("documents.endOfLease.finalAccount")}</li>
           </ul>
         </div>
 
         <div className="space-y-2">
           <Button className="w-full" onClick={handleGenerate}>
             <FileText className="mr-2 h-4 w-4" />
-            Générer le Document
+            {t("documents.endOfLease.generate")}
           </Button>
           <Button variant="outline" className="w-full">
             <Download className="mr-2 h-4 w-4" />
-            Télécharger PDF
+            {t("documents.endOfLease.download")}
           </Button>
         </div>
 
         <p className="text-xs text-muted-foreground text-center">
-          Document conforme aux Articles 12, 15 et 22 de la loi n°89-462 du 6 juillet 1989
+          {t("documents.endOfLease.legalCompliance")}
         </p>
       </CardContent>
     </Card>

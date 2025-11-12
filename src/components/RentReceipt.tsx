@@ -7,9 +7,11 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { FileText, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const RentReceipt = () => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     month: new Date().toISOString().slice(0, 7),
     tenantName: "",
@@ -22,16 +24,16 @@ export const RentReceipt = () => {
   const handleGenerateReceipt = () => {
     if (!formData.tenantName || !formData.rentAmount) {
       toast({
-        title: "Champs requis",
-        description: "Veuillez remplir tous les champs obligatoires.",
+        title: t("documents.rentReceipt.requiredFields"),
+        description: t("documents.rentReceipt.fillRequired"),
         variant: "destructive"
       });
       return;
     }
 
     toast({
-      title: "Quittance générée",
-      description: "La quittance de loyer a été créée et est prête à télécharger.",
+      title: t("documents.rentReceipt.generated"),
+      description: t("documents.rentReceipt.generatedSuccess"),
     });
   };
 
@@ -41,23 +43,22 @@ export const RentReceipt = () => {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Quittance de Loyer
+            {t("documents.rentReceipt.title")}
           </CardTitle>
           <Badge className="bg-primary/10 text-primary border-primary/20">
-            Art. 21 Loi 1989
+            {t("documents.rentReceipt.subtitle")}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="bg-accent/5 p-3 rounded-md border border-border">
           <p className="text-xs text-muted-foreground">
-            ⚖️ La quittance de loyer est obligatoire sur demande du locataire (Article 21, Loi du 6 juillet 1989). 
-            Elle atteste du paiement du loyer et des charges.
+            {t("documents.rentReceipt.legalNote")}
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="month">Période (Mois) *</Label>
+          <Label htmlFor="month">{t("documents.rentReceipt.period")} *</Label>
           <Input 
             id="month"
             type="month" 
@@ -67,7 +68,7 @@ export const RentReceipt = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="tenantName">Nom du Locataire *</Label>
+          <Label htmlFor="tenantName">{t("documents.rentReceipt.tenantName")} *</Label>
           <Input 
             id="tenantName"
             placeholder="Jean Dupont"
@@ -77,7 +78,7 @@ export const RentReceipt = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="propertyAddress">Adresse du Logement</Label>
+          <Label htmlFor="propertyAddress">{t("documents.rentReceipt.propertyAddress")}</Label>
           <Input 
             id="propertyAddress"
             placeholder="123 Rue de la Paix, 75001 Paris"
@@ -89,7 +90,7 @@ export const RentReceipt = () => {
         <Separator />
 
         <div className="space-y-2">
-          <Label htmlFor="rentAmount">Loyer Mensuel (€) *</Label>
+          <Label htmlFor="rentAmount">{t("documents.rentReceipt.monthlyRent")} *</Label>
           <Input 
             id="rentAmount"
             type="number" 
@@ -100,7 +101,7 @@ export const RentReceipt = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="chargesAmount">Charges (€)</Label>
+          <Label htmlFor="chargesAmount">{t("documents.rentReceipt.charges")}</Label>
           <Input 
             id="chargesAmount"
             type="number" 
@@ -111,7 +112,7 @@ export const RentReceipt = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="landlordName">Nom du Bailleur</Label>
+          <Label htmlFor="landlordName">{t("documents.rentReceipt.landlordName")}</Label>
           <Input 
             id="landlordName"
             placeholder="Marie Martin"
@@ -124,18 +125,18 @@ export const RentReceipt = () => {
 
         <div className="space-y-3 bg-muted/50 p-4 rounded-lg">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Loyer hors charges</span>
-            <span className="font-semibold">{formData.rentAmount || '0'} €</span>
+            <span className="text-muted-foreground">{t("documents.rentReceipt.rentExcludingCharges")}</span>
+            <span className="font-semibold">{formData.rentAmount || "0"} €</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Charges</span>
-            <span className="font-semibold">{formData.chargesAmount || '0'} €</span>
+            <span className="text-muted-foreground">{t("documents.rentReceipt.charges")}</span>
+            <span className="font-semibold">{formData.chargesAmount || "0"} €</span>
           </div>
           <Separator />
           <div className="flex justify-between text-lg">
-            <span className="font-semibold text-foreground">Total payé</span>
+            <span className="font-semibold text-foreground">{t("documents.rentReceipt.totalPaid")}</span>
             <span className="font-bold text-primary">
-              {(parseFloat(formData.rentAmount || '0') + parseFloat(formData.chargesAmount || '0')).toFixed(2)} €
+              {(parseFloat(formData.rentAmount || "0") + parseFloat(formData.chargesAmount || "0")).toFixed(2)} €
             </span>
           </div>
         </div>
@@ -143,16 +144,16 @@ export const RentReceipt = () => {
         <div className="space-y-2">
           <Button className="w-full" onClick={handleGenerateReceipt}>
             <FileText className="mr-2 h-4 w-4" />
-            Générer la Quittance
+            {t("documents.rentReceipt.generate")}
           </Button>
           <Button variant="outline" className="w-full">
             <Download className="mr-2 h-4 w-4" />
-            Télécharger PDF
+            {t("documents.rentReceipt.download")}
           </Button>
         </div>
 
         <p className="text-xs text-muted-foreground text-center">
-          Document conforme à l'Article 21 de la loi n°89-462 du 6 juillet 1989
+          {t("documents.rentReceipt.legalCompliance")}
         </p>
       </CardContent>
     </Card>

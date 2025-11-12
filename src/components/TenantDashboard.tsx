@@ -302,7 +302,7 @@ export const TenantDashboard = () => {
           <TabsTrigger value="inspection">{t("tenantDashboard.inspection")}</TabsTrigger>
           <TabsTrigger value="documents">
             <FileText className="w-4 h-4 mr-2" />
-            Documents
+            {t("documents.title")}
           </TabsTrigger>
           <TabsTrigger value="messages">{t("tenantDashboard.messages")}</TabsTrigger>
         </TabsList>

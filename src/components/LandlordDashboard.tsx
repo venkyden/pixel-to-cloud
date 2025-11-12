@@ -22,6 +22,7 @@ import {
 import { format } from "date-fns";
 import { RentReceipt } from "./RentReceipt";
 import { EndOfLeaseDocument } from "./EndOfLeaseDocument";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Property {
   id: string;
@@ -69,6 +70,7 @@ interface Incident {
 export const LandlordDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [properties, setProperties] = useState<Property[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
@@ -304,7 +306,7 @@ export const LandlordDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="documents">
             <FileText className="mr-2 h-4 w-4" />
-            Documents
+            {t("documents.title")}
           </TabsTrigger>
         </TabsList>
 
