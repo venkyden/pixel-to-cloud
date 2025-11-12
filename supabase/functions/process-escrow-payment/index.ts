@@ -1,0 +1,124 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
+  try {
+    const authHeader = req.headers.get("Authorization")!;
+    const token = authHeader.replace("Bearer ", "");
+    const { data } = await supabaseClient.auth.getUser(token);
+    const user = data.user;
+    if (!user?.email) throw new Error("User not authenticated");
+
+    const { applicationId, amount, depositAmount } = await req.json();
+    const totalAmount = amount + depositAmount;
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
+
+    // Check or create Stripe customer
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    let customerId;
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+    } else {
+      const customer = await stripe.customers.create({ email: user.email });
+      customerId = customer.id;
+    }
+
+    // Get application and property details
+    const { data: application, error: appError } = await supabaseClient
+      .from("tenant_applications")
+      .select("property_id")
+      .eq("id", applicationId)
+      .single();
+
+    if (appError || !application) {
+      throw new Error("Application not found");
+    }
+
+    const { data: property, error: propError } = await supabaseClient
+      .from("properties")
+      .select("owner_id, name")
+      .eq("id", application.property_id)
+      .single();
+
+    if (propError || !property) {
+      throw new Error("Property not found");
+    }
+
+    // Create checkout session for escrow
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: `Paiement de séquestre - ${property.name}`,
+              description: `Premier mois de loyer (${amount}€) + Dépôt de garantie (${depositAmount}€)`,
+            },
+            unit_amount: Math.round(totalAmount * 100),
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `${req.headers.get("origin")}/tenant?payment=success`,
+      cancel_url: `${req.headers.get("origin")}/tenant?payment=cancelled`,
+      metadata: {
+        applicationId,
+        type: "escrow",
+        amount: amount.toString(),
+        depositAmount: depositAmount.toString(),
+      },
+    });
+
+    // Create escrow payment record
+    await supabaseClient.from("escrow_payments").insert({
+      application_id: applicationId,
+      tenant_id: user.id,
+      landlord_id: property.owner_id,
+      property_id: application.property_id,
+      amount,
+      deposit_amount: depositAmount,
+      stripe_payment_intent_id: session.id,
+      status: "pending",
+    });
+
+    return new Response(
+      JSON.stringify({
+        url: session.url,
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error("Error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      }
+    );
+  }
+});

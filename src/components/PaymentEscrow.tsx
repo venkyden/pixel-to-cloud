@@ -4,32 +4,44 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Shield, CreditCard, Lock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PaymentEscrowProps {
+  applicationId: string;
   monthlyRent: number;
   deposit: number;
   onPayment: () => void;
 }
 
-export const PaymentEscrow = ({ monthlyRent, deposit, onPayment }: PaymentEscrowProps) => {
+export const PaymentEscrow = ({ applicationId, monthlyRent, deposit, onPayment }: PaymentEscrowProps) => {
   const [loading, setLoading] = useState(false);
   const total = monthlyRent + deposit;
 
   const handlePayment = async () => {
     setLoading(true);
     try {
-      // For demo purposes - in production, integrate with Stripe
-      toast.info("Payment integration: Connect Stripe for live payments");
-      
-      // Simulate payment processing
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      toast.success("Payment processed successfully!");
-      onPayment();
+      toast.info("Initialisation du paiement sécurisé...");
+
+      // Create checkout session via edge function
+      const { data, error } = await supabase.functions.invoke("process-escrow-payment", {
+        body: {
+          applicationId,
+          amount: monthlyRent,
+          depositAmount: deposit,
+        },
+      });
+
+      if (error) throw error;
+
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL received");
+      }
     } catch (error) {
       console.error("Payment error:", error);
-      toast.error("Payment failed. Please try again.");
-    } finally {
+      toast.error(error instanceof Error ? error.message : "Échec du paiement. Veuillez réessayer.");
       setLoading(false);
     }
   };
@@ -109,7 +121,7 @@ export const PaymentEscrow = ({ monthlyRent, deposit, onPayment }: PaymentEscrow
           <Badge variant="outline" className="text-xs">Séquestre Sécurisé</Badge>
         </div>
         <p className="text-xs text-center text-muted-foreground">
-          ⚠️ Intégration Stripe requise pour les paiements réels. Actuellement en mode démonstration.
+          Paiement sécurisé via Stripe • Crypté de bout en bout
         </p>
       </div>
     </Card>

@@ -82,6 +82,7 @@ const TenantFlow = () => {
   });
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
+  const [applicationId, setApplicationId] = useState<string | null>(null);
   
   // Application form state
   const [applicationForm, setApplicationForm] = useState({
@@ -179,7 +180,7 @@ const TenantFlow = () => {
       ]);
 
       // Submit application to database with document URLs
-      const { error } = await supabase
+      const { data: applicationData, error } = await supabase
         .from("tenant_applications")
         .insert({
           user_id: user.id,
@@ -191,9 +192,16 @@ const TenantFlow = () => {
           income_proof_url: incomeProofUrl,
           bank_statement_url: bankStatementUrl,
           status: "pending" as const
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Store application ID for payment
+      if (applicationData) {
+        setApplicationId(applicationData.id);
+      }
 
       setCurrentStep(5);
       toast.success("Application submitted successfully!");
@@ -562,9 +570,10 @@ const TenantFlow = () => {
         ) : null;
 
       case 6:
-        return selectedProperty ? (
+        return selectedProperty && applicationId ? (
           <div className="max-w-2xl mx-auto">
             <PaymentEscrow
+              applicationId={applicationId}
               monthlyRent={selectedProperty.price}
               deposit={selectedProperty.price}
               onPayment={handlePayment}

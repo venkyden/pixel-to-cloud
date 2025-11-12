@@ -1,0 +1,98 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { Resend } from "https://esm.sh/resend@4.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+interface EmailRequest {
+  to: string;
+  subject: string;
+  type: "application_update" | "payment_received" | "rent_reminder" | "incident_update";
+  data: any;
+}
+
+const getEmailTemplate = (type: string, data: any) => {
+  switch (type) {
+    case "application_update":
+      return `
+        <h1>Mise à jour de votre candidature</h1>
+        <p>Bonjour,</p>
+        <p>Votre candidature pour le logement <strong>${data.propertyName}</strong> a été mise à jour.</p>
+        <p><strong>Nouveau statut:</strong> ${data.status}</p>
+        ${data.message ? `<p><strong>Message:</strong> ${data.message}</p>` : ""}
+        <p>Cordialement,<br>L'équipe</p>
+      `;
+    case "payment_received":
+      return `
+        <h1>Paiement reçu</h1>
+        <p>Bonjour,</p>
+        <p>Nous avons bien reçu votre paiement de <strong>${data.amount} €</strong>.</p>
+        <p><strong>Description:</strong> ${data.description}</p>
+        <p><strong>Date:</strong> ${new Date(data.date).toLocaleDateString("fr-FR")}</p>
+        <p>Cordialement,<br>L'équipe</p>
+      `;
+    case "rent_reminder":
+      return `
+        <h1>Rappel de loyer</h1>
+        <p>Bonjour,</p>
+        <p>Ceci est un rappel que votre loyer de <strong>${data.amount} €</strong> est dû le <strong>${new Date(data.dueDate).toLocaleDateString("fr-FR")}</strong>.</p>
+        <p><strong>Logement:</strong> ${data.propertyName}</p>
+        <p>Le paiement sera collecté automatiquement si vous avez configuré le prélèvement automatique.</p>
+        <p>Cordialement,<br>L'équipe</p>
+      `;
+    case "incident_update":
+      return `
+        <h1>Mise à jour d'incident</h1>
+        <p>Bonjour,</p>
+        <p>L'incident "<strong>${data.title}</strong>" a été mis à jour.</p>
+        <p><strong>Nouveau statut:</strong> ${data.status}</p>
+        ${data.resolution ? `<p><strong>Résolution:</strong> ${data.resolution}</p>` : ""}
+        <p>Cordialement,<br>L'équipe</p>
+      `;
+    default:
+      return `<p>${data.message || "Notification"}</p>`;
+  }
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { to, subject, type, data }: EmailRequest = await req.json();
+
+    const html = getEmailTemplate(type, data);
+
+    const emailResponse = await resend.emails.send({
+      from: "Notifications <onboarding@resend.dev>",
+      to: [to],
+      subject,
+      html,
+    });
+
+    console.log("Email sent successfully:", emailResponse);
+
+    return new Response(JSON.stringify(emailResponse), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders,
+      },
+    });
+  } catch (error: any) {
+    console.error("Error sending email:", error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+});

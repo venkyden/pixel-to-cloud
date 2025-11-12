@@ -418,35 +418,47 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          auto_collect: boolean | null
           created_at: string
           currency: string | null
           description: string | null
           id: string
+          next_collection_date: string | null
           payment_date: string | null
+          payment_method: string | null
           property_id: string
           status: string | null
+          stripe_payment_intent_id: string | null
           tenant_id: string
         }
         Insert: {
           amount: number
+          auto_collect?: boolean | null
           created_at?: string
           currency?: string | null
           description?: string | null
           id?: string
+          next_collection_date?: string | null
           payment_date?: string | null
+          payment_method?: string | null
           property_id: string
           status?: string | null
+          stripe_payment_intent_id?: string | null
           tenant_id: string
         }
         Update: {
           amount?: number
+          auto_collect?: boolean | null
           created_at?: string
           currency?: string | null
           description?: string | null
           id?: string
+          next_collection_date?: string | null
           payment_date?: string | null
+          payment_method?: string | null
           property_id?: string
           status?: string | null
+          stripe_payment_intent_id?: string | null
           tenant_id?: string
         }
         Relationships: [
@@ -589,6 +601,65 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "property_inspections_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rent_schedules: {
+        Row: {
+          active: boolean | null
+          amount: number
+          created_at: string
+          currency: string
+          day_of_month: number
+          id: string
+          landlord_id: string
+          last_collection_date: string | null
+          next_collection_date: string
+          property_id: string
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          amount: number
+          created_at?: string
+          currency?: string
+          day_of_month: number
+          id?: string
+          landlord_id: string
+          last_collection_date?: string | null
+          next_collection_date: string
+          property_id: string
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          amount?: number
+          created_at?: string
+          currency?: string
+          day_of_month?: number
+          id?: string
+          landlord_id?: string
+          last_collection_date?: string | null
+          next_collection_date?: string
+          property_id?: string
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rent_schedules_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
