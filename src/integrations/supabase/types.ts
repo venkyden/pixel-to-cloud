@@ -145,6 +145,69 @@ export type Database = {
           },
         ]
       }
+      escrow_payments: {
+        Row: {
+          amount: number
+          application_id: string
+          created_at: string
+          currency: string
+          deposit_amount: number
+          escrow_released_at: string | null
+          id: string
+          landlord_id: string
+          property_id: string
+          status: string
+          stripe_payment_intent_id: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          application_id: string
+          created_at?: string
+          currency?: string
+          deposit_amount: number
+          escrow_released_at?: string | null
+          id?: string
+          landlord_id: string
+          property_id: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          application_id?: string
+          created_at?: string
+          currency?: string
+          deposit_amount?: number
+          escrow_released_at?: string | null
+          id?: string
+          landlord_id?: string
+          property_id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_payments_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "escrow_payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incident_timeline: {
         Row: {
           action: string
@@ -235,6 +298,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      landlord_verifications: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          government_id_url: string | null
+          id: string
+          ownership_document_url: string | null
+          phone: string
+          status: string
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          government_id_url?: string | null
+          id?: string
+          ownership_document_url?: string | null
+          phone: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          government_id_url?: string | null
+          id?: string
+          ownership_document_url?: string | null
+          phone?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -522,6 +627,7 @@ export type Database = {
         Row: {
           co_signer_income: number | null
           created_at: string
+          expires_at: string | null
           id: string
           income: number | null
           match_score: number | null
@@ -538,6 +644,7 @@ export type Database = {
         Insert: {
           co_signer_income?: number | null
           created_at?: string
+          expires_at?: string | null
           id?: string
           income?: number | null
           match_score?: number | null
@@ -554,6 +661,7 @@ export type Database = {
         Update: {
           co_signer_income?: number | null
           created_at?: string
+          expires_at?: string | null
           id?: string
           income?: number | null
           match_score?: number | null
@@ -603,6 +711,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      expire_old_applications: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
