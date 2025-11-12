@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { LandlordDashboard } from "@/components/LandlordDashboard";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { PaymentHistory } from "@/components/PaymentHistory";
 import { InvoiceGenerator } from "@/components/InvoiceGenerator";
@@ -7,7 +8,7 @@ import { MaintenanceRequests } from "@/components/MaintenanceRequests";
 import { DocumentVault } from "@/components/DocumentVault";
 import { PropertyInspection } from "@/components/PropertyInspection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, Receipt, Wrench, FileText, Video } from "lucide-react";
+import { Home, BarChart3, Receipt, Wrench, FileText, Video } from "lucide-react";
 
 export default function Dashboard() {
   return (
@@ -19,8 +20,12 @@ export default function Dashboard() {
           <p className="text-muted-foreground">Manage your properties and tenants</p>
         </div>
 
-        <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="overview">
+              <Home className="mr-2 h-4 w-4" />
+              Overview
+            </TabsTrigger>
             <TabsTrigger value="analytics">
               <BarChart3 className="mr-2 h-4 w-4" />
               Analytics
@@ -46,6 +51,10 @@ export default function Dashboard() {
               Invoices
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="overview">
+            <LandlordDashboard />
+          </TabsContent>
 
           <TabsContent value="analytics">
             <AnalyticsDashboard />

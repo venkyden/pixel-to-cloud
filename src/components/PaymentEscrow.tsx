@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Shield, CreditCard, Lock, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface PaymentEscrowProps {
   monthlyRent: number;
@@ -10,7 +12,27 @@ interface PaymentEscrowProps {
 }
 
 export const PaymentEscrow = ({ monthlyRent, deposit, onPayment }: PaymentEscrowProps) => {
+  const [loading, setLoading] = useState(false);
   const total = monthlyRent + deposit;
+
+  const handlePayment = async () => {
+    setLoading(true);
+    try {
+      // For demo purposes - in production, integrate with Stripe
+      toast.info("Payment integration: Connect Stripe for live payments");
+      
+      // Simulate payment processing
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      
+      toast.success("Payment processed successfully!");
+      onPayment();
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Payment failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Card className="p-6">
@@ -71,9 +93,9 @@ export const PaymentEscrow = ({ monthlyRent, deposit, onPayment }: PaymentEscrow
       </div>
 
       <div className="space-y-3">
-        <Button className="w-full" size="lg" onClick={onPayment}>
+        <Button className="w-full" size="lg" onClick={handlePayment} disabled={loading}>
           <CreditCard className="w-4 h-4 mr-2" />
-          Payer en toute sécurité
+          {loading ? "Processing..." : "Payer en toute sécurité"}
         </Button>
         <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
