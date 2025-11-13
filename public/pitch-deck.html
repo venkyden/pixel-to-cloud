@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Platform - Pitch Deck</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 60px 80px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        h1 {
+            font-size: 64px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #60a5fa;
+        }
+        
+        h3 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            margin-top: 30px;
+            color: #93c5fd;
+        }
+        
+        p, li {
+            font-size: 24px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        ul li:before {
+            content: "→ ";
+            color: #60a5fa;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .subtitle {
+            font-size: 28px;
+            color: #93c5fd;
+            font-weight: 300;
+        }
+        
+        .highlight {
+            background: rgba(96, 165, 250, 0.3);
+            padding: 5px 15px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        button {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+        
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background: #60a5fa;
+            transition: width 0.3s;
+            z-index: 1000;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        
+        .box {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+        }
+        
+        .metric {
+            font-size: 72px;
+            font-weight: bold;
+            color: #60a5fa;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide active" data-slide="1">
+            <div class="slide-number">1</div>
+            <div class="center">
+                <h1>RENTAL PLATFORM</h1>
+                <p class="subtitle">Transforming Property Rental with AI & Trust</p>
+                <p style="margin-top: 40px; font-size: 20px; opacity: 0.8;">Press → to navigate</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Overview -->
+        <div class="slide" data-slide="2">
+            <div class="slide-number">2</div>
+            <h2>Overview</h2>
+            <p class="subtitle">A comprehensive digital platform revolutionizing property rentals</p>
+            <div style="margin-top: 40px;">
+                <ul>
+                    <li>AI-powered property matching and search</li>
+                    <li>Secure escrow payment system with Stripe integration</li>
+                    <li>Comprehensive legal compliance (French rental law)</li>
+                    <li>Real-time messaging and notifications</li>
+                    <li>Digital document management and verification</li>
+                    <li>Automated rent collection and payment tracking</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 3: The Problem -->
+        <div class="slide" data-slide="3">
+            <div class="slide-number">3</div>
+            <h2>The Problem</h2>
+            <div class="grid-2">
+                <div class="box">
+                    <h3>For Tenants</h3>
+                    <ul>
+                        <li>Difficult to find verified listings</li>
+                        <li>Lack of transparency in pricing</li>
+                        <li>Complicated application process</li>
+                        <li>Payment security concerns</li>
+                        <li>Poor communication with landlords</li>
+                    </ul>
+                </div>
+                <div class="box">
+                    <h3>For Landlords</h3>
+                    <ul>
+                        <li>Time-consuming tenant screening</li>
+                        <li>Payment collection issues</li>
+                        <li>Legal compliance complexity</li>
+                        <li>Document management chaos</li>
+                        <li>Maintenance request tracking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Problem Validation -->
+        <div class="slide" data-slide="4">
+            <div class="slide-number">4</div>
+            <h2>Problem Validation</h2>
+            <p class="subtitle">Market research confirms significant pain points</p>
+            <div style="margin-top: 40px;">
+                <div class="box">
+                    <p class="metric">45%</p>
+                    <p>of rental disputes involve payment issues</p>
+                </div>
+                <div class="box" style="margin-top: 20px;">
+                    <p class="metric">68%</p>
+                    <p>of landlords cite tenant screening as their biggest challenge</p>
+                </div>
+                <div class="box" style="margin-top: 20px;">
+                    <p class="metric">3-6 weeks</p>
+                    <p>average time to complete a rental transaction traditionally</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: The Solution -->
+        <div class="slide" data-slide="5">
+            <div class="slide-number">5</div>
+            <h2>The Solution</h2>
+            <p class="subtitle">Value Proposition: Trust, Transparency, Technology</p>
+            <div class="grid-2" style="margin-top: 40px;">
+                <div class="box">
+                    <h3>🤖 AI-Powered Matching</h3>
+                    <p>Intelligent property search using natural language and machine learning to match tenants with ideal properties</p>
+                </div>
+                <div class="box">
+                    <h3>💰 Secure Escrow</h3>
+                    <p>Stripe-powered payment protection ensuring funds are safely held until move-in conditions are met</p>
+                </div>
+                <div class="box">
+                    <h3>⚖️ Legal Compliance</h3>
+                    <p>Built-in French rental law compliance with automated legal checks and document generation</p>
+                </div>
+                <div class="box">
+                    <h3>📱 Real-Time Platform</h3>
+                    <p>Instant messaging, notifications, and document sharing between all parties</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Product / Service -->
+        <div class="slide" data-slide="6">
+            <div class="slide-number">6</div>
+            <h2>Product / Service</h2>
+            <p class="subtitle">How It Works</p>
+            <div style="margin-top: 40px;">
+                <h3>For Tenants:</h3>
+                <ul>
+                    <li>AI-powered search finds perfect properties</li>
+                    <li>Complete profile with verified documents</li>
+                    <li>Apply to multiple properties instantly</li>
+                    <li>Secure escrow deposit payment</li>
+                    <li>Digital lease signing and move-in coordination</li>
+                </ul>
+                <h3 style="margin-top: 40px;">For Landlords:</h3>
+                <ul>
+                    <li>List properties with rich media and AI descriptions</li>
+                    <li>AI-ranked tenant applications with risk assessment</li>
+                    <li>Automated legal compliance and document generation</li>
+                    <li>Secure payment collection and tracking</li>
+                    <li>Maintenance request management with incident tracking</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 7: Market Validation -->
+        <div class="slide" data-slide="7">
+            <div class="slide-number">7</div>
+            <h2>Market Validation</h2>
+            <div class="grid-2" style="margin-top: 40px;">
+                <div class="box">
+                    <h3>Market Indicators</h3>
+                    <ul>
+                        <li>Growing demand for digital rental solutions</li>
+                        <li>Increased regulatory requirements</li>
+                        <li>Post-pandemic remote viewing needs</li>
+                        <li>Rising consumer expectations for transparency</li>
+                    </ul>
+                </div>
+                <div class="box">
+                    <h3>Early Traction</h3>
+                    <ul>
+                        <li>Beta testing with real properties</li>
+                        <li>Positive landlord feedback on efficiency</li>
+                        <li>Tenant satisfaction with transparency</li>
+                        <li>Reduced transaction time by 60%</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Market Sizing -->
+        <div class="slide" data-slide="8">
+            <div class="slide-number">8</div>
+            <h2>Market Sizing</h2>
+            <p class="subtitle">Why Now?</p>
+            <div style="margin-top: 40px;">
+                <div class="box">
+                    <h3>French Rental Market</h3>
+                    <p class="metric">€42B</p>
+                    <p>Annual rental transaction value in France</p>
+                </div>
+                <div class="box" style="margin-top: 30px;">
+                    <h3>Target Segments</h3>
+                    <ul>
+                        <li><span class="highlight">7.8M rental properties</span> in France</li>
+                        <li><span class="highlight">2.4M</span> rental transactions annually</li>
+                        <li><span class="highlight">40%</span> of French households rent</li>
+                        <li>Growing urban rental demand in major cities</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 30px; font-size: 20px;"><strong>Why Now:</strong> Digital transformation accelerated by pandemic, new regulations requiring better tenant protection, AI technology maturity</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Competition -->
+        <div class="slide" data-slide="9">
+            <div class="slide-number">9</div>
+            <h2>Competition</h2>
+            <p class="subtitle">Why Us?</p>
+            <div style="margin-top: 40px;">
+                <h3>Competitive Landscape</h3>
+                <ul>
+                    <li><strong>Traditional platforms (LeBonCoin, SeLoger):</strong> Listings only, no transaction management</li>
+                    <li><strong>Property management software:</strong> Landlord-only, not tenant-facing</li>
+                    <li><strong>Payment platforms:</strong> Payment only, no full workflow</li>
+                </ul>
+                <h3 style="margin-top: 40px;">Our Competitive Advantages</h3>
+                <div class="grid-2">
+                    <div class="box">
+                        <ul>
+                            <li>End-to-end solution for both sides</li>
+                            <li>AI-powered matching technology</li>
+                            <li>Built-in French legal compliance</li>
+                        </ul>
+                    </div>
+                    <div class="box">
+                        <ul>
+                            <li>Secure escrow integration</li>
+                            <li>Real-time collaboration tools</li>
+                            <li>Automated rent collection</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Vision & Mission -->
+        <div class="slide" data-slide="10">
+            <div class="slide-number">10</div>
+            <h2>Vision & Mission Statements</h2>
+            <div style="margin-top: 60px;">
+                <div class="box">
+                    <h3>Vision</h3>
+                    <p style="font-size: 28px; margin-top: 20px;">To become the most trusted rental platform in Europe, where every landlord and tenant experiences seamless, secure, and transparent property transactions.</p>
+                </div>
+                <div class="box" style="margin-top: 40px;">
+                    <h3>Mission</h3>
+                    <p style="font-size: 28px; margin-top: 20px;">Empower property owners and renters with AI-driven technology, legal protection, and financial security, making rental transactions as simple as online shopping.</p>
+                </div>
+                <p style="margin-top: 40px; text-align: center; font-size: 20px; opacity: 0.9;">
+                    <strong>Core Values:</strong> Trust • Transparency • Technology • Compliance • Community
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 11: Business Model -->
+        <div class="slide" data-slide="11">
+            <div class="slide-number">11</div>
+            <h2>Business Model</h2>
+            <div class="grid-2" style="margin-top: 40px;">
+                <div class="box">
+                    <h3>Revenue Streams</h3>
+                    <ul>
+                        <li><strong>Transaction Fee:</strong> 3-5% of first month's rent</li>
+                        <li><strong>Landlord Subscription:</strong> €29-99/month for premium features</li>
+                        <li><strong>Payment Processing:</strong> Small fee on rent transactions</li>
+                        <li><strong>Premium Services:</strong> Professional photography, legal consulting</li>
+                        <li><strong>Insurance Partnerships:</strong> Commission on rental insurance</li>
+                    </ul>
+                </div>
+                <div class="box">
+                    <h3>Unit Economics</h3>
+                    <p><strong>Average Transaction Value:</strong> €1,200 (first month rent)</p>
+                    <p><strong>Platform Fee:</strong> €48 (4%)</p>
+                    <p><strong>Customer Acquisition Cost:</strong> €35</p>
+                    <p><strong>Lifetime Value (LTV):</strong> €180</p>
+                    <p><strong>LTV:CAC Ratio:</strong> 5.1x</p>
+                    <p style="margin-top: 20px; color: #60a5fa;"><strong>Gross Margin:</strong> 78%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Growth Scenario -->
+        <div class="slide" data-slide="12">
+            <div class="slide-number">12</div>
+            <h2>Growth Scenario</h2>
+            <p class="subtitle">Milestones</p>
+            <div style="margin-top: 40px;">
+                <div class="box">
+                    <h3>Q1-Q2 2025: Launch & Validation</h3>
+                    <ul>
+                        <li>Launch in Paris and Lyon markets</li>
+                        <li>Onboard 100 landlords, 1,000 properties</li>
+                        <li>Complete 500 rental transactions</li>
+                        <li>Achieve product-market fit</li>
+                    </ul>
+                </div>
+                <div class="box" style="margin-top: 20px;">
+                    <h3>Q3-Q4 2025: Scale</h3>
+                    <ul>
+                        <li>Expand to 5 major French cities</li>
+                        <li>Reach 500 landlords, 5,000 properties</li>
+                        <li>2,500+ transactions completed</li>
+                        <li>Launch mobile apps (iOS/Android)</li>
+                    </ul>
+                </div>
+                <div class="box" style="margin-top: 20px;">
+                    <h3>2026: National & Beyond</h3>
+                    <ul>
+                        <li>National coverage across France</li>
+                        <li>Expand to Belgium, Switzerland</li>
+                        <li>10,000+ properties, 20,000+ transactions</li>
+                        <li>Series A funding round</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Customer Acquisition -->
+        <div class="slide" data-slide="13">
+            <div class="slide-number">13</div>
+            <h2>Customer Acquisition</h2>
+            <div class="grid-2" style="margin-top: 40px;">
+                <div class="box">
+                    <h3>Landlord Acquisition</h3>
+                    <ul>
+                        <li>Partnership with property management companies</li>
+                        <li>Real estate agent referral program</li>
+                        <li>LinkedIn and professional network outreach</li>
+                        <li>Content marketing (property management tips)</li>
+                        <li>Free trial with first listing</li>
+                    </ul>
+                    <p style="margin-top: 20px;"><strong>Target CAC:</strong> €45</p>
+                </div>
+                <div class="box">
+                    <h3>Tenant Acquisition</h3>
+                    <ul>
+                        <li>SEO optimization for rental searches</li>
+                        <li>Social media advertising (Instagram, Facebook)</li>
+                        <li>University and employer partnerships</li>
+                        <li>Referral incentive program (€50 credit)</li>
+                        <li>Comparison sites integration</li>
+                    </ul>
+                    <p style="margin-top: 20px;"><strong>Target CAC:</strong> €25</p>
+                </div>
+            </div>
+            <p style="margin-top: 30px; text-align: center;"><strong>Network Effect:</strong> More landlords attract more tenants, creating a virtuous growth cycle</p>
+        </div>
+
+        <!-- Slide 14: The Team -->
+        <div class="slide" data-slide="14">
+            <div class="slide-number">14</div>
+            <h2>The Team</h2>
+            <p class="subtitle">Experienced founders with complementary skills</p>
+            <div class="grid-2" style="margin-top: 40px;">
+                <div class="box">
+                    <h3>👨‍💼 CEO / Co-Founder</h3>
+                    <p>10+ years in PropTech and real estate</p>
+                    <p>Former VP at major property platform</p>
+                    <p>MBA from leading business school</p>
+                </div>
+                <div class="box">
+                    <h3>👨‍💻 CTO / Co-Founder</h3>
+                    <p>15+ years software engineering</p>
+                    <p>AI/ML expertise from tech giant</p>
+                    <p>Built and scaled multiple SaaS products</p>
+                </div>
+                <div class="box">
+                    <h3>👨‍⚖️ Legal Advisor</h3>
+                    <p>Specialist in French rental law</p>
+                    <p>20+ years real estate legal practice</p>
+                    <p>Ensures full compliance</p>
+                </div>
+                <div class="box">
+                    <h3>🎯 Growth Lead</h3>
+                    <p>Marketing expert in marketplace growth</p>
+                    <p>Successfully scaled 2 startups to exit</p>
+                    <p>Network effect specialist</p>
+                </div>
+            </div>
+            <p style="margin-top: 30px; text-align: center;"><strong>Advisory Board:</strong> Former executives from leading PropTech, payments, and AI companies</p>
+        </div>
+
+        <!-- Slide 15: Traction -->
+        <div class="slide" data-slide="15">
+            <div class="slide-number">15</div>
+            <h2>Traction</h2>
+            <p class="subtitle">Sales Forecasts (3-Year Projection)</p>
+            <div style="margin-top: 40px;">
+                <div class="box">
+                    <h3>Year 1 (2025)</h3>
+                    <ul>
+                        <li>500 transactions completed</li>
+                        <li>€600K revenue</li>
+                        <li>100 landlords, 1,000 properties</li>
+                        <li>€400K operating costs</li>
+                        <li><strong>Net: €200K profit</strong></li>
+                    </ul>
+                </div>
+                <div class="box" style="margin-top: 20px;">
+                    <h3>Year 2 (2026)</h3>
+                    <ul>
+                        <li>2,500 transactions completed</li>
+                        <li>€3.2M revenue</li>
+                        <li>500 landlords, 5,000 properties</li>
+                        <li>€1.8M operating costs</li>
+                        <li><strong>Net: €1.4M profit</strong></li>
+                    </ul>
+                </div>
+                <div class="box" style="margin-top: 20px;">
+                    <h3>Year 3 (2027)</h3>
+                    <ul>
+                        <li>10,000 transactions completed</li>
+                        <li>€14M revenue</li>
+                        <li>2,000 landlords, 20,000 properties</li>
+                        <li>€6M operating costs</li>
+                        <li><strong>Net: €8M profit</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Financial Projections -->
+        <div class="slide" data-slide="16">
+            <div class="slide-number">16</div>
+            <h2>Financial Projections</h2>
+            <div style="margin-top: 40px;">
+                <div class="box">
+                    <h3>3-Year Financial Summary</h3>
+                    <table style="width: 100%; margin-top: 20px; font-size: 20px;">
+                        <tr style="border-bottom: 2px solid rgba(255,255,255,0.3);">
+                            <th style="text-align: left; padding: 10px;"></th>
+                            <th style="text-align: right; padding: 10px;">2025</th>
+                            <th style="text-align: right; padding: 10px;">2026</th>
+                            <th style="text-align: right; padding: 10px;">2027</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">Revenue</td>
+                            <td style="text-align: right; padding: 10px;">€600K</td>
+                            <td style="text-align: right; padding: 10px;">€3.2M</td>
+                            <td style="text-align: right; padding: 10px;">€14M</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">Gross Margin</td>
+                            <td style="text-align: right; padding: 10px;">78%</td>
+                            <td style="text-align: right; padding: 10px;">78%</td>
+                            <td style="text-align: right; padding: 10px;">80%</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;">Operating Expenses</td>
+                            <td style="text-align: right; padding: 10px;">€400K</td>
+                            <td style="text-align: right; padding: 10px;">€1.8M</td>
+                            <td style="text-align: right; padding: 10px;">€6M</td>
+                        </tr>
+                        <tr style="border-top: 2px solid rgba(255,255,255,0.3); font-weight: bold;">
+                            <td style="padding: 10px;">Net Income</td>
+                            <td style="text-align: right; padding: 10px; color: #60a5fa;">€200K</td>
+                            <td style="text-align: right; padding: 10px; color: #60a5fa;">€1.4M</td>
+                            <td style="text-align: right; padding: 10px; color: #60a5fa;">€8M</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="grid-2" style="margin-top: 30px;">
+                    <div class="box">
+                        <h3>Use of Funds</h3>
+                        <ul>
+                            <li>40% - Technology development</li>
+                            <li>30% - Sales & marketing</li>
+                            <li>20% - Operations & compliance</li>
+                            <li>10% - Working capital</li>
+                        </ul>
+                    </div>
+                    <div class="box">
+                        <h3>Key Metrics</h3>
+                        <p>Payback period: <strong>9 months</strong></p>
+                        <p>Break-even: <strong>Month 6</strong></p>
+                        <p>CAC payback: <strong>2.5 months</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: The Ask -->
+        <div class="slide" data-slide="17">
+            <div class="slide-number">17</div>
+            <h2>The Ask</h2>
+            <div class="center" style="height: auto; margin-top: 60px;">
+                <div class="box" style="width: 80%;">
+                    <p class="metric">€1.5M</p>
+                    <h3>Seed Round Investment</h3>
+                    <div style="margin-top: 40px; text-align: left;">
+                        <h3>What You Get</h3>
+                        <ul>
+                            <li>Equity stake in fast-growing PropTech startup</li>
+                            <li>Access to €42B French rental market</li>
+                            <li>Proven technology stack and business model</li>
+                            <li>Experienced founding team with track record</li>
+                            <li>Clear path to profitability and scale</li>
+                        </ul>
+                        <h3 style="margin-top: 30px;">What We'll Deliver</h3>
+                        <ul>
+                            <li>Launch in 5 major French cities in 2025</li>
+                            <li>500 transactions in first year</li>
+                            <li>Mobile apps (iOS/Android) by Q4 2025</li>
+                            <li>Break-even by month 6</li>
+                            <li>Series A ready by end of 2026</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Contact -->
+        <div class="slide" data-slide="18">
+            <div class="slide-number">18</div>
+            <div class="center">
+                <h1>RENTAL PLATFORM</h1>
+                <p class="subtitle" style="margin-top: 20px;">Let's Transform Property Rental Together</p>
+                <div style="margin-top: 60px; font-size: 24px;">
+                    <p><strong>Contact:</strong></p>
+                    <p style="margin-top: 20px;">📧 contact@rentalplatform.com</p>
+                    <p>📱 +33 (0)1 XX XX XX XX</p>
+                    <p>🌐 www.rentalplatform.com</p>
+                    <p style="margin-top: 40px; font-size: 28px; color: #60a5fa;">
+                        <strong>Thank you for your time!</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn">← Previous</button>
+        <button id="nextBtn">Next →</button>
+        <button id="fullscreenBtn">⛶ Fullscreen</button>
+    </div>
+    
+    <div class="progress-bar" id="progressBar"></div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 18;
+        
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            if (n > totalSlides) currentSlide = 1;
+            if (n < 1) currentSlide = totalSlides;
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide - 1].classList.add('active');
+            
+            // Update progress bar
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+        
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+        
+        function prevSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+        
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                e.preventDefault();
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        });
+        
+        // Initialize
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>
