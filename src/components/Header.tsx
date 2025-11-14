@@ -44,6 +44,10 @@ export const Header = () => {
             {t("header.incidents")}
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full"></span>
           </Link>
+          <Link to="/payments" className="text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative group">
+            Payments
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full"></span>
+          </Link>
           <Link to="/messages" className="text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative group">
             {t("header.messages")}
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full"></span>
