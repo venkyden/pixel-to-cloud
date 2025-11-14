@@ -13,6 +13,7 @@ import RoleSelection from "./pages/RoleSelection";
 import TenantFlow from "./pages/TenantFlow";
 import LandlordFlow from "./pages/LandlordFlow";
 import IncidentDashboard from "./pages/IncidentDashboard";
+import PaymentHistory from "./pages/PaymentHistory";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import Properties from "./pages/Properties";
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/tenant" element={<ProtectedRoute><TenantFlow /></ProtectedRoute>} />
               <Route path="/landlord" element={<ProtectedRoute><LandlordFlow /></ProtectedRoute>} />
               <Route path="/incidents" element={<ProtectedRoute><IncidentDashboard /></ProtectedRoute>} />
+              <Route path="/payments" element={<ProtectedRoute><PaymentHistory /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
               <Route path="/properties" element={<ProtectedRoute><Properties /></ProtectedRoute>} />

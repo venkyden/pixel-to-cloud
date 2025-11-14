@@ -1,0 +1,101 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
+  try {
+    const authHeader = req.headers.get("Authorization")!;
+    const token = authHeader.replace("Bearer ", "");
+    const { data } = await supabaseClient.auth.getUser(token);
+    const user = data.user;
+    if (!user?.email) throw new Error("User not authenticated");
+
+    const { paymentId, amount, reason } = await req.json();
+
+    // Verify user is landlord or admin
+    const { data: roles } = await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+
+    const hasPermission = roles?.some(r => r.role === "landlord" || r.role === "admin");
+    if (!hasPermission) {
+      throw new Error("Unauthorized: Only landlords can process refunds");
+    }
+
+    // Get payment details
+    const { data: payment, error: paymentError } = await supabaseClient
+      .from("escrow_payments")
+      .select("*")
+      .eq("id", paymentId)
+      .single();
+
+    if (paymentError || !payment) {
+      throw new Error("Payment not found");
+    }
+
+    // Verify landlord owns the property
+    if (payment.landlord_id !== user.id && !roles?.some(r => r.role === "admin")) {
+      throw new Error("Unauthorized: You don't own this property");
+    }
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
+
+    // Process refund
+    const refund = await stripe.refunds.create({
+      payment_intent: payment.stripe_payment_intent_id,
+      amount: amount ? Math.round(amount * 100) : undefined,
+      reason: reason || "requested_by_customer",
+    });
+
+    // Update payment status
+    await supabaseClient
+      .from("escrow_payments")
+      .update({ status: "refunded" })
+      .eq("id", paymentId);
+
+    // Notify tenant
+    await supabaseClient.functions.invoke("create-notification", {
+      body: {
+        user_id: payment.tenant_id,
+        title: "Refund Processed",
+        message: `A refund of ${amount || payment.amount + payment.deposit_amount}€ has been processed`,
+        type: "success",
+        link: "/tenant",
+      },
+    });
+
+    return new Response(
+      JSON.stringify({ success: true, refund }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error("Error:", error);
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      }
+    );
+  }
+});
