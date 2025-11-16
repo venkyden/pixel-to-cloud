@@ -341,6 +341,89 @@ export type Database = {
         }
         Relationships: []
       }
+      lease_terminations: {
+        Row: {
+          acknowledged_date: string | null
+          created_at: string
+          deposit_amount: number | null
+          deposit_return_date: string | null
+          deposit_returned: boolean | null
+          document_url: string | null
+          id: string
+          landlord_id: string
+          landlord_name: string
+          lease_start_date: string | null
+          notice_date: string
+          notice_type: string
+          property_address: string
+          property_id: string
+          sent_date: string | null
+          special_conditions: string | null
+          status: string
+          tenant_id: string
+          tenant_name: string
+          termination_date: string
+          termination_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_date?: string | null
+          created_at?: string
+          deposit_amount?: number | null
+          deposit_return_date?: string | null
+          deposit_returned?: boolean | null
+          document_url?: string | null
+          id?: string
+          landlord_id: string
+          landlord_name: string
+          lease_start_date?: string | null
+          notice_date: string
+          notice_type: string
+          property_address: string
+          property_id: string
+          sent_date?: string | null
+          special_conditions?: string | null
+          status?: string
+          tenant_id: string
+          tenant_name: string
+          termination_date: string
+          termination_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_date?: string | null
+          created_at?: string
+          deposit_amount?: number | null
+          deposit_return_date?: string | null
+          deposit_returned?: boolean | null
+          document_url?: string | null
+          id?: string
+          landlord_id?: string
+          landlord_name?: string
+          lease_start_date?: string | null
+          notice_date?: string
+          notice_type?: string
+          property_address?: string
+          property_id?: string
+          sent_date?: string | null
+          special_conditions?: string | null
+          status?: string
+          tenant_id?: string
+          tenant_name?: string
+          termination_date?: string
+          termination_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lease_terminations_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
