@@ -23,6 +23,8 @@ import { format } from "date-fns";
 import { RentReceipt } from "./RentReceipt";
 import { EndOfLeaseDocument } from "./EndOfLeaseDocument";
 import { ApplicationReview } from "./ApplicationReview";
+import { ContractGenerator } from "./ContractGenerator";
+import { EtatDesLieux } from "./EtatDesLieux";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Property {
@@ -296,7 +298,7 @@ export const LandlordDashboard = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="applications" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 glass-effect border-border/50 p-1">
+        <TabsList className="grid w-full grid-cols-6 glass-effect border-border/50 p-1">
           <TabsTrigger value="applications" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground transition-all duration-300">
             <Users className="mr-2 h-4 w-4" />
             Applications
@@ -304,6 +306,14 @@ export const LandlordDashboard = () => {
           <TabsTrigger value="properties" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground transition-all duration-300">
             <Home className="mr-2 h-4 w-4" />
             Properties
+          </TabsTrigger>
+          <TabsTrigger value="contracts" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground transition-all duration-300">
+            <FileText className="mr-2 h-4 w-4" />
+            Contrats
+          </TabsTrigger>
+          <TabsTrigger value="inspections" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground transition-all duration-300">
+            <CheckCircle2 className="mr-2 h-4 w-4" />
+            États des lieux
           </TabsTrigger>
           <TabsTrigger value="maintenance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground transition-all duration-300">
             <Wrench className="mr-2 h-4 w-4" />
@@ -374,6 +384,65 @@ export const LandlordDashboard = () => {
                   </div>
                 </Card>
               ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Contracts Tab */}
+        <TabsContent value="contracts" className="space-y-4">
+          {applications.filter(app => app.status === "approved").length === 0 ? (
+            <Card className="p-12 text-center glass-effect border-border/50 shadow-elegant">
+              <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground font-medium">Aucune candidature acceptée</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Les contrats apparaîtront ici une fois que vous aurez accepté des candidatures
+              </p>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {applications
+                .filter(app => app.status === "approved")
+                .map((application) => (
+                  <ContractGenerator
+                    key={application.id}
+                    applicationId={application.id}
+                    propertyId={application.property_id}
+                    propertyName={application.properties?.name || ""}
+                    propertyAddress={properties.find(p => p.id === application.property_id)?.location || ""}
+                    monthlyRent={application.properties?.price || 0}
+                    tenantId={application.user_id}
+                    tenantName={`${application.profiles?.first_name || ""} ${application.profiles?.last_name || ""}`.trim()}
+                    landlordId={user!.id}
+                    landlordName={`Propriétaire`}
+                  />
+                ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Inspections Tab */}
+        <TabsContent value="inspections" className="space-y-4">
+          {properties.length === 0 ? (
+            <Card className="p-12 text-center glass-effect border-border/50 shadow-elegant">
+              <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground font-medium">Aucune propriété</p>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {properties.map((property) => {
+                const approvedApps = applications.filter(
+                  app => app.property_id === property.id && app.status === "approved"
+                );
+                
+                if (approvedApps.length === 0) return null;
+                
+                return (
+                  <div key={property.id} className="space-y-4">
+                    <h3 className="text-lg font-semibold">{property.name}</h3>
+                    <EtatDesLieux propertyId={property.id} type="check-in" />
+                  </div>
+                );
+              })}
             </div>
           )}
         </TabsContent>
