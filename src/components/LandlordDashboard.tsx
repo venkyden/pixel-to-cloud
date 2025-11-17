@@ -22,6 +22,7 @@ import {
 import { format } from "date-fns";
 import { RentReceipt } from "./RentReceipt";
 import { EndOfLeaseDocument } from "./EndOfLeaseDocument";
+import { ApplicationReview } from "./ApplicationReview";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Property {
@@ -326,86 +327,11 @@ export const LandlordDashboard = () => {
             </Card>
           ) : (
             applications.map((application) => (
-              <Card key={application.id} className="p-6 glass-effect border-border/50 shadow-elegant overflow-hidden group hover:shadow-glow transition-all duration-300 animate-fade-in">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="relative">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-foreground">
-                          {application.profiles?.first_name || "Unknown"} {application.profiles?.last_name || ""}
-                        </h3>
-                        <Badge className={getStatusColor(application.status)}>
-                          {application.status}
-                        </Badge>
-                        {application.match_score && (
-                          <Badge variant="outline" className="bg-gradient-to-r from-success/20 to-success/10 text-success border-success/30 shadow-md">
-                            {application.match_score}% Match
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Property: {application.properties?.name || "Unknown"} (€{application.properties?.price || 0}/month)
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {application.profession || "Unknown"} • €{application.income || 0}/month
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-4 mb-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">
-                        Applied: {format(new Date(application.created_at), "MMM dd, yyyy")}
-                      </span>
-                    </div>
-                    {application.expires_at && (
-                      <div className="flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">
-                          Expires: {format(new Date(application.expires_at), "MMM dd, yyyy")}
-                        </span>
-                      </div>
-                    )}
-                    {application.move_in_date && (
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">
-                          Move-in: {format(new Date(application.move_in_date), "MMM dd, yyyy")}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {application.status === "pending" && (
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={() => handleApproveApplication(application.id)}
-                        className="flex-1 bg-gradient-to-r from-success to-success/80 hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg"
-                      >
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
-                        Approve
-                      </Button>
-                      <Button
-                        onClick={() => handleRejectApplication(application.id)}
-                        variant="outline"
-                        className="flex-1 glass-effect border-destructive/30 text-destructive hover:bg-destructive/10 transition-all duration-300"
-                      >
-                        <XCircle className="w-4 h-4 mr-2" />
-                        Reject
-                      </Button>
-                      <Button
-                        onClick={() => navigate(`/messages?user=${application.user_id}`)}
-                        variant="outline"
-                        className="glass-effect border-border/50 hover:bg-primary/5 transition-all duration-300"
-                      >
-                        Message
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </Card>
+              <ApplicationReview 
+                key={application.id}
+                application={application}
+                onUpdate={fetchDashboardData}
+              />
             ))
           )}
         </TabsContent>
