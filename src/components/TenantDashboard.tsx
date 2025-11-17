@@ -22,6 +22,7 @@ import {
 import { EtatDesLieux } from "./EtatDesLieux";
 import { RentReceipt } from "./RentReceipt";
 import { EndOfLeaseDocument } from "./EndOfLeaseDocument";
+import { ContractGenerator } from "./ContractGenerator";
 
 interface Application {
   id: string;
@@ -287,6 +288,38 @@ export const TenantDashboard = () => {
     return <EtatDesLieux propertyId={approvedApp.property_id} type="check-in" />;
   };
 
+  const ContractTab = () => {
+    const approvedApp = applications.find(a => a.status === "approved");
+    
+    if (!approvedApp) {
+      return (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold mb-2">Aucune candidature acceptée</h3>
+            <p className="text-muted-foreground">
+              Le contrat sera disponible une fois votre candidature acceptée
+            </p>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <ContractGenerator
+        applicationId={approvedApp.id}
+        propertyId={approvedApp.property_id}
+        propertyName={approvedApp.property.name}
+        propertyAddress={approvedApp.property.location}
+        monthlyRent={approvedApp.property.price}
+        tenantId={user!.id}
+        tenantName={`${user!.email}`}
+        landlordId=""
+        landlordName="Propriétaire"
+      />
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -297,9 +330,10 @@ export const TenantDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">{t("tenantDashboard.overview")}</TabsTrigger>
           <TabsTrigger value="applications">{t("tenantDashboard.applications")}</TabsTrigger>
+          <TabsTrigger value="contract">Contrat</TabsTrigger>
           <TabsTrigger value="inspection">{t("tenantDashboard.inspection")}</TabsTrigger>
           <TabsTrigger value="documents">
             <FileText className="w-4 h-4 mr-2" />
@@ -318,6 +352,10 @@ export const TenantDashboard = () => {
 
         <TabsContent value="inspection" className="mt-6">
           <InspectionTab />
+        </TabsContent>
+
+        <TabsContent value="contract" className="mt-6">
+          <ContractTab />
         </TabsContent>
 
         <TabsContent value="documents" className="mt-6">

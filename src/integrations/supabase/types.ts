@@ -47,6 +47,90 @@ export type Database = {
         }
         Relationships: []
       }
+      contracts: {
+        Row: {
+          application_id: string | null
+          contract_data: Json
+          contract_type: string
+          created_at: string | null
+          deposit_amount: number
+          duration_months: number | null
+          end_date: string | null
+          id: string
+          landlord_id: string
+          landlord_signature_url: string | null
+          landlord_signed_at: string | null
+          monthly_rent: number
+          pdf_url: string | null
+          property_id: string
+          start_date: string
+          status: string
+          tenant_id: string
+          tenant_signature_url: string | null
+          tenant_signed_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          application_id?: string | null
+          contract_data: Json
+          contract_type?: string
+          created_at?: string | null
+          deposit_amount: number
+          duration_months?: number | null
+          end_date?: string | null
+          id?: string
+          landlord_id: string
+          landlord_signature_url?: string | null
+          landlord_signed_at?: string | null
+          monthly_rent: number
+          pdf_url?: string | null
+          property_id: string
+          start_date: string
+          status?: string
+          tenant_id: string
+          tenant_signature_url?: string | null
+          tenant_signed_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          application_id?: string | null
+          contract_data?: Json
+          contract_type?: string
+          created_at?: string | null
+          deposit_amount?: number
+          duration_months?: number | null
+          end_date?: string | null
+          id?: string
+          landlord_id?: string
+          landlord_signature_url?: string | null
+          landlord_signed_at?: string | null
+          monthly_rent?: number
+          pdf_url?: string | null
+          property_id?: string
+          start_date?: string
+          status?: string
+          tenant_id?: string
+          tenant_signature_url?: string | null
+          tenant_signed_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       data_deletion_requests: {
         Row: {
           completed_at: string | null
@@ -655,28 +739,46 @@ export type Database = {
       }
       property_inspections: {
         Row: {
+          completed: boolean | null
           created_at: string
           id: string
+          inspection_data: Json | null
+          landlord_signature_url: string | null
+          landlord_signed_at: string | null
           notes: string | null
           property_id: string
+          tenant_signature_url: string | null
+          tenant_signed_at: string | null
           type: string
           user_id: string
           video_url: string | null
         }
         Insert: {
+          completed?: boolean | null
           created_at?: string
           id?: string
+          inspection_data?: Json | null
+          landlord_signature_url?: string | null
+          landlord_signed_at?: string | null
           notes?: string | null
           property_id: string
+          tenant_signature_url?: string | null
+          tenant_signed_at?: string | null
           type: string
           user_id: string
           video_url?: string | null
         }
         Update: {
+          completed?: boolean | null
           created_at?: string
           id?: string
+          inspection_data?: Json | null
+          landlord_signature_url?: string | null
+          landlord_signed_at?: string | null
           notes?: string | null
           property_id?: string
+          tenant_signature_url?: string | null
+          tenant_signed_at?: string | null
           type?: string
           user_id?: string
           video_url?: string | null
