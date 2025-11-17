@@ -11,14 +11,18 @@ import { ReviewCard } from "@/components/ReviewCard";
 import { AIPropertySearch } from "@/components/AIPropertySearch";
 import { AdvancedFilters, PropertyFilters } from "@/components/AdvancedFilters";
 import { SavedSearches } from "@/components/SavedSearches";
+import { TenantApplicationForm } from "@/components/TenantApplicationForm";
+import { PropertyLegalChecks } from "@/components/PropertyLegalChecks";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Property } from "@/types";
 import { toast } from "sonner";
-import { GitCompare } from "lucide-react";
+import { GitCompare, FileText, Shield } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Properties() {
+  const { user } = useAuth();
   const [properties, setProperties] = useState<Property[]>([]);
   const [displayProperties, setDisplayProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +30,9 @@ export default function Properties() {
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<Property[]>([]);
   const [filters, setFilters] = useState<PropertyFilters>({});
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [showLegalChecks, setShowLegalChecks] = useState(false);
+  const [selectedPropertyForAction, setSelectedPropertyForAction] = useState<Property | null>(null);
 
   useEffect(() => {
     fetchProperties();
@@ -261,6 +268,33 @@ export default function Properties() {
                         ))}
                       </div>
                     </div>
+                    {user && (
+                      <div className="flex gap-3 pt-4 border-t border-border">
+                        <Button 
+                          onClick={() => {
+                            setSelectedPropertyForAction(selectedProperty);
+                            setShowApplicationForm(true);
+                            setSelectedProperty(null);
+                          }}
+                          className="flex-1"
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          Postuler
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedPropertyForAction(selectedProperty);
+                            setShowLegalChecks(true);
+                            setSelectedProperty(null);
+                          }}
+                          className="flex-1"
+                        >
+                          <Shield className="w-4 h-4 mr-2" />
+                          Vérifier la conformité
+                        </Button>
+                      </div>
+                    )}
                   </TabsContent>
                   <TabsContent value="gallery">
                     {selectedProperty.images && selectedProperty.images.length > 0 ? (
@@ -277,6 +311,33 @@ export default function Properties() {
                   </TabsContent>
                 </Tabs>
               </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showApplicationForm} onOpenChange={setShowApplicationForm}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            {selectedPropertyForAction && (
+              <TenantApplicationForm
+                propertyId={String(selectedPropertyForAction.id)}
+                propertyName={selectedPropertyForAction.name}
+                propertyPrice={selectedPropertyForAction.price}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showLegalChecks} onOpenChange={setShowLegalChecks}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Vérification de conformité légale</DialogTitle>
+            </DialogHeader>
+            {selectedPropertyForAction && (
+              <PropertyLegalChecks
+                propertyId={String(selectedPropertyForAction.id)}
+                price={selectedPropertyForAction.price}
+                location={selectedPropertyForAction.location}
+              />
             )}
           </DialogContent>
         </Dialog>
