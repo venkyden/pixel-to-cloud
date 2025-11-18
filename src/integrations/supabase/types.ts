@@ -737,6 +737,38 @@ export type Database = {
         }
         Relationships: []
       }
+      property_diagnostics: {
+        Row: {
+          created_at: string
+          diagnostics: Json
+          id: string
+          property_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          diagnostics?: Json
+          id?: string
+          property_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          diagnostics?: Json
+          id?: string
+          property_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_diagnostics_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: true
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_inspections: {
         Row: {
           completed: boolean | null
@@ -789,6 +821,47 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ratings: {
+        Row: {
+          comment: string | null
+          contract_id: string
+          created_at: string
+          id: string
+          rated_user_id: string
+          rating: number
+          reviewer_id: string
+          updated_at: string
+        }
+        Insert: {
+          comment?: string | null
+          contract_id: string
+          created_at?: string
+          id?: string
+          rated_user_id: string
+          rating: number
+          reviewer_id: string
+          updated_at?: string
+        }
+        Update: {
+          comment?: string | null
+          contract_id?: string
+          created_at?: string
+          id?: string
+          rated_user_id?: string
+          rating?: number
+          reviewer_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
             referencedColumns: ["id"]
           },
         ]
@@ -946,6 +1019,60 @@ export type Database = {
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transaction_fees: {
+        Row: {
+          application_id: string | null
+          contract_id: string | null
+          created_at: string
+          description: string | null
+          fee_amount: number
+          fee_percentage: number
+          gross_amount: number
+          id: string
+          net_amount: number
+          transaction_type: string
+        }
+        Insert: {
+          application_id?: string | null
+          contract_id?: string | null
+          created_at?: string
+          description?: string | null
+          fee_amount: number
+          fee_percentage: number
+          gross_amount: number
+          id?: string
+          net_amount: number
+          transaction_type: string
+        }
+        Update: {
+          application_id?: string | null
+          contract_id?: string | null
+          created_at?: string
+          description?: string | null
+          fee_amount?: number
+          fee_percentage?: number
+          gross_amount?: number
+          id?: string
+          net_amount?: number
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_fees_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_fees_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
             referencedColumns: ["id"]
           },
         ]
