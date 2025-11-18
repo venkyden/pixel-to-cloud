@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,7 +15,7 @@ serve(async (req) => {
 
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
   );
 
   try {
@@ -24,7 +25,27 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { paymentId, amount, reason } = await req.json();
+    const refundSchema = z.object({
+      paymentId: z.string().uuid("Invalid payment ID"),
+      amount: z.number()
+        .positive("Refund amount must be positive")
+        .finite("Refund amount must be a valid number")
+        .optional(),
+      reason: z.enum(["duplicate", "fraudulent", "requested_by_customer"])
+        .optional()
+    });
+
+    const body = await req.json();
+    const validation = refundSchema.safeParse(body);
+    
+    if (!validation.success) {
+      return new Response(
+        JSON.stringify({ error: "Invalid input", details: validation.error.errors }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { paymentId, amount, reason } = validation.data;
 
     // Verify user is landlord or admin
     const { data: roles } = await supabaseClient
@@ -56,6 +77,12 @@ serve(async (req) => {
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
+
+    // Verify refund amount doesn't exceed original payment
+    const maxRefund = payment.amount + payment.deposit_amount;
+    if (amount && amount > maxRefund) {
+      throw new Error(`Refund amount (€${amount}) exceeds original payment (€${maxRefund})`);
+    }
 
     // Process refund
     const refund = await stripe.refunds.create({
