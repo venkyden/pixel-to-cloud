@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,7 +15,7 @@ serve(async (req) => {
 
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
   );
 
   try {
@@ -24,7 +25,29 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { applicationId, amount, depositAmount } = await req.json();
+    const escrowSchema = z.object({
+      applicationId: z.string().uuid("Invalid application ID"),
+      amount: z.number()
+        .positive("Amount must be positive")
+        .max(50000, "Amount exceeds maximum (€50,000)")
+        .finite("Amount must be a valid number"),
+      depositAmount: z.number()
+        .positive("Deposit must be positive")
+        .max(50000, "Deposit exceeds maximum (€50,000)")
+        .finite("Deposit must be a valid number")
+    });
+
+    const body = await req.json();
+    const validation = escrowSchema.safeParse(body);
+    
+    if (!validation.success) {
+      return new Response(
+        JSON.stringify({ error: "Invalid input", details: validation.error.errors }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { applicationId, amount, depositAmount } = validation.data;
     const totalAmount = amount + depositAmount;
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
