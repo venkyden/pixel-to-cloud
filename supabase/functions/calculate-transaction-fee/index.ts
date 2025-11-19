@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,6 +15,19 @@ const FEE_STRUCTURE = {
   deposit_release: 0.02, // 2% of deposit when released
 };
 
+// Input validation schema
+const feeRequestSchema = z.object({
+  transactionType: z.enum(['application', 'contract', 'monthly_rent', 'deposit_release'], {
+    errorMap: () => ({ message: "Invalid transaction type" })
+  }),
+  amount: z.number()
+    .positive('Amount must be positive')
+    .max(1000000, 'Amount exceeds maximum (€1,000,000)')
+    .finite('Amount must be a valid number'),
+  contractId: z.string().uuid('Invalid contract ID').optional(),
+  applicationId: z.string().uuid('Invalid application ID').optional()
+});
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -25,36 +39,87 @@ serve(async (req) => {
   );
 
   try {
-    const { transactionType, amount, contractId, applicationId } = await req.json();
+    // Verify authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      throw new Error("Missing authorization header");
+    }
 
-    if (!transactionType || !amount) {
-      throw new Error("Transaction type and amount are required");
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+
+    if (authError || !user) {
+      throw new Error("Unauthorized: Invalid or expired token");
+    }
+
+    // Parse and validate input
+    const body = await req.json();
+    const validation = feeRequestSchema.safeParse(body);
+
+    if (!validation.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid input', 
+          details: validation.error.errors 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    }
+
+    const { transactionType, amount, contractId, applicationId } = validation.data;
+
+    // Verify ownership if contractId provided
+    if (contractId) {
+      const { data: contract, error: contractError } = await supabaseClient
+        .from('contracts')
+        .select('tenant_id, landlord_id')
+        .eq('id', contractId)
+        .single();
+      
+      if (contractError || !contract) {
+        throw new Error('Contract not found');
+      }
+
+      if (contract.tenant_id !== user.id && contract.landlord_id !== user.id) {
+        throw new Error('Unauthorized: You do not own this contract');
+      }
+    }
+
+    // Verify ownership if applicationId provided
+    if (applicationId) {
+      const { data: application, error: appError } = await supabaseClient
+        .from('tenant_applications')
+        .select('user_id, property_id')
+        .eq('id', applicationId)
+        .single();
+      
+      if (appError || !application) {
+        throw new Error('Application not found');
+      }
+
+      // Check if user is applicant or property owner
+      const { data: property } = await supabaseClient
+        .from('properties')
+        .select('owner_id')
+        .eq('id', application.property_id)
+        .single();
+
+      if (application.user_id !== user.id && property?.owner_id !== user.id) {
+        throw new Error('Unauthorized: You do not own this application');
+      }
     }
 
     // Calculate fee based on transaction type
-    let feePercentage = 0;
-    let description = "";
-
-    switch (transactionType) {
-      case "application":
-        feePercentage = FEE_STRUCTURE.application;
-        description = "Application processing fee";
-        break;
-      case "contract":
-        feePercentage = FEE_STRUCTURE.contract;
-        description = "Contract signing fee";
-        break;
-      case "monthly_rent":
-        feePercentage = FEE_STRUCTURE.monthly_rent;
-        description = "Monthly rent transaction fee";
-        break;
-      case "deposit_release":
-        feePercentage = FEE_STRUCTURE.deposit_release;
-        description = "Deposit release fee";
-        break;
-      default:
-        throw new Error("Invalid transaction type");
-    }
+    const feePercentage = FEE_STRUCTURE[transactionType];
+    const description = {
+      application: "Application processing fee",
+      contract: "Contract signing fee",
+      monthly_rent: "Monthly rent transaction fee",
+      deposit_release: "Deposit release fee"
+    }[transactionType];
 
     const feeAmount = amount * feePercentage;
     const netAmount = amount - feeAmount;
@@ -79,8 +144,9 @@ serve(async (req) => {
 
     if (error) throw error;
 
-    // Create audit log
+    // Create audit log with user tracking
     await supabaseClient.from("audit_logs").insert({
+      user_id: user.id,
       action: "transaction_fee_calculated",
       table_name: "transaction_fees",
       record_id: data.id,
@@ -107,7 +173,7 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
+        status: error.message.includes("Unauthorized") ? 401 : 500,
       }
     );
   }
