@@ -10,6 +10,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { z } from "zod";
+import zxcvbn from "zxcvbn";
 
 const signUpSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
@@ -24,12 +25,55 @@ const signInSchema = z.object({
   password: z.string().min(1, "Password is required")
 });
 
+// Password strength color mapping
+const getPasswordStrengthColor = (score: number) => {
+  if (score === 0) return 'bg-destructive';
+  if (score === 1) return 'bg-destructive';
+  if (score === 2) return 'bg-warning';
+  if (score === 3) return 'bg-success';
+  return 'bg-success';
+};
+
 export default function Auth() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState<number>(0);
+  const [signupPassword, setSignupPassword] = useState("");
+
+  // Check password against HaveIBeenPwned API using k-anonymity
+  const checkPasswordBreach = async (password: string): Promise<boolean> => {
+    try {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+      
+      const prefix = hashHex.substring(0, 5);
+      const suffix = hashHex.substring(5);
+      
+      const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+      const text = await response.text();
+      
+      return text.split('\n').some(line => line.startsWith(suffix));
+    } catch (error) {
+      console.error('Password breach check failed:', error);
+      return false; // Fail open - don't block signup if API is down
+    }
+  };
+
+  const handlePasswordChange = (password: string) => {
+    setSignupPassword(password);
+    if (password) {
+      const result = zxcvbn(password);
+      setPasswordStrength(result.score);
+    } else {
+      setPasswordStrength(0);
+    }
+  };
 
   useEffect(() => {
     // Check if user is returning from password reset email
@@ -92,12 +136,27 @@ export default function Auth() {
     const formData = new FormData(e.currentTarget);
     const rawData = {
       email: formData.get("email") as string,
-      password: formData.get("password") as string,
+      password: signupPassword,
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
       role: formData.get("role") as string
     };
     const marketingConsent = formData.get("marketingConsent") === "on";
+
+    // Check password strength
+    if (passwordStrength < 2) {
+      toast.error("Password is too weak. Please use a stronger password with a mix of letters, numbers, and symbols.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Check if password has been breached
+    const isBreached = await checkPasswordBreach(rawData.password);
+    if (isBreached) {
+      toast.error("This password has been found in a data breach. Please choose a different password for your security.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       // Validate input
@@ -376,9 +435,42 @@ export default function Auth() {
                     type="password"
                     placeholder="••••••••"
                     required
-                    minLength={6}
+                    minLength={8}
+                    value={signupPassword}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
                     className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                   />
+                  {signupPassword && (
+                    <div className="space-y-1">
+                      <div className="flex gap-1">
+                        {[0, 1, 2, 3, 4].map((level) => (
+                          <div
+                            key={level}
+                            className={`h-1 flex-1 rounded-full transition-all ${
+                              level <= passwordStrength
+                                ? passwordStrength === 0
+                                  ? 'bg-destructive'
+                                  : passwordStrength === 1
+                                  ? 'bg-destructive'
+                                  : passwordStrength === 2
+                                  ? 'bg-warning'
+                                  : passwordStrength === 3
+                                  ? 'bg-success'
+                                  : 'bg-success'
+                                : 'bg-muted'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {passwordStrength === 0 && 'Very weak password'}
+                        {passwordStrength === 1 && 'Weak password'}
+                        {passwordStrength === 2 && 'Fair password'}
+                        {passwordStrength === 3 && 'Strong password'}
+                        {passwordStrength === 4 && 'Very strong password'}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role" className="text-sm font-medium">{t("auth.iAmA")}</Label>
