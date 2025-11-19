@@ -59,9 +59,16 @@ export const RatingSystem = ({
     }
   };
 
+  const MAX_COMMENT_LENGTH = 500;
+
   const handleSubmit = async () => {
     if (rating === 0) {
       toast.error("Please select a rating");
+      return;
+    }
+
+    if (comment.trim().length > MAX_COMMENT_LENGTH) {
+      toast.error(`Comment must be less than ${MAX_COMMENT_LENGTH} characters`);
       return;
     }
 
