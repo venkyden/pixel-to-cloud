@@ -188,6 +188,116 @@ export type Database = {
         }
         Relationships: []
       }
+      dispute_timeline: {
+        Row: {
+          action: string
+          actor_id: string
+          actor_name: string
+          created_at: string
+          details: string | null
+          dispute_id: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          actor_name: string
+          created_at?: string
+          details?: string | null
+          dispute_id: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          actor_name?: string
+          created_at?: string
+          details?: string | null
+          dispute_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispute_timeline_dispute_id_fkey"
+            columns: ["dispute_id"]
+            isOneToOne: false
+            referencedRelation: "disputes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disputes: {
+        Row: {
+          category: Database["public"]["Enums"]["dispute_category"]
+          contract_id: string | null
+          created_at: string
+          description: string
+          evidence_urls: string[] | null
+          id: string
+          landlord_id: string
+          mediator_notes: string | null
+          priority: number
+          property_id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["dispute_status"]
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["dispute_category"]
+          contract_id?: string | null
+          created_at?: string
+          description: string
+          evidence_urls?: string[] | null
+          id?: string
+          landlord_id: string
+          mediator_notes?: string | null
+          priority?: number
+          property_id: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["dispute_status"]
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["dispute_category"]
+          contract_id?: string | null
+          created_at?: string
+          description?: string
+          evidence_urls?: string[] | null
+          id?: string
+          landlord_id?: string
+          mediator_notes?: string | null
+          priority?: number
+          property_id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["dispute_status"]
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           created_at: string
@@ -1114,6 +1224,20 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "landlord" | "tenant"
+      dispute_category:
+        | "rent_payment"
+        | "property_damage"
+        | "lease_terms"
+        | "maintenance"
+        | "deposit"
+        | "noise"
+        | "other"
+      dispute_status:
+        | "open"
+        | "investigating"
+        | "mediation_scheduled"
+        | "resolved"
+        | "closed"
       incident_category:
         | "maintenance"
         | "payment"
@@ -1253,6 +1377,22 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "landlord", "tenant"],
+      dispute_category: [
+        "rent_payment",
+        "property_damage",
+        "lease_terms",
+        "maintenance",
+        "deposit",
+        "noise",
+        "other",
+      ],
+      dispute_status: [
+        "open",
+        "investigating",
+        "mediation_scheduled",
+        "resolved",
+        "closed",
+      ],
       incident_category: [
         "maintenance",
         "payment",

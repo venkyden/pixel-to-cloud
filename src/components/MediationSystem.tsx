@@ -43,9 +43,13 @@ export const MediationSystem = () => {
 
   const fetchDisputes = async () => {
     try {
-      // This would query a disputes table in production
-      // For now, showing empty state
-      setCases([]);
+      const { data, error } = await supabase
+        .from("disputes")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setCases(data || []);
     } catch (error) {
       console.error("Error fetching disputes:", error);
     }
@@ -61,7 +65,52 @@ export const MediationSystem = () => {
 
     setLoading(true);
     try {
-      // In production, this would create a dispute case
+      // Get property and tenant info
+      const { data: propertyData, error: propError } = await supabase
+        .from("properties")
+        .select("owner_id")
+        .eq("id", formData.propertyId)
+        .single();
+
+      if (propError) throw propError;
+
+      // Get tenant from active contract
+      const { data: contractData } = await supabase
+        .from("contracts")
+        .select("tenant_id")
+        .eq("property_id", formData.propertyId)
+        .eq("status", "active")
+        .maybeSingle();
+
+      const tenantId = contractData?.tenant_id || user.id;
+
+      // Create dispute
+      const { data, error } = await supabase
+        .from("disputes")
+        .insert({
+          property_id: formData.propertyId,
+          landlord_id: propertyData.owner_id,
+          tenant_id: tenantId,
+          title: formData.title,
+          description: formData.description,
+          category: formData.category as any,
+          status: "open",
+          priority: 2,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Create timeline entry
+      await supabase.from("dispute_timeline").insert({
+        dispute_id: data.id,
+        actor_id: user.id,
+        actor_name: user.email || "User",
+        action: "Dispute created",
+        details: `Category: ${formData.category}`,
+      });
+
       toast.success("Mediation case submitted successfully");
       setShowNewCase(false);
       setFormData({
@@ -73,7 +122,7 @@ export const MediationSystem = () => {
       fetchDisputes();
     } catch (error: any) {
       console.error("Error submitting case:", error);
-      toast.error("Failed to submit mediation case");
+      toast.error(error.message || "Failed to submit mediation case");
     } finally {
       setLoading(false);
     }

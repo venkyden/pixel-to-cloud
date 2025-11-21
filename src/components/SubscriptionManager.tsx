@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Crown, Zap, Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription, SUBSCRIPTION_TIERS } from "@/contexts/SubscriptionContext";
 import { toast } from "sonner";
 
 interface SubscriptionPlan {
@@ -20,77 +21,39 @@ interface SubscriptionPlan {
 
 const PLANS: SubscriptionPlan[] = [
   {
-    id: "free",
-    name: "Free",
-    price: 0,
+    id: "basic",
+    name: "Basic",
+    price: 29,
     currency: "EUR",
     interval: "month",
     icon: Building2,
-    features: [
-      "List up to 2 properties",
-      "Basic tenant screening",
-      "Standard support",
-      "3% transaction fee",
-    ],
+    features: SUBSCRIPTION_TIERS.basic.features,
   },
   {
     id: "pro",
-    name: "Professional",
-    price: 29,
+    name: "Pro",
+    price: 79,
     currency: "EUR",
     interval: "month",
     icon: Zap,
     popular: true,
-    features: [
-      "List up to 10 properties",
-      "Advanced AI tenant screening",
-      "Priority support",
-      "2% transaction fee",
-      "Automated rent collection",
-      "Contract generation",
-      "Digital signatures",
-    ],
+    features: SUBSCRIPTION_TIERS.pro.features,
   },
   {
-    id: "enterprise",
-    name: "Enterprise",
-    price: 99,
+    id: "premium",
+    name: "Premium",
+    price: 149,
     currency: "EUR",
     interval: "month",
     icon: Crown,
-    features: [
-      "Unlimited properties",
-      "Premium AI screening & matching",
-      "24/7 dedicated support",
-      "1.5% transaction fee",
-      "All Professional features",
-      "Custom integrations",
-      "White-label options",
-      "API access",
-    ],
+    features: SUBSCRIPTION_TIERS.premium.features,
   },
 ];
 
 export const SubscriptionManager = () => {
   const { user, role } = useAuth();
+  const { tier, subscribed, loading: subLoading, refreshSubscription } = useSubscription();
   const [loading, setLoading] = useState(false);
-  const [currentPlan, setCurrentPlan] = useState("free");
-
-  useEffect(() => {
-    if (user) {
-      fetchCurrentSubscription();
-    }
-  }, [user]);
-
-  const fetchCurrentSubscription = async () => {
-    try {
-      // This would query a subscriptions table in production
-      // For now, default to free
-      setCurrentPlan("free");
-    } catch (error) {
-      console.error("Error fetching subscription:", error);
-    }
-  };
 
   const handleSubscribe = async (planId: string) => {
     if (!user) {
@@ -105,17 +68,22 @@ export const SubscriptionManager = () => {
 
     setLoading(true);
     try {
-      // In production, this would create a Stripe checkout session
-      toast.info("Subscription system is in development. Contact support to upgrade.");
-      
-      // Placeholder for future Stripe integration:
-      // const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-      //   body: { planId, customerId: user.id }
-      // });
-      
+      const tierConfig = SUBSCRIPTION_TIERS[planId as keyof typeof SUBSCRIPTION_TIERS];
+      if (!tierConfig) throw new Error("Invalid plan");
+
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { price_id: tierConfig.price_id },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, "_blank");
+        toast.success("Redirecting to checkout...");
+      }
     } catch (error: any) {
       console.error("Error subscribing:", error);
-      toast.error("Failed to process subscription");
+      toast.error(error.message || "Failed to process subscription");
     } finally {
       setLoading(false);
     }
@@ -126,17 +94,17 @@ export const SubscriptionManager = () => {
 
     setLoading(true);
     try {
-      // In production, this would create a Stripe customer portal session
-      toast.info("Subscription management is in development. Contact support for changes.");
-      
-      // Placeholder for future Stripe integration:
-      // const { data, error } = await supabase.functions.invoke('create-customer-portal', {
-      //   body: { customerId: user.id }
-      // });
-      
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, "_blank");
+        toast.success("Opening subscription management...");
+      }
     } catch (error: any) {
       console.error("Error managing subscription:", error);
-      toast.error("Failed to access subscription management");
+      toast.error(error.message || "Failed to access subscription management");
     } finally {
       setLoading(false);
     }
@@ -166,7 +134,7 @@ export const SubscriptionManager = () => {
       <div className="grid md:grid-cols-3 gap-6">
         {PLANS.map((plan) => {
           const Icon = plan.icon;
-          const isCurrentPlan = currentPlan === plan.id;
+          const isCurrentPlan = tier === plan.id;
 
           return (
             <Card
@@ -222,9 +190,9 @@ export const SubscriptionManager = () => {
                     variant="outline"
                     className="w-full"
                     onClick={handleManageSubscription}
-                    disabled={loading || plan.id === "free"}
+                    disabled={loading}
                   >
-                    {plan.id === "free" ? "Current Plan" : "Manage Subscription"}
+                    Manage Subscription
                   </Button>
                 ) : (
                   <Button
@@ -233,7 +201,7 @@ export const SubscriptionManager = () => {
                     disabled={loading}
                     variant={plan.popular ? "default" : "outline"}
                   >
-                    {loading ? "Processing..." : plan.id === "free" ? "Downgrade" : "Upgrade"}
+                    {loading ? "Processing..." : "Subscribe"}
                   </Button>
                 )}
               </CardContent>
