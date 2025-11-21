@@ -9,22 +9,60 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
+const SMS_PHONE_REGEX = /^\+33[1-9]\d{8}$/;
+
 export const SMSNotifications = () => {
   const { user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [smsEnabled, setSmsEnabled] = useState(false);
   const [urgentOnly, setUrgentOnly] = useState(true);
+  const [phoneError, setPhoneError] = useState("");
+
+  const validatePhoneNumber = (phone: string): boolean => {
+    const cleaned = phone.replace(/[\s-]/g, '');
+    
+    if (!SMS_PHONE_REGEX.test(cleaned)) {
+      return false;
+    }
+    
+    const mobilePrefix = cleaned.substring(3, 4);
+    if (mobilePrefix !== '6' && mobilePrefix !== '7') {
+      toast.warning("Note: SMS notifications work best with mobile numbers (starting with +33 6 or +33 7)");
+    }
+    
+    return true;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPhoneNumber(value);
+    
+    if (value && !validatePhoneNumber(value.replace(/[\s-]/g, ''))) {
+      setPhoneError("Invalid format. Use: +33 6 12 34 56 78");
+    } else {
+      setPhoneError("");
+    }
+  };
 
   const handleSavePreferences = async () => {
     if (!user) return;
+
+    if (smsEnabled && phoneNumber) {
+      const cleaned = phoneNumber.replace(/[\s-]/g, '');
+      
+      if (!validatePhoneNumber(cleaned)) {
+        toast.error("Invalid French phone number. Use format: +33 6 12 34 56 78");
+        return;
+      }
+    }
 
     setLoading(true);
     try {
       const { error } = await supabase
         .from("profiles")
         .update({
-          phone: phoneNumber,
+          phone: phoneNumber.replace(/[\s-]/g, ''),
         })
         .eq("id", user.id);
 
@@ -59,8 +97,12 @@ export const SMSNotifications = () => {
               type="tel"
               placeholder="+33 6 12 34 56 78"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={handlePhoneChange}
+              className={phoneError ? "border-destructive" : ""}
             />
+            {phoneError && (
+              <p className="text-xs text-destructive">{phoneError}</p>
+            )}
             <p className="text-xs text-muted-foreground">
               Enter your phone number with country code (e.g., +33 for France)
             </p>
