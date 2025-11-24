@@ -40,3 +40,4 @@ dist-ssr
 # API Keys and tokens
 .api-keys
 .tokens
+.env
