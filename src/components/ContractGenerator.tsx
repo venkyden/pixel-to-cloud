@@ -243,7 +243,7 @@ export const ContractGenerator = ({
 
       const { error } = await supabase
         .from("contracts")
-        .update(updateData)
+        .update(updateData as unknown as Record<string, never>)
         .eq("id", contract.id);
 
       if (error) throw error;

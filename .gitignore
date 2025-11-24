@@ -22,3 +22,21 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables (CRITICAL - never commit these)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# Secrets and credentials
+*.pem
+*.key
+*.cert
+.secrets/
+
+# API Keys and tokens
+.api-keys
+.tokens
