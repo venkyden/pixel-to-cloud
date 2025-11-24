@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.80.0';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
+import { checkRateLimit } from "../_shared/rateLimit.ts";
+import { handleError } from "../_shared/errorHandler.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +13,9 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const rateLimit = checkRateLimit(req, { maxRequests: 30, windowMs: 60000, message: 'Too many notification requests' });
+  if (!rateLimit.allowed) return rateLimit.response!;
 
   try {
     const authHeader = req.headers.get('Authorization');
@@ -23,7 +28,7 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       global: {
         headers: {
@@ -34,7 +39,7 @@ serve(async (req) => {
 
     // Verify the JWT and get the authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Invalid authentication token' }),
@@ -48,7 +53,7 @@ serve(async (req) => {
       .select('role')
       .eq('user_id', user.id)
       .maybeSingle();
-    
+
     if (roleError || !roleData) {
       return new Response(
         JSON.stringify({ error: 'User role not found. Please complete registration.' }),
@@ -66,13 +71,13 @@ serve(async (req) => {
     });
 
     const body = await req.json();
-    
+
     // Validate input
     const validation = notificationSchema.safeParse(body);
     if (!validation.success) {
       return new Response(
-        JSON.stringify({ 
-          error: 'Invalid input', 
+        JSON.stringify({
+          error: 'Invalid input',
           details: validation.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -115,10 +120,6 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error:', error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return handleError(error, 'CREATE-NOTIFICATION');
   }
 });

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { handleError } from "../_shared/errorHandler.ts";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   apiVersion: "2025-08-27.basil",
@@ -37,7 +38,7 @@ serve(async (req) => {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        
+
         if (session.metadata?.type === "escrow") {
           const { data: escrowPayment } = await supabaseClient
             .from("escrow_payments")
@@ -78,7 +79,7 @@ serve(async (req) => {
 
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        
+
         // Update payment status
         await supabaseClient
           .from("payments")
@@ -91,7 +92,7 @@ serve(async (req) => {
 
       case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        
+
         // Update payment status
         const { data: payment } = await supabaseClient
           .from("payments")
@@ -119,7 +120,7 @@ serve(async (req) => {
 
       case "charge.refunded": {
         const charge = event.data.object as Stripe.Charge;
-        
+
         // Update escrow payment status if refunded
         await supabaseClient
           .from("escrow_payments")

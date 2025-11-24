@@ -171,13 +171,6 @@ serve(async (req) => {
       }
     );
   } catch (error: unknown) {
-    console.error("Error processing deposit refund:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
-    );
+    return handleError(error, 'PROCESS-DEPOSIT-REFUND');
   }
 });
