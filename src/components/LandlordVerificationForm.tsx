@@ -9,10 +9,20 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Shield, Upload, CheckCircle2, Clock, XCircle } from "lucide-react";
 
+interface Verification {
+  id: string;
+  user_id: string;
+  status: string;
+  full_name?: string;
+  email?: string;
+  phone?: string;
+  [key: string]: unknown;
+}
+
 export const LandlordVerificationForm = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [verification, setVerification] = useState<any>(null);
+  const [verification, setVerification] = useState<Verification | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",

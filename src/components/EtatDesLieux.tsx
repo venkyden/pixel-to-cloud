@@ -30,7 +30,21 @@ const getRoomNames = (t: (key: string) => string) => [
   t("inspection.rooms.balcony")
 ];
 
-export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: string; type: "check-in" | "check-out" }) => {
+interface Inspection {
+  id: string;
+  property_id: string;
+  type: string;
+  notes: string;
+  created_at: string;
+  [key: string]: unknown;
+}
+
+interface EtatDesLieuxProps {
+  propertyId: string;
+  type: "check-in" | "check-out";
+}
+
+export const EtatDesLieux = ({ propertyId, type }: EtatDesLieuxProps) => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [rooms, setRooms] = useState<Room[]>(
@@ -38,7 +52,7 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
   );
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [existingInspection, setExistingInspection] = useState<any>(null);
+  const [existingInspection, setExistingInspection] = useState<Inspection | null>(null);
   const [signingStatus, setSigningStatus] = useState<"pending" | "landlord-signed" | "tenant-signed" | "both-signed">("pending");
 
   useEffect(() => {
@@ -100,7 +114,7 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
   const handleConditionChange = (roomIndex: number, condition: string) => {
     setRooms(prev => {
       const updated = [...prev];
-      updated[roomIndex].condition = condition as any;
+      updated[roomIndex].condition = condition as "bon" | "moyen" | "mauvais";
       return updated;
     });
   };

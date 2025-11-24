@@ -31,6 +31,7 @@ interface Lease {
   monthly_rent: number;
   tenant_id: string;
   property_id: string;
+  duration_months: number;
   [key: string]: unknown;
 }
 

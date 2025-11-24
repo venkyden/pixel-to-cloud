@@ -33,6 +33,8 @@ interface ContractGeneratorProps {
 interface ContractData {
   terms?: {
     special_conditions?: string;
+    notice_period_tenant?: string;
+    notice_period_landlord?: string;
     [key: string]: unknown;
   };
   [key: string]: unknown;
@@ -373,11 +375,11 @@ export const ContractGenerator = ({
             </div>
           </div>
 
-          {contract.contract_data && (contract.contract_data as any).terms?.special_conditions && (
+          {contract.contract_data && (contract.contract_data as ContractData).terms?.special_conditions && (
             <div className="p-4 rounded-lg bg-muted/50">
               <p className="text-sm font-medium mb-2">Conditions particulières</p>
               <p className="text-sm text-muted-foreground">
-                {(contract.contract_data as any).terms.special_conditions}
+                {(contract.contract_data as ContractData).terms?.special_conditions}
               </p>
             </div>
           )}
@@ -387,7 +389,7 @@ export const ContractGenerator = ({
             <ul className="space-y-1 text-muted-foreground">
               <li>✓ Conforme à la Loi n° 89-462 du 6 juillet 1989</li>
               <li>✓ Respect de la Loi ALUR (2014)</li>
-              <li>✓ Préavis: {(contract.contract_data as any)?.terms?.notice_period_tenant} (locataire), {(contract.contract_data as any)?.terms?.notice_period_landlord} (bailleur)</li>
+              <li>✓ Préavis: {(contract.contract_data as ContractData)?.terms?.notice_period_tenant} (locataire), {(contract.contract_data as ContractData)?.terms?.notice_period_landlord} (bailleur)</li>
               <li>✓ Dépôt de garantie: {contract.deposit_amount <= contract.monthly_rent * 2 ? "Conforme" : "Non conforme"}</li>
             </ul>
           </div>
