@@ -7,9 +7,11 @@ import { Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+import { Property } from "@/types";
+
 interface AIPropertySearchProps {
   onSearchResults?: (matches: Array<{ id: number; score: number; reason: string }>) => void;
-  properties: any[];
+  properties: Property[];
 }
 
 export const AIPropertySearch = ({ onSearchResults, properties }: AIPropertySearchProps) => {

@@ -26,8 +26,27 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+
+interface ApplicationDocument {
+  [key: string]: string;
+}
+
+interface Application {
+  id: string;
+  user_id: string;
+  property_id: string;
+  status: string;
+  created_at: string;
+  match_score?: number;
+  monthly_income?: number;
+  employment_status?: string;
+  documents?: ApplicationDocument;
+  [key: string]: unknown;
+}
+
 interface ApplicationReviewProps {
-  application: any;
+  applicationId: string;
+  application: Application;
   onUpdate: () => void;
 }
 
@@ -173,10 +192,10 @@ export const ApplicationReview = ({ application, onUpdate }: ApplicationReviewPr
 
             <div className="space-y-3">
               <div className={`p-4 rounded-lg ${ratioValue > 33
-                  ? "bg-destructive/10 border border-destructive/20"
-                  : ratioValue > 25
-                    ? "bg-warning/10 border border-warning/20"
-                    : "bg-success/10 border border-success/20"
+                ? "bg-destructive/10 border border-destructive/20"
+                : ratioValue > 25
+                  ? "bg-warning/10 border border-warning/20"
+                  : "bg-success/10 border border-success/20"
                 }`}>
                 <p className="text-sm font-medium mb-1">Ratio Loyer/Revenus</p>
                 <p className="text-2xl font-bold">{rentToIncomeRatio}%</p>

@@ -23,6 +23,17 @@ interface LeaseManagementProps {
   userRole: "landlord" | "tenant";
 }
 
+interface Lease {
+  id: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  monthly_rent: number;
+  tenant_id: string;
+  property_id: string;
+  [key: string]: unknown;
+}
+
 export const LeaseManagement = ({ userRole }: LeaseManagementProps) => {
   const { user } = useAuth();
   const [leases, setLeases] = useState<any[]>([]);
@@ -66,7 +77,7 @@ export const LeaseManagement = ({ userRole }: LeaseManagementProps) => {
     }
   };
 
-  const getLeaseStatus = (lease: any) => {
+  const getLeaseStatus = (lease: Lease) => {
     const startDate = new Date(lease.start_date);
     const endDate = lease.end_date ? new Date(lease.end_date) : null;
     const today = new Date();
@@ -92,7 +103,7 @@ export const LeaseManagement = ({ userRole }: LeaseManagementProps) => {
     return { status: "active", color: "bg-green-500", label: "Active" };
   };
 
-  const calculateProgress = (lease: any) => {
+  const calculateProgress = (lease: Lease) => {
     const startDate = new Date(lease.start_date);
     const endDate = lease.end_date
       ? new Date(lease.end_date)
