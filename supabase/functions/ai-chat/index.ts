@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { checkRateLimit } from "../_shared/rateLimit.ts";
+import { handleError } from "../_shared/errorHandler.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,6 +10,17 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // ✅ SECURITY FIX: Add rate limiting (5 requests per minute)
+  const rateLimit = checkRateLimit(req, {
+    maxRequests: 5,
+    windowMs: 60000, // 1 minute
+    message: 'Too many AI requests. Please wait before trying again.',
+  });
+
+  if (!rateLimit.allowed) {
+    return rateLimit.response!;
   }
 
   try {
@@ -172,10 +185,7 @@ Be precise, professional, and empathetic. Always cite relevant French laws. If y
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e: unknown) {
-    console.error("Chat error:", e);
-    return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    // ✅ SECURITY FIX: Use generic error handler
+    return handleError(e, 'AI-CHAT');
   }
 });

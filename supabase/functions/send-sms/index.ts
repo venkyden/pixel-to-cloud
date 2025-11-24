@@ -83,7 +83,8 @@ serve(async (req) => {
 
     if (!response.ok) {
       logStep("Twilio error", result);
-      throw new Error(`Twilio API error: ${result.message || "Unknown error"}`);
+      // ✅ SECURITY FIX: Don't expose Twilio API details
+      throw new Error("SMS delivery failed");
     }
 
     logStep("SMS sent successfully", { sid: result.sid, status: result.status });
@@ -106,9 +107,19 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
+    // ✅ SECURITY FIX: Log detailed error server-side only
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+
+    // Return generic error message to client (prevent information leakage)
+    let publicError = "Failed to send SMS notification";
+    if (errorMessage.includes("auth")) {
+      publicError = "Authentication failed";
+    } else if (errorMessage.includes("Invalid French phone number")) {
+      publicError = "Invalid phone number format";
+    }
+
+    return new Response(JSON.stringify({ error: publicError }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

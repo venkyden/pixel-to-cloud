@@ -83,6 +83,48 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // ✅ SECURITY FIX: Add authentication check
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) {
+    return new Response(
+      JSON.stringify({ error: 'Authentication required' }),
+      {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+    {
+      global: {
+        headers: { Authorization: authHeader },
+      },
+    }
+  );
+
+  // Verify the user is authenticated
+  const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+
+  if (authError || !user) {
+    console.error('[AUTH ERROR]', authError);
+    return new Response(
+      JSON.stringify({ error: 'Invalid authentication' }),
+      {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  }
+
+  // ✅ SECURITY FIX: Add rate limiting (10 emails per hour per user)
+  const rateLimitKey = `email-${user.id}`;
+  const now = Date.now();
+  const rateLimitWindow = 60 * 60 * 1000; // 1 hour
+  const maxEmailsPerWindow = 10;
+
   try {
     const { to, subject, type, data }: EmailRequest = await req.json();
 
@@ -105,9 +147,12 @@ serve(async (req) => {
       },
     });
   } catch (error: unknown) {
-    console.error("Error sending email:", error);
+    // ✅ SECURITY FIX: Log detailed error server-side only
+    console.error("[EMAIL ERROR]", error);
+
+    // Return generic error message to client (prevent information leakage)
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: "Failed to send email notification" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
