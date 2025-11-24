@@ -52,14 +52,14 @@ export const AIChatbot = () => {
 
     try {
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
-      
+
       const response = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           messages: newMessages,
           language,
           pageContext: getPageContext()
@@ -69,7 +69,7 @@ export const AIChatbot = () => {
 
       if (!response.ok) {
         if (response.status === 429) {
-          toast.error(language === "fr" 
+          toast.error(language === "fr"
             ? "Limite de taux atteinte. Veuillez réessayer plus tard."
             : "Rate limit reached. Please try again later."
           );
@@ -113,14 +113,14 @@ export const AIChatbot = () => {
           try {
             const parsed = JSON.parse(jsonStr);
             const content = parsed.choices?.[0]?.delta?.content;
-            
+
             if (content) {
               assistantContent += content;
-              
+
               setMessages(prev => {
                 const last = prev[prev.length - 1];
                 if (last?.role === "assistant") {
-                  return prev.map((m, i) => 
+                  return prev.map((m, i) =>
                     i === prev.length - 1 ? { ...m, content: assistantContent } : m
                   );
                 }
@@ -133,9 +133,9 @@ export const AIChatbot = () => {
           }
         }
       }
-    } catch (error: any) {
-      if (error.name === 'AbortError') return;
-      
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') return;
+
       if (import.meta.env.DEV) console.error("Chat error:", error);
       toast.error(language === "fr"
         ? "Erreur lors de la communication avec l'IA"
@@ -166,10 +166,9 @@ export const AIChatbot = () => {
   }
 
   return (
-    <Card 
-      className={`fixed bottom-6 right-6 glass-effect border-border/50 shadow-elegant transition-all duration-300 ${
-        isMinimized ? "w-80 h-16" : "w-96 h-[600px]"
-      } flex flex-col overflow-hidden`}
+    <Card
+      className={`fixed bottom-6 right-6 glass-effect border-border/50 shadow-elegant transition-all duration-300 ${isMinimized ? "w-80 h-16" : "w-96 h-[600px]"
+        } flex flex-col overflow-hidden`}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       {/* Header */}
@@ -214,26 +213,24 @@ export const AIChatbot = () => {
                 </p>
               </div>
             )}
-            
+
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`mb-4 flex animate-fade-in ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
+                className={`mb-4 flex animate-fade-in ${message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2 shadow-md transition-all duration-300 hover:scale-[1.02] ${
-                    message.role === "user"
+                  className={`max-w-[80%] rounded-2xl px-4 py-2 shadow-md transition-all duration-300 hover:scale-[1.02] ${message.role === "user"
                       ? "bg-gradient-to-r from-primary to-accent text-primary-foreground"
                       : "glass-effect border border-border/50"
-                  }`}
+                    }`}
                 >
                   <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
                 </div>
               </div>
             ))}
-            
+
             {isLoading && (
               <div className="flex justify-start mb-4 animate-fade-in">
                 <div className="glass-effect rounded-2xl px-4 py-2 border border-border/50">
@@ -261,9 +258,9 @@ export const AIChatbot = () => {
                 disabled={isLoading}
                 className="flex-1 glass-effect border-border/50 focus:ring-2 focus:ring-primary/30 transition-all duration-300"
               />
-              <Button 
-                type="submit" 
-                size="icon" 
+              <Button
+                type="submit"
+                size="icon"
                 disabled={isLoading || !input.trim()}
                 className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
               >

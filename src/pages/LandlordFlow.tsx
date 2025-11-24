@@ -13,13 +13,15 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
+import { Tenant } from "@/types";
+
 const landlordSteps = ["Verify", "Listing", "Applications", "Compare", "Contract", "Management", "Support"];
 
 const LandlordFlow = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedTenant, setSelectedTenant] = useState<any | null>(null);
-  const [tenantApplications, setTenantApplications] = useState<any[]>([]);
+  const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+  const [tenantApplications, setTenantApplications] = useState<Tenant[]>([]);
 
   const handleVerification = () => {
     setCurrentStep(2);
@@ -31,7 +33,7 @@ const LandlordFlow = () => {
     toast.success("Listing published! AI matching in progress...");
   };
 
-  const handleTenantSelect = (tenant: any) => {
+  const handleTenantSelect = (tenant: Tenant) => {
     setSelectedTenant(tenant);
     setCurrentStep(4);
     toast.success(`${tenant.name} selected!`);
@@ -70,12 +72,12 @@ const LandlordFlow = () => {
               </div>
               <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
                 <p className="text-sm text-foreground">
-                  <strong>Parallel Processing Active:</strong> Applications will be reviewed simultaneously. 
+                  <strong>Parallel Processing Active:</strong> Applications will be reviewed simultaneously.
                   Top matches shown first based on income verification, rental history, and move-in date compatibility.
                 </p>
               </div>
             </div>
-            
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tenantApplications.length === 0 ? (
                 <p className="text-center text-muted-foreground col-span-3 py-12">
@@ -99,7 +101,7 @@ const LandlordFlow = () => {
           <div className="max-w-4xl mx-auto">
             <Card className="p-8">
               <h2 className="text-3xl font-bold mb-6 text-foreground">Compare & Verify: {selectedTenant.name}</h2>
-              
+
               <div className="grid md:grid-cols-2 gap-8 mb-8">
                 <div>
                   <h3 className="text-xl font-semibold mb-4 text-foreground">Tenant Profile</h3>

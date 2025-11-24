@@ -15,9 +15,9 @@ import { IncidentStatsDisplay } from "@/components/incidents/IncidentStats";
 import { IncidentTimeline } from "@/components/incidents/IncidentTimeline";
 import { Incident, IncidentStats } from "@/types/incidents";
 import { toast } from "sonner";
-import { 
-  Search, 
-  Filter, 
+import {
+  Search,
+  Filter,
   Download,
   Plus,
   FileText,
@@ -53,23 +53,27 @@ const IncidentDashboard = () => {
 
       if (error) throw error;
 
-      const formattedIncidents: Incident[] = (data || []).map((inc: any) => ({
-        id: inc.id,
-        title: inc.title,
-        description: inc.description,
-        category: inc.category,
-        status: inc.status,
-        priority: inc.priority,
-        reportedBy: inc.reported_by === user?.id ? 'tenant' : 'landlord',
-        reporterName: `${inc.reporter?.first_name || ''} ${inc.reporter?.last_name || ''}`.trim(),
-        propertyName: inc.property?.name || 'Unknown Property',
-        createdAt: inc.created_at,
-        updatedAt: inc.updated_at,
-        resolvedAt: inc.resolved_at,
-        resolution: inc.resolution,
-        attachments: inc.attachments,
-        timeline: []
-      }));
+      const formattedIncidents: Incident[] = (data || []).map((inc: Record<string, unknown>) => {
+        const reporter = inc.reporter as { first_name?: string; last_name?: string } | null;
+        const property = inc.property as { name?: string } | null;
+        return {
+          id: inc.id as string,
+          title: inc.title as string,
+          description: inc.description as string,
+          category: inc.category as Incident['category'],
+          status: inc.status as Incident['status'],
+          priority: inc.priority as Incident['priority'],
+          reportedBy: inc.reported_by === user?.id ? 'tenant' : 'landlord',
+          reporterName: `${reporter?.first_name || ''} ${reporter?.last_name || ''}`.trim(),
+          propertyName: property?.name || 'Unknown Property',
+          createdAt: inc.created_at as string,
+          updatedAt: inc.updated_at as string,
+          resolvedAt: inc.resolved_at as string | undefined,
+          resolution: inc.resolution as string | undefined,
+          attachments: inc.attachments as string[] | undefined,
+          timeline: []
+        };
+      });
 
       setIncidents(formattedIncidents);
 
@@ -96,7 +100,7 @@ const IncidentDashboard = () => {
       };
 
       setStats(calculatedStats);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to load incidents");
       if (import.meta.env.DEV) console.error(error);
     } finally {
@@ -106,7 +110,7 @@ const IncidentDashboard = () => {
 
   const filteredIncidents = incidents.filter(incident => {
     const matchesSearch = incident.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         incident.description.toLowerCase().includes(searchQuery.toLowerCase());
+      incident.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || incident.status === statusFilter;
     const matchesCategory = categoryFilter === "all" || incident.category === categoryFilter;
     return matchesSearch && matchesStatus && matchesCategory;
@@ -282,16 +286,16 @@ const IncidentDashboard = () => {
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="outline" className={
                     selectedIncident.status === 'resolved' ? 'bg-success/10 text-success border-success/20' :
-                    selectedIncident.status === 'investigating' ? 'bg-warning/10 text-warning border-warning/20' :
-                    'bg-destructive/10 text-destructive border-destructive/20'
+                      selectedIncident.status === 'investigating' ? 'bg-warning/10 text-warning border-warning/20' :
+                        'bg-destructive/10 text-destructive border-destructive/20'
                   }>
                     Status: {selectedIncident.status}
                   </Badge>
                   <Badge className={
                     selectedIncident.priority === 'critical' ? 'bg-destructive' :
-                    selectedIncident.priority === 'high' ? 'bg-warning/80 text-white' :
-                    selectedIncident.priority === 'medium' ? 'bg-secondary' :
-                    'bg-muted'
+                      selectedIncident.priority === 'high' ? 'bg-warning/80 text-white' :
+                        selectedIncident.priority === 'medium' ? 'bg-secondary' :
+                          'bg-muted'
                   }>
                     Priority: {selectedIncident.priority}
                   </Badge>

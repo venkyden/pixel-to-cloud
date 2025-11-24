@@ -16,7 +16,7 @@ import { PropertyFilters } from "./AdvancedFilters";
 interface SavedSearch {
   id: string;
   name: string;
-  filters: any;
+  filters: PropertyFilters;
   created_at: string;
 }
 
@@ -49,7 +49,7 @@ export const SavedSearches = ({ onLoadSearch }: SavedSearchesProps) => {
       return;
     }
 
-    setSearches(data || []);
+    setSearches((data as unknown as SavedSearch[]) || []);
   };
 
   const handleLoadSearch = (search: SavedSearch) => {

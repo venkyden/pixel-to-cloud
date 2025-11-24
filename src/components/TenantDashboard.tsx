@@ -7,17 +7,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { 
-  Home, 
-  FileText, 
-  MessageSquare, 
-  Calendar, 
+import {
+  Home,
+  FileText,
+  MessageSquare,
+  Calendar,
   Euro,
   CheckCircle2,
   Clock,
   AlertCircle,
   Search,
-  Upload
+  Upload,
+  LucideIcon
 } from "lucide-react";
 import { EtatDesLieux } from "./EtatDesLieux";
 import { RentReceipt } from "./RentReceipt";
@@ -64,7 +65,7 @@ export const TenantDashboard = () => {
 
       if (error) throw error;
       setApplications(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching applications:", error);
       toast.error(t("tenantDashboard.loading"));
     } finally {
@@ -73,7 +74,7 @@ export const TenantDashboard = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: any; icon: any; label: string }> = {
+    const variants: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; icon: LucideIcon; label: string }> = {
       pending: { variant: "outline", icon: Clock, label: t("tenantDashboard.status.pending") },
       approved: { variant: "default", icon: CheckCircle2, label: t("tenantDashboard.status.approved") },
       rejected: { variant: "destructive", icon: AlertCircle, label: t("tenantDashboard.status.rejected") }
@@ -270,7 +271,7 @@ export const TenantDashboard = () => {
 
   const InspectionTab = () => {
     const approvedApp = applications.find(a => a.status === "approved");
-    
+
     if (!approvedApp) {
       return (
         <Card>
@@ -290,7 +291,7 @@ export const TenantDashboard = () => {
 
   const ContractTab = () => {
     const approvedApp = applications.find(a => a.status === "approved");
-    
+
     if (!approvedApp) {
       return (
         <Card>

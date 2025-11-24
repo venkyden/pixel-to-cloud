@@ -9,9 +9,19 @@ import { Upload, FileText, CheckCircle2, AlertTriangle, AlertCircle } from "luci
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+interface DiagnosticData {
+  fileUrl?: string;
+  uploadedAt?: string;
+  date?: string;
+}
+
+interface DiagnosticsCollection {
+  [key: string]: DiagnosticData;
+}
+
 interface MandatoryDiagnosticsProps {
   propertyId: string;
-  onComplete?: (diagnostics: any) => void;
+  onComplete?: (diagnostics: DiagnosticsCollection) => void;
   readOnly?: boolean;
 }
 
@@ -79,7 +89,7 @@ export const MandatoryDiagnostics = ({
   onComplete,
   readOnly = false,
 }: MandatoryDiagnosticsProps) => {
-  const [diagnostics, setDiagnostics] = useState<any>({});
+  const [diagnostics, setDiagnostics] = useState<DiagnosticsCollection>({});
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<{ [key: string]: File }>({});
 
@@ -96,7 +106,7 @@ export const MandatoryDiagnostics = ({
         .maybeSingle();
 
       if (data) {
-        setDiagnostics(data.diagnostics || {});
+        setDiagnostics((data.diagnostics as unknown as DiagnosticsCollection) || {});
       }
     } catch (error) {
       console.error("Error fetching diagnostics:", error);
@@ -146,7 +156,7 @@ export const MandatoryDiagnostics = ({
         .from("property_diagnostics")
         .upsert({
           property_id: propertyId,
-          diagnostics: updatedDiagnostics,
+          diagnostics: updatedDiagnostics as unknown as Record<string, never>,
         });
 
       if (error) throw error;
@@ -155,7 +165,7 @@ export const MandatoryDiagnostics = ({
       setFiles({});
       fetchDiagnostics();
       onComplete?.(updatedDiagnostics);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error saving diagnostics:", error);
       toast.error("Failed to save diagnostics");
     } finally {
@@ -164,7 +174,7 @@ export const MandatoryDiagnostics = ({
   };
 
   const handleDateChange = (key: string, date: string) => {
-    setDiagnostics((prev: any) => ({
+    setDiagnostics((prev: DiagnosticsCollection) => ({
       ...prev,
       [key]: {
         ...prev[key],
@@ -173,7 +183,7 @@ export const MandatoryDiagnostics = ({
     }));
   };
 
-  const isExpired = (diagnostic: any, validityYears: number | null) => {
+  const isExpired = (diagnostic: DiagnosticData | undefined, validityYears: number | null) => {
     if (!diagnostic?.date || validityYears === null) return false;
     const expiryDate = new Date(diagnostic.date);
     expiryDate.setFullYear(expiryDate.getFullYear() + validityYears);
@@ -229,13 +239,12 @@ export const MandatoryDiagnostics = ({
             return (
               <Card
                 key={diag.key}
-                className={`${
-                  hasFile && hasDate && !expired
-                    ? "border-success/20 bg-success/5"
-                    : diag.required
+                className={`${hasFile && hasDate && !expired
+                  ? "border-success/20 bg-success/5"
+                  : diag.required
                     ? "border-warning/20 bg-warning/5"
                     : ""
-                }`}
+                  }`}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">

@@ -83,7 +83,7 @@ const TenantFlow = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
   const [applicationId, setApplicationId] = useState<string | null>(null);
-  
+
   // Application form state
   const [applicationForm, setApplicationForm] = useState({
     fullName: "",
@@ -92,7 +92,7 @@ const TenantFlow = () => {
     occupation: "",
     monthlyIncome: ""
   });
-  
+
   const [applicationDocs, setApplicationDocs] = useState({
     governmentId: null as File | null,
     incomeProof: null as File | null,
@@ -111,13 +111,29 @@ const TenantFlow = () => {
       .from("properties")
       .select("*")
       .limit(50);
-    
+
     if (error) {
       if (import.meta.env.DEV) console.error("Error fetching properties:", error);
       return;
     }
-    
-    setProperties((data as any[]) || []);
+
+    const formattedProperties: Property[] = (data || []).map((prop: Record<string, unknown>) => ({
+      id: prop.id as string | number,
+      name: String(prop.name),
+      price: Number(prop.price),
+      currency: String(prop.currency || '€'),
+      rooms: Number(prop.rooms),
+      location: String(prop.location),
+      amenities: Array.isArray(prop.amenities) ? prop.amenities as string[] : [],
+      description: String(prop.description || ''),
+      neighborhood_rating: Number(prop.neighborhood_rating || 0),
+      transport_score: Number(prop.transport_score || 0),
+      legal_status: String(prop.legal_status || 'pending'),
+      match_score: 0,
+      match_reason: ''
+    }));
+
+    setProperties(formattedProperties);
   };
 
   const handlePropertySelect = (property: Property) => {
@@ -128,7 +144,7 @@ const TenantFlow = () => {
   const uploadApplicationFile = async (file: File, userId: string, type: string): Promise<string> => {
     const fileExt = file.name.split('.').pop();
     const fileName = `${userId}/application-${type}-${Date.now()}.${fileExt}`;
-    
+
     const { error: uploadError } = await supabase.storage
       .from('verification-documents')
       .upload(fileName, file, {
@@ -137,17 +153,17 @@ const TenantFlow = () => {
       });
 
     if (uploadError) throw uploadError;
-    
+
     const { data: { publicUrl } } = supabase.storage
       .from('verification-documents')
       .getPublicUrl(fileName);
-    
+
     return publicUrl;
   };
 
   const handleApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedProperty || !user) {
       toast.error("Missing property or user information");
       return;
@@ -234,12 +250,12 @@ const TenantFlow = () => {
           <Card className="p-8 max-w-2xl mx-auto">
             <h2 className="text-3xl font-bold mb-2 text-foreground">Create Your Smart Profile</h2>
             <p className="text-muted-foreground mb-6">Tell us about your preferences and we'll find your perfect match using AI</p>
-            
+
             <form onSubmit={handleProfileSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Budget Range (€/month)</Label>
-                  <Select value={profile.budget} onValueChange={(value) => setProfile({...profile, budget: value})}>
+                  <Select value={profile.budget} onValueChange={(value) => setProfile({ ...profile, budget: value })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -254,7 +270,7 @@ const TenantFlow = () => {
 
                 <div className="space-y-2">
                   <Label>Preferred Location</Label>
-                  <Select value={profile.location} onValueChange={(value) => setProfile({...profile, location: value})}>
+                  <Select value={profile.location} onValueChange={(value) => setProfile({ ...profile, location: value })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -270,10 +286,10 @@ const TenantFlow = () => {
 
               <div className="space-y-2">
                 <Label>Move-in Date</Label>
-                <Input 
-                  type="date" 
+                <Input
+                  type="date"
                   value={profile.moveInDate}
-                  onChange={(e) => setProfile({...profile, moveInDate: e.target.value})}
+                  onChange={(e) => setProfile({ ...profile, moveInDate: e.target.value })}
                 />
               </div>
 
@@ -282,14 +298,14 @@ const TenantFlow = () => {
                 <div className="grid grid-cols-2 gap-3">
                   {amenityKeys.map((key) => (
                     <div key={key} className="flex items-center space-x-2">
-                      <Checkbox 
+                      <Checkbox
                         id={key}
                         checked={profile.amenities?.includes(key)}
                         onCheckedChange={(checked) => {
                           const newAmenities = checked
                             ? [...(profile.amenities || []), key]
                             : profile.amenities?.filter(a => a !== key) || [];
-                          setProfile({...profile, amenities: newAmenities});
+                          setProfile({ ...profile, amenities: newAmenities });
                         }}
                       />
                       <label htmlFor={key} className="text-sm cursor-pointer">
@@ -332,7 +348,7 @@ const TenantFlow = () => {
           <div className="max-w-4xl mx-auto">
             <Card className="p-8">
               <h2 className="text-3xl font-bold mb-6 text-foreground">{selectedProperty.name}</h2>
-              
+
               <div className="grid md:grid-cols-2 gap-8 mb-8">
                 <div>
                   <h3 className="text-xl font-semibold mb-4 text-foreground">Property Details</h3>
@@ -418,21 +434,21 @@ const TenantFlow = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Full Name *</Label>
-                    <Input 
-                      placeholder="John Doe" 
+                    <Input
+                      placeholder="John Doe"
                       value={applicationForm.fullName}
-                      onChange={(e) => setApplicationForm({...applicationForm, fullName: e.target.value})}
-                      required 
+                      onChange={(e) => setApplicationForm({ ...applicationForm, fullName: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>Email *</Label>
-                    <Input 
-                      type="email" 
+                    <Input
+                      type="email"
                       placeholder="john@example.com"
                       value={applicationForm.email}
-                      onChange={(e) => setApplicationForm({...applicationForm, email: e.target.value})}
-                      required 
+                      onChange={(e) => setApplicationForm({ ...applicationForm, email: e.target.value })}
+                      required
                     />
                   </div>
                 </div>
@@ -440,47 +456,47 @@ const TenantFlow = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Phone Number *</Label>
-                    <Input 
-                      type="tel" 
+                    <Input
+                      type="tel"
                       placeholder="+33 6 12 34 56 78"
                       value={applicationForm.phone}
-                      onChange={(e) => setApplicationForm({...applicationForm, phone: e.target.value})}
-                      required 
+                      onChange={(e) => setApplicationForm({ ...applicationForm, phone: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>Occupation *</Label>
-                    <Input 
+                    <Input
                       placeholder="Software Engineer"
                       value={applicationForm.occupation}
-                      onChange={(e) => setApplicationForm({...applicationForm, occupation: e.target.value})}
-                      required 
+                      onChange={(e) => setApplicationForm({ ...applicationForm, occupation: e.target.value })}
+                      required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Monthly Income (€) *</Label>
-                  <Input 
-                    type="number" 
+                  <Input
+                    type="number"
                     placeholder="3000"
                     value={applicationForm.monthlyIncome}
-                    onChange={(e) => setApplicationForm({...applicationForm, monthlyIncome: e.target.value})}
-                    required 
+                    onChange={(e) => setApplicationForm({ ...applicationForm, monthlyIncome: e.target.value })}
+                    required
                   />
                 </div>
 
                 <div className="space-y-4 p-4 bg-muted rounded-lg">
                   <Label className="text-sm font-medium">Required Documents *</Label>
-                  
+
                   <div className="space-y-3">
                     <div className="space-y-2">
                       <Label className="text-sm">Government-issued ID</Label>
                       <div className="flex items-center gap-2">
-                        <Input 
-                          type="file" 
+                        <Input
+                          type="file"
                           accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => setApplicationDocs({...applicationDocs, governmentId: e.target.files?.[0] || null})}
+                          onChange={(e) => setApplicationDocs({ ...applicationDocs, governmentId: e.target.files?.[0] || null })}
                           required
                         />
                         {applicationDocs.governmentId && <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />}
@@ -491,10 +507,10 @@ const TenantFlow = () => {
                     <div className="space-y-2">
                       <Label className="text-sm">Proof of Income</Label>
                       <div className="flex items-center gap-2">
-                        <Input 
-                          type="file" 
+                        <Input
+                          type="file"
                           accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => setApplicationDocs({...applicationDocs, incomeProof: e.target.files?.[0] || null})}
+                          onChange={(e) => setApplicationDocs({ ...applicationDocs, incomeProof: e.target.files?.[0] || null })}
                           required
                         />
                         {applicationDocs.incomeProof && <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />}
@@ -505,10 +521,10 @@ const TenantFlow = () => {
                     <div className="space-y-2">
                       <Label className="text-sm">Bank Statement</Label>
                       <div className="flex items-center gap-2">
-                        <Input 
-                          type="file" 
+                        <Input
+                          type="file"
                           accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => setApplicationDocs({...applicationDocs, bankStatement: e.target.files?.[0] || null})}
+                          onChange={(e) => setApplicationDocs({ ...applicationDocs, bankStatement: e.target.files?.[0] || null })}
                           required
                         />
                         {applicationDocs.bankStatement && <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />}
@@ -631,8 +647,8 @@ const TenantFlow = () => {
             />
 
             <Card className="p-6">
-              <Button 
-                className="w-full" 
+              <Button
+                className="w-full"
                 size="lg"
                 onClick={() => navigate('/tenant')}
               >
@@ -662,7 +678,7 @@ const TenantFlow = () => {
           </Button>
           <ProgressSteps steps={tenantSteps} currentStep={currentStep} />
         </div>
-        
+
         {renderStep()}
       </div>
     </div>

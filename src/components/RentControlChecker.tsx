@@ -41,12 +41,12 @@ export const RentControlChecker = () => {
 
   const handleCheck = () => {
     setLoading(true);
-    
+
     try {
       const surface = parseFloat(formData.surface);
       const rent = parseFloat(formData.rentAmount);
       const isFurnished = formData.furnished === "true";
-      
+
       if (isNaN(surface) || isNaN(rent) || surface <= 0 || rent <= 0) {
         throw new Error("Please enter valid numbers for surface and rent");
       }
@@ -55,21 +55,21 @@ export const RentControlChecker = () => {
       const isControlledCity = RENT_CONTROL_ZONES.zone_tendue.cities.some(
         city => formData.city.toLowerCase().includes(city.toLowerCase())
       );
-      
+
       const zone = isControlledCity ? "zone_tendue" : "zone_normale";
       let maxPerM2 = RENT_CONTROL_ZONES[zone].maxPerM2;
-      
+
       // Furnished apartments can have +15% rent
       if (isFurnished) {
         maxPerM2 *= 1.15;
       }
-      
+
       const maxAllowedRent = surface * maxPerM2;
       const rentPerM2 = rent / surface;
       const isCompliant = rent <= maxAllowedRent;
-      
+
       const excessPercentage = ((rent - maxAllowedRent) / maxAllowedRent * 100).toFixed(1);
-      
+
       let message = "";
       if (isCompliant) {
         message = `✓ This rent is compliant with French law. You are ${((maxAllowedRent - rent) / maxAllowedRent * 100).toFixed(1)}% below the maximum.`;
@@ -84,7 +84,7 @@ export const RentControlChecker = () => {
         zone: zone === "zone_tendue" ? "Rent-Controlled Zone" : "Normal Zone",
         message
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error checking rent control:", error);
     } finally {
       setLoading(false);
@@ -162,8 +162,8 @@ export const RentControlChecker = () => {
           </div>
         </div>
 
-        <Button 
-          onClick={handleCheck} 
+        <Button
+          onClick={handleCheck}
           disabled={loading || !formData.city || !formData.surface || !formData.rentAmount}
           className="w-full"
         >

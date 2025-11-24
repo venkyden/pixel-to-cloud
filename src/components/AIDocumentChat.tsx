@@ -41,7 +41,7 @@ export const AIDocumentChat = ({ documentName, documentContext }: AIDocumentChat
 
     try {
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-document-qa`;
-      
+
       const response = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
@@ -57,7 +57,7 @@ export const AIDocumentChat = ({ documentName, documentContext }: AIDocumentChat
 
       if (!response.ok) {
         if (response.status === 429) {
-          toast.error(language === 'fr' 
+          toast.error(language === 'fr'
             ? 'Limite de taux atteinte. Réessayez plus tard.'
             : 'Rate limit reached. Try again later.'
           );
@@ -101,14 +101,14 @@ export const AIDocumentChat = ({ documentName, documentContext }: AIDocumentChat
           try {
             const parsed = JSON.parse(jsonStr);
             const content = parsed.choices?.[0]?.delta?.content;
-            
+
             if (content) {
               assistantContent += content;
-              
+
               setMessages(prev => {
                 const last = prev[prev.length - 1];
                 if (last?.role === "assistant") {
-                  return prev.map((m, i) => 
+                  return prev.map((m, i) =>
                     i === prev.length - 1 ? { ...m, content: assistantContent } : m
                   );
                 }
@@ -121,7 +121,7 @@ export const AIDocumentChat = ({ documentName, documentContext }: AIDocumentChat
           }
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (import.meta.env.DEV) console.error("Document chat error:", error);
       toast.error(language === 'fr'
         ? 'Erreur lors de l\'analyse du document'
@@ -149,26 +149,24 @@ export const AIDocumentChat = ({ documentName, documentContext }: AIDocumentChat
                 : 'Ask questions about this document...'}
             </div>
           )}
-          
+
           {messages.map((message, index) => (
             <div
               key={index}
-              className={`mb-3 flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
-              }`}
+              className={`mb-3 flex ${message.role === "user" ? "justify-end" : "justify-start"
+                }`}
             >
               <div
-                className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                  message.role === "user"
+                className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${message.role === "user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
-                }`}
+                  }`}
               >
                 <p className="whitespace-pre-wrap">{message.content}</p>
               </div>
             </div>
           ))}
-          
+
           {isLoading && (
             <div className="flex justify-start mb-3">
               <div className="bg-muted rounded-lg px-3 py-2">

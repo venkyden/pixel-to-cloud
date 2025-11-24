@@ -13,6 +13,12 @@ interface PropertyLegalChecksProps {
   hasLeadDiagnostic?: boolean;
 }
 
+interface LegalCheckResult {
+  name: string;
+  status: "pass" | "fail" | "warning";
+  details: string;
+}
+
 export const PropertyLegalChecks = ({
   propertyId,
   price,
@@ -23,7 +29,7 @@ export const PropertyLegalChecks = ({
   hasAsbestosDiagnostic = false,
   hasLeadDiagnostic = false,
 }: PropertyLegalChecksProps) => {
-  const [checks, setChecks] = useState<any[]>([]);
+  const [checks, setChecks] = useState<LegalCheckResult[]>([]);
 
   useEffect(() => {
     runLegalChecks();
@@ -34,7 +40,7 @@ export const PropertyLegalChecks = ({
 
     // Check rent control zones (Paris and surrounding areas)
     const rentControlZones = ["Paris", "Lille", "Lyon", "Montpellier", "Bordeaux"];
-    const isInControlZone = rentControlZones.some(zone => 
+    const isInControlZone = rentControlZones.some(zone =>
       location.toLowerCase().includes(zone.toLowerCase())
     );
 
@@ -64,7 +70,7 @@ export const PropertyLegalChecks = ({
     results.push({
       name: "Diagnostic de Performance Énergétique (DPE)",
       status: hasEnergyDiagnostic ? "pass" : "fail",
-      details: hasEnergyDiagnostic 
+      details: hasEnergyDiagnostic
         ? "DPE fourni (obligatoire depuis 2006 - Loi ENL)"
         : "⚠️ DPE manquant - Obligatoire pour toute mise en location",
     });

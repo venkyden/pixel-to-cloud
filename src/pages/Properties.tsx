@@ -39,10 +39,6 @@ export default function Properties() {
   }, []);
 
   useEffect(() => {
-    applyFilters();
-  }, [filters, properties]);
-
-  const applyFilters = () => {
     let filtered = [...properties];
 
     if (filters.minPrice) {
@@ -78,7 +74,7 @@ export default function Properties() {
     }
 
     setDisplayProperties(filtered);
-  };
+  }, [filters, properties]);
 
   const fetchProperties = async () => {
     try {
@@ -89,25 +85,25 @@ export default function Properties() {
 
       if (error) throw error;
 
-      const formattedProperties: Property[] = (data || []).map((prop: any) => ({
-        id: Number(prop.id.split('-')[0]),
-        name: prop.name,
+      const formattedProperties: Property[] = (data || []).map((prop: Record<string, unknown>) => ({
+        id: Number(String(prop.id).split('-')[0]),
+        name: String(prop.name),
         price: Number(prop.price),
-        currency: prop.currency || '€',
-        rooms: prop.rooms,
-        location: prop.location,
-        amenities: prop.amenities || [],
-        description: prop.description || '',
-        neighborhood_rating: prop.neighborhood_rating || 0,
-        transport_score: prop.transport_score || 0,
-        legal_status: prop.legal_status || 'pending',
+        currency: String(prop.currency || '€'),
+        rooms: Number(prop.rooms),
+        location: String(prop.location),
+        amenities: Array.isArray(prop.amenities) ? prop.amenities as string[] : [],
+        description: String(prop.description || ''),
+        neighborhood_rating: Number(prop.neighborhood_rating || 0),
+        transport_score: Number(prop.transport_score || 0),
+        legal_status: String(prop.legal_status || 'pending'),
         match_score: 0,
         match_reason: ''
       }));
 
       setProperties(formattedProperties);
       setDisplayProperties(formattedProperties);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Failed to load properties");
       if (import.meta.env.DEV) console.error(error);
     } finally {
@@ -120,11 +116,11 @@ export default function Properties() {
       const match = matches.find(m => m.id === prop.id);
       return match ? { ...prop, match_score: match.score, match_reason: match.reason } : prop;
     });
-    
+
     const sortedProperties = updatedProperties
       .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
       .filter(p => (p.match_score || 0) > 0);
-    
+
     setDisplayProperties(sortedProperties.length > 0 ? sortedProperties : updatedProperties);
   };
 
@@ -165,7 +161,7 @@ export default function Properties() {
             <AdvancedFilters
               filters={filters}
               onFiltersChange={setFilters}
-              onSaveSearch={() => {}}
+              onSaveSearch={() => { }}
             />
             <Button
               variant={compareMode ? "default" : "outline"}
@@ -193,8 +189,8 @@ export default function Properties() {
 
           <div className="lg:col-span-3">
             <div className="mb-6">
-              <AIPropertySearch 
-                properties={properties} 
+              <AIPropertySearch
+                properties={properties}
                 onSearchResults={handleAISearchResults}
               />
             </div>
@@ -270,7 +266,7 @@ export default function Properties() {
                     </div>
                     {user && (
                       <div className="flex gap-3 pt-4 border-t border-border">
-                        <Button 
+                        <Button
                           onClick={() => {
                             setSelectedPropertyForAction(selectedProperty);
                             setShowApplicationForm(true);
@@ -281,7 +277,7 @@ export default function Properties() {
                           <FileText className="w-4 h-4 mr-2" />
                           Postuler
                         </Button>
-                        <Button 
+                        <Button
                           variant="outline"
                           onClick={() => {
                             setSelectedPropertyForAction(selectedProperty);

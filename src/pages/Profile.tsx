@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,16 +11,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
-import { 
-  AlertDialog, 
-  AlertDialogAction, 
-  AlertDialogCancel, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogFooter, 
-  AlertDialogHeader, 
-  AlertDialogTitle, 
-  AlertDialogTrigger 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 
 interface Profile {
@@ -52,13 +52,7 @@ export default function Profile() {
     confirmPassword: "",
   });
 
-  useEffect(() => {
-    if (user) {
-      fetchProfile();
-    }
-  }, [user]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -85,7 +79,13 @@ export default function Profile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user, fetchProfile]);
 
   const handleSaveProfile = async () => {
     if (!user) return;
@@ -105,9 +105,9 @@ export default function Profile() {
 
       toast.success(t("common.saveChanges") + " successful");
       fetchProfile();
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (import.meta.env.DEV) console.error("Error updating profile:", error);
-      toast.error("Failed to update profile: " + error.message);
+      toast.error("Failed to update profile: " + (error instanceof Error ? error.message : "Unknown error"));
     } finally {
       setSaving(false);
     }
@@ -137,15 +137,15 @@ export default function Profile() {
         newPassword: "",
         confirmPassword: "",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (import.meta.env.DEV) console.error("Error updating password:", error);
-      toast.error("Failed to update password: " + error.message);
+      toast.error("Failed to update password: " + (error instanceof Error ? error.message : "Unknown error"));
     }
   };
 
   const handleExportData = async () => {
     if (!user) return;
-    
+
     setIsExporting(true);
     try {
       const { error } = await supabase
@@ -158,8 +158,8 @@ export default function Profile() {
       if (error) throw error;
 
       toast.success(t("profile.exportRequested"));
-    } catch (error: any) {
-      toast.error(t("profile.exportError") + " " + error.message);
+    } catch (error: unknown) {
+      toast.error(t("profile.exportError") + " " + (error instanceof Error ? error.message : "Unknown error"));
     } finally {
       setIsExporting(false);
     }
@@ -167,7 +167,7 @@ export default function Profile() {
 
   const handleDeleteAccount = async () => {
     if (!user) return;
-    
+
     setIsDeleting(true);
     try {
       const { error } = await supabase
@@ -180,12 +180,12 @@ export default function Profile() {
       if (error) throw error;
 
       toast.success(t("profile.deleteRequested"));
-      
+
       setTimeout(async () => {
         await supabase.auth.signOut();
       }, 2000);
-    } catch (error: any) {
-      toast.error(t("profile.deleteError") + " " + error.message);
+    } catch (error: unknown) {
+      toast.error(t("profile.deleteError") + " " + (error instanceof Error ? error.message : "Unknown error"));
     } finally {
       setIsDeleting(false);
     }
@@ -233,21 +233,21 @@ export default function Profile() {
                       <Label htmlFor="firstName">{t("common.firstName")}</Label>
                       <div className="relative">
                         <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input 
-                          id="firstName" 
+                        <Input
+                          id="firstName"
                           value={formData.first_name}
-                          onChange={(e) => setFormData({...formData, first_name: e.target.value})}
-                          className="pl-10" 
+                          onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                          className="pl-10"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="lastName">{t("common.lastName")}</Label>
-                      <Input 
-                        id="lastName" 
+                      <Input
+                        id="lastName"
                         value={formData.last_name}
-                        onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                        onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                       />
                     </div>
 
@@ -255,12 +255,12 @@ export default function Profile() {
                       <Label htmlFor="email">{t("common.email")}</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input 
-                          id="email" 
-                          type="email" 
+                        <Input
+                          id="email"
+                          type="email"
                           value={formData.email}
                           disabled
-                          className="pl-10" 
+                          className="pl-10"
                         />
                       </div>
                     </div>
@@ -269,18 +269,18 @@ export default function Profile() {
                       <Label htmlFor="phone">{t("common.phone")}</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input 
-                          id="phone" 
+                        <Input
+                          id="phone"
                           value={formData.phone}
-                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                          className="pl-10" 
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          className="pl-10"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <Button 
-                    className="w-full md:w-auto bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
+                  <Button
+                    className="w-full md:w-auto bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg"
                     onClick={handleSaveProfile}
                     disabled={saving}
                   >
@@ -299,32 +299,32 @@ export default function Profile() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">{t("profile.currentPassword")}</Label>
-                <Input 
-                  id="currentPassword" 
+                <Input
+                  id="currentPassword"
                   type="password"
                   value={passwordData.currentPassword}
-                  onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="newPassword">{t("profile.newPassword")}</Label>
-                <Input 
-                  id="newPassword" 
+                <Input
+                  id="newPassword"
                   type="password"
                   value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">{t("profile.confirmPassword")}</Label>
-                <Input 
-                  id="confirmPassword" 
+                <Input
+                  id="confirmPassword"
                   type="password"
                   value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                 />
               </div>
-              <Button 
+              <Button
                 variant="outline"
                 onClick={handleUpdatePassword}
                 disabled={!passwordData.newPassword || !passwordData.confirmPassword}
@@ -353,8 +353,8 @@ export default function Profile() {
                     <p className="text-sm text-muted-foreground mb-3">
                       {t("profile.dataPortabilityText")}
                     </p>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={handleExportData}
                       disabled={isExporting}
                     >
@@ -373,7 +373,7 @@ export default function Profile() {
                     <p className="text-sm text-muted-foreground mb-3">
                       {t("profile.rightToErasureText")}
                     </p>
-                    
+
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="destructive" disabled={isDeleting}>

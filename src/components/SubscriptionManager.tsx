@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Crown, Zap, Building2 } from "lucide-react";
+import { Check, Crown, Zap, Building2, LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription, SUBSCRIPTION_TIERS } from "@/contexts/SubscriptionContext";
@@ -15,7 +15,7 @@ interface SubscriptionPlan {
   currency: string;
   interval: "month" | "year";
   features: string[];
-  icon: any;
+  icon: LucideIcon;
   popular?: boolean;
 }
 
@@ -81,9 +81,9 @@ export const SubscriptionManager = () => {
         window.open(data.url, "_blank");
         toast.success("Redirecting to checkout...");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error subscribing:", error);
-      toast.error(error.message || "Failed to process subscription");
+      toast.error((error instanceof Error ? error.message : "Unknown error") || "Failed to process subscription");
     } finally {
       setLoading(false);
     }
@@ -102,9 +102,9 @@ export const SubscriptionManager = () => {
         window.open(data.url, "_blank");
         toast.success("Opening subscription management...");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error managing subscription:", error);
-      toast.error(error.message || "Failed to access subscription management");
+      toast.error((error instanceof Error ? error.message : "Unknown error") || "Failed to access subscription management");
     } finally {
       setLoading(false);
     }
@@ -139,11 +139,10 @@ export const SubscriptionManager = () => {
           return (
             <Card
               key={plan.id}
-              className={`relative ${
-                plan.popular
-                  ? "border-primary shadow-lg scale-105"
-                  : ""
-              } ${isCurrentPlan ? "border-success" : ""}`}
+              className={`relative ${plan.popular
+                ? "border-primary shadow-lg scale-105"
+                : ""
+                } ${isCurrentPlan ? "border-success" : ""}`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">

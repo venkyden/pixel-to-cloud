@@ -54,7 +54,7 @@ export const LandlordVerificationForm = () => {
       .upload(path, file, { upsert: true });
 
     if (error) throw error;
-    
+
     const { data: { publicUrl } } = supabase.storage
       .from('documents')
       .getPublicUrl(path);
@@ -98,18 +98,18 @@ export const LandlordVerificationForm = () => {
 
       const { error } = verification
         ? await supabase
-            .from("landlord_verifications")
-            .update(verificationData)
-            .eq("id", verification.id)
+          .from("landlord_verifications")
+          .update(verificationData)
+          .eq("id", verification.id)
         : await supabase
-            .from("landlord_verifications")
-            .insert(verificationData);
+          .from("landlord_verifications")
+          .insert(verificationData);
 
       if (error) throw error;
 
       toast.success("Verification submitted successfully!");
       fetchVerification();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting verification:", error);
       toast.error("Failed to submit verification");
     } finally {
@@ -271,9 +271,9 @@ export const LandlordVerificationForm = () => {
               </div>
             )}
 
-            <Button 
-              type="submit" 
-              disabled={loading || verification?.status === "pending"} 
+            <Button
+              type="submit"
+              disabled={loading || verification?.status === "pending"}
               className="w-full"
             >
               {loading ? "Envoi en cours..." : verification ? "Mettre à jour" : "Soumettre pour vérification"}

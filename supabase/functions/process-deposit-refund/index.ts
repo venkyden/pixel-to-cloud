@@ -39,7 +39,7 @@ serve(async (req) => {
     // Validate input
     const body = await req.json();
     const validation = refundSchema.safeParse(body);
-    
+
     if (!validation.success) {
       return new Response(
         JSON.stringify({ error: "Invalid input", details: validation.error.errors }),
@@ -127,9 +127,8 @@ serve(async (req) => {
     await supabaseClient.from("notifications").insert({
       user_id: contract.tenant_id,
       title: "Deposit Refund Processed",
-      message: `Your deposit refund of €${refundAmount.toFixed(2)} has been processed. ${
-        deductions > 0 ? `Deductions: €${deductions.toFixed(2)}. Reason: ${reason}` : ""
-      }`,
+      message: `Your deposit refund of €${refundAmount.toFixed(2)} has been processed. ${deductions > 0 ? `Deductions: €${deductions.toFixed(2)}. Reason: ${reason}` : ""
+        }`,
       type: deductions > 0 ? "warning" : "success",
     });
 
@@ -165,10 +164,10 @@ serve(async (req) => {
         status: 200,
       }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error processing deposit refund:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,

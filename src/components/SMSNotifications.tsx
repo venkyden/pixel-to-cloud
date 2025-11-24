@@ -21,23 +21,23 @@ export const SMSNotifications = () => {
 
   const validatePhoneNumber = (phone: string): boolean => {
     const cleaned = phone.replace(/[\s-]/g, '');
-    
+
     if (!SMS_PHONE_REGEX.test(cleaned)) {
       return false;
     }
-    
+
     const mobilePrefix = cleaned.substring(3, 4);
     if (mobilePrefix !== '6' && mobilePrefix !== '7') {
       toast.warning("Note: SMS notifications work best with mobile numbers (starting with +33 6 or +33 7)");
     }
-    
+
     return true;
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPhoneNumber(value);
-    
+
     if (value && !validatePhoneNumber(value.replace(/[\s-]/g, ''))) {
       setPhoneError("Invalid format. Use: +33 6 12 34 56 78");
     } else {
@@ -50,7 +50,7 @@ export const SMSNotifications = () => {
 
     if (smsEnabled && phoneNumber) {
       const cleaned = phoneNumber.replace(/[\s-]/g, '');
-      
+
       if (!validatePhoneNumber(cleaned)) {
         toast.error("Invalid French phone number. Use format: +33 6 12 34 56 78");
         return;
@@ -69,7 +69,7 @@ export const SMSNotifications = () => {
       if (error) throw error;
 
       toast.success("SMS notification preferences saved");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error saving SMS preferences:", error);
       toast.error("Failed to save preferences");
     } finally {
@@ -160,8 +160,8 @@ export const SMSNotifications = () => {
           </div>
         </div>
 
-        <Button 
-          onClick={handleSavePreferences} 
+        <Button
+          onClick={handleSavePreferences}
           disabled={loading || !phoneNumber}
           className="w-full"
         >

@@ -93,7 +93,7 @@ export const MediationSystem = () => {
           tenant_id: tenantId,
           title: formData.title,
           description: formData.description,
-          category: formData.category as any,
+          category: formData.category as "rent_payment" | "property_damage" | "maintenance" | "lease_terms" | "deposit" | "noise" | "other",
           status: "open",
           priority: 2,
         })
@@ -120,9 +120,9 @@ export const MediationSystem = () => {
         propertyId: "",
       });
       fetchDisputes();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting case:", error);
-      toast.error(error.message || "Failed to submit mediation case");
+      toast.error((error instanceof Error ? error.message : "Unknown error") || "Failed to submit mediation case");
     } finally {
       setLoading(false);
     }
@@ -271,8 +271,8 @@ export const MediationSystem = () => {
                   </div>
                   <Badge variant={
                     disputeCase.status === "resolved" ? "default" :
-                    disputeCase.status === "in_progress" ? "secondary" :
-                    "destructive"
+                      disputeCase.status === "in_progress" ? "secondary" :
+                        "destructive"
                   }>
                     {disputeCase.status}
                   </Badge>

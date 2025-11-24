@@ -9,14 +9,33 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface EmailData {
+  propertyName?: string;
+  status?: string;
+  message?: string;
+  amount?: number;
+  description?: string;
+  date?: string;
+  dueDate?: string;
+  title?: string;
+  resolution?: string;
+  refundAmount?: number;
+  deductions?: number;
+  reason?: string;
+  contractId?: string;
+  to?: string;
+  subject?: string;
+  type?: string;
+}
+
 interface EmailRequest {
   to: string;
   subject: string;
-  type: "application_update" | "payment_received" | "rent_reminder" | "incident_update";
-  data: any;
+  type: "application_update" | "payment_received" | "rent_reminder" | "incident_update" | "deposit_refund";
+  data: EmailData;
 }
 
-const getEmailTemplate = (type: string, data: any) => {
+const getEmailTemplate = (type: string, data: EmailData) => {
   switch (type) {
     case "application_update":
       return `
@@ -33,14 +52,14 @@ const getEmailTemplate = (type: string, data: any) => {
         <p>Bonjour,</p>
         <p>Nous avons bien reçu votre paiement de <strong>${data.amount} €</strong>.</p>
         <p><strong>Description:</strong> ${data.description}</p>
-        <p><strong>Date:</strong> ${new Date(data.date).toLocaleDateString("fr-FR")}</p>
+        <p><strong>Date:</strong> ${new Date(data.date || new Date().toISOString()).toLocaleDateString("fr-FR")}</p>
         <p>Cordialement,<br>L'équipe</p>
       `;
     case "rent_reminder":
       return `
         <h1>Rappel de loyer</h1>
         <p>Bonjour,</p>
-        <p>Ceci est un rappel que votre loyer de <strong>${data.amount} €</strong> est dû le <strong>${new Date(data.dueDate).toLocaleDateString("fr-FR")}</strong>.</p>
+        <p>Ceci est un rappel que votre loyer de <strong>${data.amount} €</strong> est dû le <strong>${new Date(data.dueDate || new Date().toISOString()).toLocaleDateString("fr-FR")}</strong>.</p>
         <p><strong>Logement:</strong> ${data.propertyName}</p>
         <p>Le paiement sera collecté automatiquement si vous avez configuré le prélèvement automatique.</p>
         <p>Cordialement,<br>L'équipe</p>
@@ -85,10 +104,10 @@ serve(async (req) => {
         ...corsHeaders,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error sending email:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

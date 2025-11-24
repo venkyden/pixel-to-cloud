@@ -68,7 +68,7 @@ export const PropertyInspection = () => {
 
       if (error) throw error;
       setProperties(data || []);
-      
+
       if (data && data.length > 0) {
         setSelectedProperty(data[0].id);
       }
@@ -97,11 +97,11 @@ export const PropertyInspection = () => {
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: true 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
       });
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
@@ -138,13 +138,13 @@ export const PropertyInspection = () => {
   const stopRecording = () => {
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
       mediaRecorder.stop();
-      
+
       mediaRecorder.onstop = () => {
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
         const file = new File([blob], `inspection-${Date.now()}.webm`, { type: 'video/webm' });
         setSelectedFile(file);
         setRecordedChunks([]);
-        
+
         // Stop camera stream
         if (videoRef.current && videoRef.current.srcObject) {
           const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
@@ -152,7 +152,7 @@ export const PropertyInspection = () => {
           videoRef.current.srcObject = null;
         }
       };
-      
+
       setRecording(false);
       setMediaRecorder(null);
     }
@@ -193,7 +193,7 @@ export const PropertyInspection = () => {
       const validated = inspectionSchema.parse({ notes, type: inspectionType });
 
       setUploading(true);
-      
+
       // Upload to storage
       const filePath = `${user.id}/${selectedProperty}/${Date.now()}-${selectedFile.name}`;
       const { error: uploadError } = await supabase.storage
@@ -231,10 +231,10 @@ export const PropertyInspection = () => {
       setSelectedFile(null);
       setNotes("");
       if (fileInputRef.current) fileInputRef.current.value = "";
-      
+
       // Refresh inspections
       fetchInspections();
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         toast({
           title: "Validation error",
@@ -243,11 +243,11 @@ export const PropertyInspection = () => {
         });
         return;
       }
-      
+
       if (import.meta.env.DEV) console.error("Error uploading video:", error);
       toast({
         title: "Upload failed",
-        description: error.message,
+        description: (error instanceof Error ? error.message : "Unknown error"),
         variant: "destructive",
       });
     } finally {
@@ -330,7 +330,7 @@ export const PropertyInspection = () => {
 
             <div className="space-y-2">
               <Label>Inspection Type</Label>
-              <Select value={inspectionType} onValueChange={(v: any) => setInspectionType(v)}>
+              <Select value={inspectionType} onValueChange={(v: "check-in" | "check-out") => setInspectionType(v)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

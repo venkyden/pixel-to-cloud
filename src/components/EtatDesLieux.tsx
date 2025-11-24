@@ -60,7 +60,7 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
         .single();
 
       if (error && error.code !== "PGRST116") throw error;
-      
+
       if (data) {
         setExistingInspection(data);
         // Parse existing data
@@ -77,7 +77,7 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
           setSigningStatus("tenant-signed");
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching inspection:", error);
     } finally {
       setLoading(false);
@@ -86,14 +86,14 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
 
   const handlePhotoUpload = (roomIndex: number, files: FileList | null) => {
     if (!files) return;
-    
+
     const newFiles = Array.from(files);
     setRooms(prev => {
       const updated = [...prev];
       updated[roomIndex].photos = [...updated[roomIndex].photos, ...newFiles];
       return updated;
     });
-    
+
     toast.success(`${newFiles.length} ${t("inspection.photosAdded")}`);
   };
 
@@ -115,13 +115,13 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
 
   const uploadPhotosToStorage = async () => {
     const uploadedUrls: string[] = [];
-    
+
     for (const room of rooms) {
       for (const photo of room.photos) {
         try {
           const fileExt = photo.name.split(".").pop();
           const fileName = `${propertyId}/${type}/${room.name}/${Date.now()}.${fileExt}`;
-          
+
           const { data, error } = await supabase.storage
             .from("property-videos") // Reusing existing bucket
             .upload(fileName, photo, {
@@ -136,13 +136,13 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
             .getPublicUrl(data.path);
 
           uploadedUrls.push(publicUrl);
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error("Error uploading photo:", error);
           toast.error(`${t("inspection.error")}: ${photo.name}`);
         }
       }
     }
-    
+
     return uploadedUrls;
   };
 
@@ -188,7 +188,7 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
 
       toast.success(t("inspection.inspectionSaved"));
       fetchExistingInspection();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting inspection:", error);
       toast.error(t("inspection.error"));
     } finally {
@@ -202,7 +202,7 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
     try {
       const parsedData = JSON.parse(existingInspection.notes || "{}");
       const isLandlord = true; // TODO: Check actual role from property ownership
-      
+
       if (isLandlord) {
         parsedData.landlordSignature = {
           userId: user.id,
@@ -224,7 +224,7 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
 
       toast.success(t("inspection.signatureSaved"));
       fetchExistingInspection();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error signing:", error);
       toast.error(t("inspection.error"));
     }
@@ -315,8 +315,8 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
                   <h4 className="font-semibold text-foreground">{room.name}</h4>
                   <Badge variant={
                     room.condition === "excellent" ? "default" :
-                    room.condition === "bon" ? "secondary" :
-                    room.condition === "moyen" ? "outline" : "destructive"
+                      room.condition === "bon" ? "secondary" :
+                        room.condition === "moyen" ? "outline" : "destructive"
                   }>
                     {t(`inspection.conditions.${room.condition === "bon" ? "good" : room.condition === "moyen" ? "average" : room.condition === "mauvais" ? "poor" : "excellent"}`)}
                   </Badge>
@@ -378,8 +378,8 @@ export const EtatDesLieux = ({ propertyId, type = "check-in" }: { propertyId: st
           ))}
         </div>
 
-        <Button 
-          onClick={handleSubmitInspection} 
+        <Button
+          onClick={handleSubmitInspection}
           disabled={uploading || rooms.some(r => r.photos.length === 0)}
           className="w-full"
           size="lg"

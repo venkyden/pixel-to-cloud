@@ -37,6 +37,11 @@ interface Incident {
   property_id: string;
 }
 
+interface Property {
+  id: string;
+  name: string;
+}
+
 export const MaintenanceRequests = () => {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -44,7 +49,7 @@ export const MaintenanceRequests = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [properties, setProperties] = useState<any[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -71,7 +76,7 @@ export const MaintenanceRequests = () => {
 
       if (error) throw error;
       setProperties(data || []);
-      
+
       if (data && data.length > 0) {
         setFormData(prev => ({ ...prev, property_id: data[0].id }));
       }
@@ -154,15 +159,15 @@ export const MaintenanceRequests = () => {
 
       setSubmitting(true);
 
-      const { error } = await supabase.from("incidents").insert([{
+      const { error } = await supabase.from("incidents").insert({
         title: validated.title,
         description: validated.description,
-        priority: formData.priority as any,
-        category: formData.category as any,
+        priority: formData.priority as "low" | "medium" | "high" | "critical",
+        category: formData.category as "maintenance" | "payment" | "dispute" | "legal" | "safety" | "communication" | "other",
         property_id: validated.property_id,
         reported_by: user.id,
-        status: "open" as any,
-      }]);
+        status: "open" as "open" | "investigating" | "resolved" | "closed",
+      });
 
       if (error) throw error;
 
@@ -180,7 +185,7 @@ export const MaintenanceRequests = () => {
       });
       setIsDialogOpen(false);
       fetchIncidents();
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         toast({
           title: "Validation error",
@@ -189,11 +194,11 @@ export const MaintenanceRequests = () => {
         });
         return;
       }
-      
+
       if (import.meta.env.DEV) console.error("Error submitting request:", error);
       toast({
         title: "Error",
-        description: "Failed to submit request: " + error.message,
+        description: "Failed to submit request: " + (error instanceof Error ? error.message : "Unknown error"),
         variant: "destructive",
       });
     } finally {
@@ -224,9 +229,9 @@ export const MaintenanceRequests = () => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Property</Label>
-                  <Select 
+                  <Select
                     value={formData.property_id}
-                    onValueChange={(value) => setFormData({...formData, property_id: value})}
+                    onValueChange={(value) => setFormData({ ...formData, property_id: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select property" />
@@ -242,38 +247,38 @@ export const MaintenanceRequests = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Title</Label>
-                  <Input 
+                  <Input
                     placeholder="Brief description of the issue"
                     value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Description</Label>
-                  <Textarea 
-                    placeholder="Detailed description of the problem" 
+                  <Textarea
+                    placeholder="Detailed description of the problem"
                     rows={4}
                     value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Priority</Label>
                   <div className="flex gap-2">
                     {["low", "medium", "high"].map((priority) => (
-                      <Button 
-                        key={priority} 
+                      <Button
+                        key={priority}
                         variant={formData.priority === priority ? "default" : "outline"}
                         className="flex-1"
-                        onClick={() => setFormData({...formData, priority})}
+                        onClick={() => setFormData({ ...formData, priority })}
                       >
                         {priority}
                       </Button>
                     ))}
                   </div>
                 </div>
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   onClick={handleSubmit}
                   disabled={submitting}
                 >
@@ -294,7 +299,7 @@ export const MaintenanceRequests = () => {
           <div className="text-center glass-effect rounded-xl border border-border/50 p-8">
             <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground font-medium">
-              {properties.length === 0 
+              {properties.length === 0
                 ? "You need to add properties first to create maintenance requests"
                 : "No maintenance requests yet"}
             </p>

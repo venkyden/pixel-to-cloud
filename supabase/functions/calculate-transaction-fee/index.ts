@@ -58,12 +58,12 @@ serve(async (req) => {
 
     if (!validation.success) {
       return new Response(
-        JSON.stringify({ 
-          error: 'Invalid input', 
-          details: validation.error.errors 
+        JSON.stringify({
+          error: 'Invalid input',
+          details: validation.error.errors
         }),
-        { 
-          status: 400, 
+        {
+          status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         }
       );
@@ -78,7 +78,7 @@ serve(async (req) => {
         .select('tenant_id, landlord_id')
         .eq('id', contractId)
         .single();
-      
+
       if (contractError || !contract) {
         throw new Error('Contract not found');
       }
@@ -95,7 +95,7 @@ serve(async (req) => {
         .select('user_id, property_id')
         .eq('id', applicationId)
         .single();
-      
+
       if (appError || !application) {
         throw new Error('Application not found');
       }
@@ -167,13 +167,14 @@ serve(async (req) => {
         status: 200,
       }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error calculating transaction fee:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: error.message.includes("Unauthorized") ? 401 : 500,
+        status: errorMessage.includes("Unauthorized") ? 401 : 500,
       }
     );
   }

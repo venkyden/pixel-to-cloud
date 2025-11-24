@@ -57,7 +57,7 @@ export const ApplicationReview = ({ application, onUpdate }: ApplicationReviewPr
 
       toast.success("Application approved!");
       onUpdate();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error approving application:", error);
       toast.error("Failed to approve application");
     } finally {
@@ -92,7 +92,7 @@ export const ApplicationReview = ({ application, onUpdate }: ApplicationReviewPr
       toast.success("Application rejected");
       setShowRejectDialog(false);
       onUpdate();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error rejecting application:", error);
       toast.error("Failed to reject application");
     } finally {
@@ -113,7 +113,7 @@ export const ApplicationReview = ({ application, onUpdate }: ApplicationReviewPr
     }
   };
 
-  const rentToIncomeRatio = application.income 
+  const rentToIncomeRatio = application.income
     ? ((application.properties?.price * 12) / application.income * 100).toFixed(1)
     : "0";
   const ratioValue = parseFloat(rentToIncomeRatio);
@@ -163,7 +163,7 @@ export const ApplicationReview = ({ application, onUpdate }: ApplicationReviewPr
                 <div>
                   <p className="text-sm text-muted-foreground">Emménagement souhaité</p>
                   <p className="font-semibold">
-                    {application.move_in_date 
+                    {application.move_in_date
                       ? new Date(application.move_in_date).toLocaleDateString("fr-FR")
                       : "Non renseigné"}
                   </p>
@@ -172,21 +172,20 @@ export const ApplicationReview = ({ application, onUpdate }: ApplicationReviewPr
             </div>
 
             <div className="space-y-3">
-              <div className={`p-4 rounded-lg ${
-                ratioValue > 33 
+              <div className={`p-4 rounded-lg ${ratioValue > 33
                   ? "bg-destructive/10 border border-destructive/20"
                   : ratioValue > 25
-                  ? "bg-warning/10 border border-warning/20"
-                  : "bg-success/10 border border-success/20"
-              }`}>
+                    ? "bg-warning/10 border border-warning/20"
+                    : "bg-success/10 border border-success/20"
+                }`}>
                 <p className="text-sm font-medium mb-1">Ratio Loyer/Revenus</p>
                 <p className="text-2xl font-bold">{rentToIncomeRatio}%</p>
                 <p className="text-xs mt-1">
-                  {ratioValue > 33 
+                  {ratioValue > 33
                     ? "⚠️ Au-dessus du seuil recommandé (33%)"
                     : ratioValue > 25
-                    ? "Proche du seuil recommandé"
-                    : "✓ Conforme aux recommandations"}
+                      ? "Proche du seuil recommandé"
+                      : "✓ Conforme aux recommandations"}
                 </p>
               </div>
 

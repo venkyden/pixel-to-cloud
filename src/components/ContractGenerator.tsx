@@ -176,7 +176,7 @@ export const ContractGenerator = ({
         type: "success",
         link: "/tenant",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error generating contract:", error);
       toast.error("Erreur lors de la génération du contrat");
     } finally {
@@ -218,7 +218,7 @@ export const ContractGenerator = ({
 
       toast.success("Contrat signé avec succès!");
       fetchExistingContract();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error signing contract:", error);
       toast.error("Erreur lors de la signature");
     } finally {

@@ -29,7 +29,7 @@ export const AIPropertySearch = ({ onSearchResults, properties }: AIPropertySear
       if (error) throw error;
 
       if (data?.error === 'rate_limit') {
-        toast.error(language === 'fr' 
+        toast.error(language === 'fr'
           ? 'Limite de taux atteinte. Réessayez plus tard.'
           : 'Rate limit reached. Try again later.'
         );
@@ -51,7 +51,7 @@ export const AIPropertySearch = ({ onSearchResults, properties }: AIPropertySear
           : `${data.matches.length} properties found`
         );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (import.meta.env.DEV) console.error('AI search error:', error);
       toast.error(language === 'fr'
         ? 'Erreur lors de la recherche IA'
@@ -82,8 +82,8 @@ export const AIPropertySearch = ({ onSearchResults, properties }: AIPropertySear
               disabled={isSearching}
             />
           </div>
-          <Button 
-            onClick={handleAISearch} 
+          <Button
+            onClick={handleAISearch}
             disabled={isSearching || !query.trim()}
             className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
           >

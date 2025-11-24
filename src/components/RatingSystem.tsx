@@ -16,6 +16,17 @@ interface RatingSystemProps {
   contractId: string;
 }
 
+interface Rating {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  reviewer?: {
+    first_name: string | null;
+    last_name: string | null;
+  };
+}
+
 export const RatingSystem = ({
   targetUserId,
   targetUserName,
@@ -27,8 +38,8 @@ export const RatingSystem = ({
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
-  const [existingRating, setExistingRating] = useState<any>(null);
-  const [allRatings, setAllRatings] = useState<any[]>([]);
+  const [existingRating, setExistingRating] = useState<Rating | null>(null);
+  const [allRatings, setAllRatings] = useState<Rating[]>([]);
 
   useEffect(() => {
     fetchRatings();
@@ -44,7 +55,7 @@ export const RatingSystem = ({
         .eq("reviewer_id", user?.id)
         .maybeSingle();
 
-      setExistingRating(myRating);
+      setExistingRating(myRating as unknown as Rating);
 
       // Fetch all ratings for this user
       const { data: ratings } = await supabase
@@ -53,7 +64,7 @@ export const RatingSystem = ({
         .eq("rated_user_id", targetUserId)
         .order("created_at", { ascending: false });
 
-      setAllRatings(ratings || []);
+      setAllRatings((ratings as unknown as Rating[]) || []);
     } catch (error) {
       console.error("Error fetching ratings:", error);
     }
@@ -94,7 +105,7 @@ export const RatingSystem = ({
 
       toast.success("Rating submitted successfully");
       fetchRatings();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting rating:", error);
       toast.error("Failed to submit rating");
     } finally {
@@ -128,11 +139,10 @@ export const RatingSystem = ({
                   className="transition-transform hover:scale-110"
                 >
                   <Star
-                    className={`w-8 h-8 ${
-                      star <= (hoverRating || rating)
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-muted-foreground"
-                    }`}
+                    className={`w-8 h-8 ${star <= (hoverRating || rating)
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-muted-foreground"
+                      }`}
                   />
                 </button>
               ))}

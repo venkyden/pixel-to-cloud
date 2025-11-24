@@ -38,7 +38,7 @@ export default function RoleSelection() {
 
       toast.success(role === "tenant" ? t("roleSelection.welcomeTenant") : t("roleSelection.welcomeLandlord"));
       navigate(role === "tenant" ? "/tenant" : "/landlord");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error setting role:", error);
       toast.error(t("roleSelection.errorSelectingRole"));
     }
@@ -121,9 +121,9 @@ export default function RoleSelection() {
                     </div>
                   </div>
                 </div>
-                <Button 
+                <Button
                   onClick={() => handleRoleSelection("tenant")}
-                  className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
+                  className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg"
                   size="lg"
                 >
                   {t("roleSelection.tenantCta")}
@@ -167,9 +167,9 @@ export default function RoleSelection() {
                     </div>
                   </div>
                 </div>
-                <Button 
+                <Button
                   onClick={() => handleRoleSelection("landlord")}
-                  className="w-full bg-gradient-to-r from-secondary to-secondary/80 hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
+                  className="w-full bg-gradient-to-r from-secondary to-secondary/80 hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg"
                   size="lg"
                 >
                   {t("roleSelection.landlordCta")}

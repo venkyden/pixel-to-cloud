@@ -51,13 +51,13 @@ export default function Auth() {
       const hashBuffer = await crypto.subtle.digest('SHA-1', data);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-      
+
       const prefix = hashHex.substring(0, 5);
       const suffix = hashHex.substring(5);
-      
+
       const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
       const text = await response.text();
-      
+
       return text.split('\n').some(line => line.startsWith(suffix));
     } catch (error) {
       console.error('Password breach check failed:', error);
@@ -79,7 +79,7 @@ export default function Auth() {
     // Check if user is returning from password reset email
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const type = hashParams.get('type');
-    
+
     if (type === 'recovery') {
       setIsPasswordReset(true);
     }
@@ -97,8 +97,8 @@ export default function Auth() {
       if (error) throw error;
 
       toast.success("Password reset email sent! Check your inbox.");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send reset email");
+    } catch (error: unknown) {
+      toast.error((error instanceof Error ? error.message : "Unknown error") || "Failed to send reset email");
     }
   };
 
@@ -121,8 +121,8 @@ export default function Auth() {
       setIsPasswordReset(false);
       setNewPassword("");
       navigate("/role-selection");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to reset password");
+    } catch (error: unknown) {
+      toast.error((error instanceof Error ? error.message : "Unknown error") || "Failed to reset password");
     } finally {
       setIsLoading(false);
     }
@@ -201,11 +201,11 @@ export default function Auth() {
         toast.success(t("auth.accountCreated"));
         navigate("/role-selection");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       } else {
-        toast.error(error.message || "Failed to sign up");
+        toast.error((error instanceof Error ? error.message : "Unknown error") || "Failed to sign up");
       }
     } finally {
       setIsLoading(false);
@@ -236,11 +236,11 @@ export default function Auth() {
 
       toast.success(t("auth.signedIn"));
       navigate("/role-selection");
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       } else {
-        toast.error(error.message || "Failed to sign in");
+        toast.error((error instanceof Error ? error.message : "Unknown error") || "Failed to sign in");
       }
     } finally {
       setIsLoading(false);
@@ -284,9 +284,9 @@ export default function Auth() {
                     Password must be at least 8 characters
                   </p>
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
+                <Button
+                  type="submit"
+                  className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg"
                   disabled={isLoading}
                 >
                   {isLoading ? "Updating..." : "Update Password"}
@@ -330,220 +330,219 @@ export default function Auth() {
               <CardDescription className="text-center">Choose your preferred method</CardDescription>
             </CardHeader>
             <CardContent>
-          <Tabs defaultValue="signin" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1">
-              <TabsTrigger 
-                value="signin"
-                className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300"
-              >
-                {t("common.signIn")}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="signup"
-                className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300"
-              >
-                {t("common.signUp")}
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="signin" className="space-y-6">
-              <form onSubmit={handleSignIn} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email" className="text-sm font-medium">{t("common.email")}</Label>
-                  <Input
-                    id="signin-email"
-                    name="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    required
-                    className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="signin-password" className="text-sm font-medium">{t("common.password")}</Label>
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="p-0 h-auto text-sm hover:text-primary transition-colors"
-                      onClick={handleForgotPassword}
-                    >
-                      Forgot password?
-                    </Button>
-                  </div>
-                  <Input
-                    id="signin-password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? t("auth.signingIn") : t("common.signIn")}
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="signup" className="space-y-6">
-              <form onSubmit={handleSignUp} className="space-y-5">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName" className="text-sm font-medium">{t("common.firstName")}</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      type="text"
-                      placeholder="John"
-                      required
-                      className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName" className="text-sm font-medium">{t("common.lastName")}</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      type="text"
-                      placeholder="Doe"
-                      required
-                      className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-sm font-medium">{t("common.email")}</Label>
-                  <Input
-                    id="signup-email"
-                    name="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    required
-                    className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-sm font-medium">{t("common.password")}</Label>
-                  <Input
-                    id="signup-password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    minLength={8}
-                    value={signupPassword}
-                    onChange={(e) => handlePasswordChange(e.target.value)}
-                    className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
-                  />
-                  {signupPassword && (
-                    <div className="space-y-1">
-                      <div className="flex gap-1">
-                        {[0, 1, 2, 3, 4].map((level) => (
-                          <div
-                            key={level}
-                            className={`h-1 flex-1 rounded-full transition-all ${
-                              level <= passwordStrength
-                                ? passwordStrength === 0
-                                  ? 'bg-destructive'
-                                  : passwordStrength === 1
-                                  ? 'bg-destructive'
-                                  : passwordStrength === 2
-                                  ? 'bg-warning'
-                                  : passwordStrength === 3
-                                  ? 'bg-success'
-                                  : 'bg-success'
-                                : 'bg-muted'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {passwordStrength === 0 && 'Very weak password'}
-                        {passwordStrength === 1 && 'Weak password'}
-                        {passwordStrength === 2 && 'Fair password'}
-                        {passwordStrength === 3 && 'Strong password'}
-                        {passwordStrength === 4 && 'Very strong password'}
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role" className="text-sm font-medium">{t("auth.iAmA")}</Label>
-                  <select
-                    id="role"
-                    name="role"
-                    className="w-full h-11 px-3 rounded-md border border-input bg-background transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                    required
+              <Tabs defaultValue="signin" className="space-y-6">
+                <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1">
+                  <TabsTrigger
+                    value="signin"
+                    className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300"
                   >
-                    <option value="tenant">{t("auth.tenant")}</option>
-                    <option value="landlord">{t("auth.landlord")}</option>
-                  </select>
-                </div>
-                
-                <div className="space-y-3 pt-2 border-t">
-                  <div className="flex items-start gap-2">
-                    <input
-                      type="checkbox"
-                      id="gdpr-consent"
-                      name="gdprConsent"
-                      required
-                      className="mt-1"
-                    />
-                    <Label htmlFor="gdpr-consent" className="text-xs leading-relaxed cursor-pointer">
-                      {t("auth.gdprConsent")}{" "}
-                      <a href="/privacy" target="_blank" className="text-primary hover:underline">
-                        {t("auth.privacyPolicy")}
-                      </a>{" "}
-                      {t("auth.andGDPR")} {t("auth.required")}
-                    </Label>
-                  </div>
-                  
-                  <div className="flex items-start gap-2">
-                    <input
-                      type="checkbox"
-                      id="terms-consent"
-                      name="termsConsent"
-                      required
-                      className="mt-1"
-                    />
-                    <Label htmlFor="terms-consent" className="text-xs leading-relaxed cursor-pointer">
-                      {t("auth.termsConsent")}{" "}
-                      <a href="/terms" target="_blank" className="text-primary hover:underline">
-                        {t("auth.termsOfService")}
-                      </a> {t("auth.required")}
-                    </Label>
-                  </div>
-                  
-                  <div className="flex items-start gap-2">
-                    <input
-                      type="checkbox"
-                      id="marketing-consent"
-                      name="marketingConsent"
-                      className="mt-1"
-                    />
-                    <Label htmlFor="marketing-consent" className="text-xs leading-relaxed cursor-pointer">
-                      {t("auth.marketingConsent")}
-                    </Label>
-                  </div>
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg" 
-                  disabled={isLoading}
-                >
-                  {isLoading ? t("auth.creatingAccount") : t("auth.createAccount")}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+                    {t("common.signIn")}
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="signup"
+                    className="data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300"
+                  >
+                    {t("common.signUp")}
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="signin" className="space-y-6">
+                  <form onSubmit={handleSignIn} className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="signin-email" className="text-sm font-medium">{t("common.email")}</Label>
+                      <Input
+                        id="signin-email"
+                        name="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        required
+                        className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="signin-password" className="text-sm font-medium">{t("common.password")}</Label>
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="p-0 h-auto text-sm hover:text-primary transition-colors"
+                          onClick={handleForgotPassword}
+                        >
+                          Forgot password?
+                        </Button>
+                      </div>
+                      <Input
+                        id="signin-password"
+                        name="password"
+                        type="password"
+                        placeholder="••••••••"
+                        required
+                        className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? t("auth.signingIn") : t("common.signIn")}
+                    </Button>
+                  </form>
+                </TabsContent>
+
+                <TabsContent value="signup" className="space-y-6">
+                  <form onSubmit={handleSignUp} className="space-y-5">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName" className="text-sm font-medium">{t("common.firstName")}</Label>
+                        <Input
+                          id="firstName"
+                          name="firstName"
+                          type="text"
+                          placeholder="John"
+                          required
+                          className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName" className="text-sm font-medium">{t("common.lastName")}</Label>
+                        <Input
+                          id="lastName"
+                          name="lastName"
+                          type="text"
+                          placeholder="Doe"
+                          required
+                          className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-email" className="text-sm font-medium">{t("common.email")}</Label>
+                      <Input
+                        id="signup-email"
+                        name="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        required
+                        className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-password" className="text-sm font-medium">{t("common.password")}</Label>
+                      <Input
+                        id="signup-password"
+                        name="password"
+                        type="password"
+                        placeholder="••••••••"
+                        required
+                        minLength={8}
+                        value={signupPassword}
+                        onChange={(e) => handlePasswordChange(e.target.value)}
+                        className="h-11 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
+                      />
+                      {signupPassword && (
+                        <div className="space-y-1">
+                          <div className="flex gap-1">
+                            {[0, 1, 2, 3, 4].map((level) => (
+                              <div
+                                key={level}
+                                className={`h-1 flex-1 rounded-full transition-all ${level <= passwordStrength
+                                    ? passwordStrength === 0
+                                      ? 'bg-destructive'
+                                      : passwordStrength === 1
+                                        ? 'bg-destructive'
+                                        : passwordStrength === 2
+                                          ? 'bg-warning'
+                                          : passwordStrength === 3
+                                            ? 'bg-success'
+                                            : 'bg-success'
+                                    : 'bg-muted'
+                                  }`}
+                              />
+                            ))}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {passwordStrength === 0 && 'Very weak password'}
+                            {passwordStrength === 1 && 'Weak password'}
+                            {passwordStrength === 2 && 'Fair password'}
+                            {passwordStrength === 3 && 'Strong password'}
+                            {passwordStrength === 4 && 'Very strong password'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="role" className="text-sm font-medium">{t("auth.iAmA")}</Label>
+                      <select
+                        id="role"
+                        name="role"
+                        className="w-full h-11 px-3 rounded-md border border-input bg-background transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                        required
+                      >
+                        <option value="tenant">{t("auth.tenant")}</option>
+                        <option value="landlord">{t("auth.landlord")}</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-3 pt-2 border-t">
+                      <div className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          id="gdpr-consent"
+                          name="gdprConsent"
+                          required
+                          className="mt-1"
+                        />
+                        <Label htmlFor="gdpr-consent" className="text-xs leading-relaxed cursor-pointer">
+                          {t("auth.gdprConsent")}{" "}
+                          <a href="/privacy" target="_blank" className="text-primary hover:underline">
+                            {t("auth.privacyPolicy")}
+                          </a>{" "}
+                          {t("auth.andGDPR")} {t("auth.required")}
+                        </Label>
+                      </div>
+
+                      <div className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          id="terms-consent"
+                          name="termsConsent"
+                          required
+                          className="mt-1"
+                        />
+                        <Label htmlFor="terms-consent" className="text-xs leading-relaxed cursor-pointer">
+                          {t("auth.termsConsent")}{" "}
+                          <a href="/terms" target="_blank" className="text-primary hover:underline">
+                            {t("auth.termsOfService")}
+                          </a> {t("auth.required")}
+                        </Label>
+                      </div>
+
+                      <div className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          id="marketing-consent"
+                          name="marketingConsent"
+                          className="mt-1"
+                        />
+                        <Label htmlFor="marketing-consent" className="text-xs leading-relaxed cursor-pointer">
+                          {t("auth.marketingConsent")}
+                        </Label>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? t("auth.creatingAccount") : t("auth.createAccount")}
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

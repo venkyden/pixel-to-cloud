@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
-    
+
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Invalid authentication token' }),
@@ -58,13 +58,24 @@ Deno.serve(async (req) => {
       .eq('status', 'expired');
 
     if (expiredApplications && expiredApplications.length > 0) {
-      const notifications = expiredApplications.map((app: any) => ({
-        user_id: app.properties.owner_id,
-        title: 'Application Expired',
-        message: `An application for ${app.properties.name} has expired`,
-        type: 'warning',
-        link: '/dashboard'
-      }));
+      interface Application {
+        id: string;
+        properties: {
+          owner_id: string;
+          name: string;
+        };
+      }
+
+      const notifications = expiredApplications.map((app: unknown) => {
+        const application = app as Application;
+        return {
+          user_id: application.properties.owner_id,
+          title: 'Application Expired',
+          message: `An application for ${application.properties.name} has expired`,
+          type: 'warning',
+          link: '/dashboard'
+        };
+      });
 
       await supabase.from('notifications').insert(notifications);
       console.log(`Sent ${notifications.length} expiration notifications`);

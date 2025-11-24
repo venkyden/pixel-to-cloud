@@ -45,7 +45,7 @@ export const TenantApplicationForm = ({ propertyId, propertyName, propertyPrice 
       .upload(path, file, { upsert: true });
 
     if (error) throw error;
-    
+
     const { data: { publicUrl } } = supabase.storage
       .from('documents')
       .getPublicUrl(path);
@@ -137,7 +137,7 @@ export const TenantApplicationForm = ({ propertyId, propertyName, propertyPrice 
 
       toast.success("Application submitted successfully!");
       navigate("/tenant");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting application:", error);
       toast.error("Failed to submit application");
     } finally {
@@ -275,7 +275,7 @@ export const TenantApplicationForm = ({ propertyId, propertyName, propertyPrice 
           <div className="bg-muted/50 p-4 rounded-lg text-sm">
             <p className="font-medium mb-2">Conformité Loi ALUR</p>
             <p className="text-muted-foreground">
-              Votre dossier sera évalué selon les critères légaux français. 
+              Votre dossier sera évalué selon les critères légaux français.
               Les documents fournis sont nécessaires pour constituer un dossier conforme à la loi n° 89-462.
             </p>
           </div>

@@ -24,7 +24,7 @@ serve(async (req) => {
     // Validate the JWT token
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
-    
+
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase configuration missing');
     }
@@ -43,7 +43,7 @@ serve(async (req) => {
     }
 
     const { query, properties, language } = await req.json();
-    
+
     // Input validation
     const MAX_QUERY_LENGTH = 1000;
     const MAX_PROPERTIES = 100;
@@ -123,9 +123,9 @@ serve(async (req) => {
         model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
-          { 
-            role: 'user', 
-            content: `User query: "${query}"\n\nAvailable properties:\n${JSON.stringify(properties, null, 2)}\n\nAnalyze and return matching properties with scores and reasons.` 
+          {
+            role: 'user',
+            content: `User query: "${query}"\n\nAvailable properties:\n${JSON.stringify(properties, null, 2)}\n\nAnalyze and return matching properties with scores and reasons.`
           }
         ],
       }),
@@ -149,22 +149,22 @@ serve(async (req) => {
 
     const data = await response.json();
     const content = data.choices[0].message.content;
-    
+
     // Extract JSON from the response (handle cases where AI wraps JSON in markdown)
-    let jsonMatch = content.match(/\{[\s\S]*\}/);
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('Invalid AI response format');
     }
-    
+
     const result = JSON.parse(jsonMatch[0]);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('AI property search error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

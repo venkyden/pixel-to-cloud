@@ -24,7 +24,7 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.80.0');
-    
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       global: { headers: { Authorization: authHeader } }
     });
@@ -42,7 +42,7 @@ serve(async (req) => {
       .select('role')
       .eq('user_id', user.id)
       .maybeSingle();
-    
+
     if (roleError || !roleData) {
       return new Response(
         JSON.stringify({ error: 'User role not found. Please complete registration.' }),
@@ -51,7 +51,7 @@ serve(async (req) => {
     }
 
     const { messages, language = "fr", pageContext } = await req.json();
-    
+
     // Input validation
     const MAX_MESSAGES = 50;
     const MAX_MESSAGE_LENGTH = 10000;
@@ -94,16 +94,16 @@ serve(async (req) => {
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
+
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const contextInfo = pageContext ? (language === "fr" 
+    const contextInfo = pageContext ? (language === "fr"
       ? ` L'utilisateur est actuellement sur la ${pageContext}.`
       : ` The user is currently on the ${pageContext}.`) : "";
 
-    const systemPrompt = language === "fr" 
+    const systemPrompt = language === "fr"
       ? `Tu es l'assistant virtuel de Roomivo, une plateforme de location transparente qui met en relation locataires et propriétaires en France.
 
 Tu peux aider avec :
@@ -147,14 +147,14 @@ Be precise, professional, and empathetic. Always cite relevant French laws. If y
     if (!response.ok) {
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
-      
+
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      
+
       if (response.status === 402) {
         return new Response(
           JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }),
@@ -171,7 +171,7 @@ Be precise, professional, and empathetic. Always cite relevant French laws. If y
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
-  } catch (e) {
+  } catch (e: unknown) {
     console.error("Chat error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),

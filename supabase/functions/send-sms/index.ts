@@ -13,7 +13,7 @@ const smsSchema = z.object({
   priority: z.enum(["urgent", "normal"]).default("normal"),
 });
 
-const logStep = (step: string, details?: any) => {
+const logStep = (step: string, details?: Record<string, unknown> | unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[SEND-SMS] ${step}${detailsStr}`);
 };
@@ -35,7 +35,7 @@ serve(async (req) => {
     // Authenticate user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
-    
+
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
@@ -97,10 +97,10 @@ serve(async (req) => {
       ip_address: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip"),
     });
 
-    return new Response(JSON.stringify({ 
-      success: true, 
+    return new Response(JSON.stringify({
+      success: true,
       message_sid: result.sid,
-      status: result.status 
+      status: result.status
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

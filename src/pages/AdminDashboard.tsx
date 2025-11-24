@@ -19,11 +19,32 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 
+interface DashboardStats {
+  totalUsers: number;
+  totalLandlords: number;
+  totalTenants: number;
+  totalProperties: number;
+  totalApplications: number;
+  activeContracts: number;
+  totalRevenue: number;
+  pendingVerifications: number;
+  incidents: number;
+  averageRating: number;
+}
+
+interface Activity {
+  id: string;
+  action: string;
+  table_name: string;
+  created_at: string;
+  user_id: string | null;
+}
+
 export default function AdminDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     totalLandlords: 0,
     totalTenants: 0,
@@ -35,7 +56,7 @@ export default function AdminDashboard() {
     incidents: 0,
     averageRating: 0,
   });
-  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
     checkAdminAccess();
@@ -134,7 +155,7 @@ export default function AdminDashboard() {
         averageRating: avgRating,
       });
 
-      setRecentActivities(logs || []);
+      setRecentActivities((logs as unknown as Activity[]) || []);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {

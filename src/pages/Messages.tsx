@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MessageThread } from "@/components/MessageThread";
@@ -29,14 +29,7 @@ export default function Messages() {
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      fetchConversations();
-      subscribeToNewMessages();
-    }
-  }, [user]);
-
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -55,11 +48,13 @@ export default function Messages() {
 
       // Group messages by conversation
       const conversationMap = new Map<string, Conversation>();
-      
-      (messages || []).forEach((msg: any) => {
-        const isOwnMessage = msg.sender_id === user.id;
-        const otherUserId = isOwnMessage ? msg.recipient_id : msg.sender_id;
-        const otherUser = isOwnMessage ? msg.recipient : msg.sender;
+
+      (messages || []).forEach((msg: Record<string, unknown>) => {
+        const senderId = msg.sender_id as string;
+        const recipientId = msg.recipient_id as string;
+        const isOwnMessage = senderId === user.id;
+        const otherUserId = isOwnMessage ? recipientId : senderId;
+        const otherUser = (isOwnMessage ? msg.recipient : msg.sender) as { first_name?: string; last_name?: string } | null;
         const otherUserName = `${otherUser?.first_name || ''} ${otherUser?.last_name || ''}`.trim() || 'Unknown User';
 
         if (!conversationMap.has(otherUserId)) {
@@ -67,15 +62,15 @@ export default function Messages() {
             id: otherUserId,
             other_user_id: otherUserId,
             other_user_name: otherUserName,
-            last_message: msg.content,
-            last_message_time: msg.created_at,
+            last_message: msg.content as string,
+            last_message_time: msg.created_at as string,
             unread_count: 0,
-            property_id: msg.property_id,
+            property_id: msg.property_id as string | undefined,
           });
         }
 
         // Count unread messages
-        if (!isOwnMessage && !msg.read) {
+        if (!isOwnMessage && !(msg.read as boolean)) {
           const conv = conversationMap.get(otherUserId)!;
           conv.unread_count++;
         }
@@ -83,7 +78,7 @@ export default function Messages() {
 
       const convArray = Array.from(conversationMap.values());
       setConversations(convArray);
-      
+
       if (convArray.length > 0 && !selectedConversation) {
         setSelectedConversation(convArray[0]);
       }
@@ -92,9 +87,9 @@ export default function Messages() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, selectedConversation]);
 
-  const subscribeToNewMessages = () => {
+  const subscribeToNewMessages = useCallback(() => {
     if (!user) return;
 
     const channel = supabase
@@ -116,7 +111,14 @@ export default function Messages() {
     return () => {
       supabase.removeChannel(channel);
     };
-  };
+  }, [user, fetchConversations]);
+
+  useEffect(() => {
+    if (user) {
+      fetchConversations();
+      subscribeToNewMessages();
+    }
+  }, [user, fetchConversations, subscribeToNewMessages]);
 
   const filteredConversations = conversations.filter(conv =>
     conv.other_user_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -151,8 +153,8 @@ export default function Messages() {
               <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">Messages</h2>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search conversations..." 
+                <Input
+                  placeholder="Search conversations..."
                   className="pl-10 glass-effect border-border/50 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -174,9 +176,8 @@ export default function Messages() {
                 filteredConversations.map((conversation) => (
                   <div
                     key={conversation.id}
-                    className={`p-4 border-b border-border/50 cursor-pointer transition-all duration-300 hover:bg-muted/50 ${
-                      selectedConversation?.id === conversation.id ? "bg-muted/70" : ""
-                    }`}
+                    className={`p-4 border-b border-border/50 cursor-pointer transition-all duration-300 hover:bg-muted/50 ${selectedConversation?.id === conversation.id ? "bg-muted/70" : ""
+                      }`}
                     onClick={() => setSelectedConversation(conversation)}
                   >
                     <div className="flex items-start space-x-3">
