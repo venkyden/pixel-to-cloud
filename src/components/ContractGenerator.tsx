@@ -44,11 +44,20 @@ interface Contract {
   start_date: string;
   duration_months: number;
   deposit_amount: number;
+  monthly_rent: number;
   contract_type: string;
   contract_data: ContractData | unknown;
   landlord_signature?: string;
   tenant_signature?: string;
+  landlord_signed_at?: string;
+  tenant_signed_at?: string;
   status: string;
+  created_at?: string;
+  updated_at?: string;
+  end_date?: string;
+  landlord_id?: string;
+  tenant_id?: string;
+  property_id?: string;
 }
 
 export const ContractGenerator = ({
