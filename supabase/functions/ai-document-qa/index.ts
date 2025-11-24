@@ -1,5 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { checkRateLimit } from "../_shared/rateLimit.ts";
+import { handleError } from "../_shared/errorHandler.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,6 +11,17 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // ✅ SECURITY FIX: Rate limiting (5 requests/minute)
+  const rateLimit = checkRateLimit(req, {
+    maxRequests: 5,
+    windowMs: 60000,
+    message: 'Too many AI document requests',
+  });
+
+  if (!rateLimit.allowed) {
+    return rateLimit.response!;
   }
 
   try {
@@ -133,11 +146,8 @@ serve(async (req) => {
     return new Response(response.body, {
       headers: { ...corsHeaders, 'Content-Type': 'text/event-stream' },
     });
-  } catch (error: unknown) {
-    console.error('AI document Q&A error:', error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+  } catch (error) {
+    // ✅ SECURITY FIX: Use generic error handler
+    return handleError(error, 'AI-DOCUMENT-QA');
   }
 });
