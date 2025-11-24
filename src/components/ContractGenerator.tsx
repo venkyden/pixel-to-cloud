@@ -30,6 +30,27 @@ interface ContractGeneratorProps {
   landlordName: string;
 }
 
+interface ContractData {
+  terms?: {
+    special_conditions?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+interface Contract {
+  id: string;
+  application_id: string;
+  start_date: string;
+  duration_months: number;
+  deposit_amount: number;
+  contract_type: string;
+  contract_data: ContractData | unknown;
+  landlord_signature?: string;
+  tenant_signature?: string;
+  status: string;
+}
+
 export const ContractGenerator = ({
   applicationId,
   propertyId,
@@ -43,7 +64,7 @@ export const ContractGenerator = ({
 }: ContractGeneratorProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [contract, setContract] = useState<any>(null);
+  const [contract, setContract] = useState<Contract | null>(null);
   const [formData, setFormData] = useState({
     startDate: "",
     durationMonths: 12,
@@ -65,7 +86,7 @@ export const ContractGenerator = ({
 
     if (data) {
       setContract(data);
-      const contractData = data.contract_data as any;
+      const contractData = data.contract_data as ContractData;
       setFormData({
         startDate: data.start_date,
         durationMonths: data.duration_months || 12,
@@ -190,7 +211,7 @@ export const ContractGenerator = ({
     setLoading(true);
     try {
       const isLandlord = user?.id === landlordId;
-      const updateData: any = {
+      const updateData: Partial<Contract> = {
         updated_at: new Date().toISOString(),
       };
 

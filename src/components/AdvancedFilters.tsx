@@ -96,7 +96,7 @@ export const AdvancedFilters = ({
       const { error } = await supabase.from("saved_searches").insert([{
         user_id: user.id,
         name: searchName,
-        filters: filters as any,
+        filters: filters as unknown as Record<string, never>,
       }]);
 
       if (error) throw error;
