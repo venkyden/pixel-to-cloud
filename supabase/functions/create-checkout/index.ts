@@ -88,4 +88,3 @@ serve(async (req) => {
     return handleError(error, 'CREATE-CHECKOUT');
   }
 });
-```

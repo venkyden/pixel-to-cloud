@@ -176,4 +176,4 @@ serve(async (req) => {
     return handleError(error, 'COLLECT-RENT');
   }
 });
-```
+
