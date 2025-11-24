@@ -179,4 +179,3 @@ serve(async (req) => {
     return handleError(error, 'AI-PROPERTY-SEARCH');
   }
 });
-```
