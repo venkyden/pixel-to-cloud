@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { checkRateLimit } from "../_shared/rateLimit.ts";
+import { handleError } from "../_shared/errorHandler.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,6 +14,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const rateLimit = checkRateLimit(req, { maxRequests: 5, windowMs: 60000, message: 'Too many refund requests' });
+  if (!rateLimit.allowed) return rateLimit.response!;
 
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
@@ -37,7 +42,7 @@ serve(async (req) => {
 
     const body = await req.json();
     const validation = refundSchema.safeParse(body);
-    
+
     if (!validation.success) {
       return new Response(
         JSON.stringify({ error: "Invalid input", details: validation.error.errors }),
@@ -116,13 +121,6 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
-    );
+    return handleError(error, 'PROCESS-REFUND');
   }
 });
