@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { checkRateLimit } from "../_shared/rateLimit.ts";
+import { handleError } from "../_shared/errorHandler.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +12,17 @@ const corsHeaders = {
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // ✅ SECURITY FIX: Rate limiting (5 requests/minute for admin operation)
+  const rateLimit = checkRateLimit(req, {
+    maxRequests: 5,
+    windowMs: 60000,
+    message: 'Too many rent collection requests',
+  });
+
+  if (!rateLimit.allowed) {
+    return rateLimit.response!;
   }
 
   const supabaseClient = createClient(
@@ -159,14 +172,8 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error("Error in collect-rent:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
-    );
+    // ✅ SECURITY FIX: Use generic error handler
+    return handleError(error, 'COLLECT-RENT');
   }
 });
+```
