@@ -143,4 +143,3 @@ serve(async (req) => {
     return handleError(error, 'STRIPE-WEBHOOK');
   }
 });
-```
