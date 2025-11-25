@@ -97,14 +97,6 @@ Deno.serve(async (req) => {
       },
     );
   } catch (error) {
-    console.error('Function error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      },
-    );
+    return handleError(error, 'EXPIRE-APPLICATIONS');
   }
 });
