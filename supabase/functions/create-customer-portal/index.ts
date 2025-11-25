@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { checkRateLimit } from "../_shared/rateLimit.ts";
+import { handleError } from "../_shared/errorHandler.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +13,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const rateLimit = checkRateLimit(req, { maxRequests: 10, windowMs: 60000, message: 'Too many portal creation requests' });
+  if (!rateLimit.allowed) return rateLimit.response!;
 
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
@@ -31,7 +36,7 @@ serve(async (req) => {
     // Find or create Stripe customer
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
-    
+
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
     } else {
@@ -53,13 +58,6 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      }
-    );
+    return handleError(error, 'CREATE-CUSTOMER-PORTAL');
   }
 });
