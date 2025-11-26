@@ -45,6 +45,17 @@ After deployment, verify the following:
 - **Landlord Dashboard**: Login as a landlord, check insights.
 - **Supabase Connection**: Ensure data is persisting to your production database.
 
+## 7. Custom Domain Configuration (roomivo.eu)
+Since you have purchased **roomivo.eu**, follow these steps to connect it on Vercel:
+
+1.  Go to your Vercel Project Dashboard > **Settings** > **Domains**.
+2.  Enter `roomivo.eu` and click **Add**.
+3.  Vercel will provide DNS records. Log in to your domain registrar (where you bought the domain).
+4.  Add the following records (Vercel will confirm the exact values):
+    *   **Type:** `A` | **Name:** `@` | **Value:** `76.76.21.21`
+    *   **Type:** `CNAME` | **Name:** `www` | **Value:** `cname.vercel-dns.com`
+5.  Wait for propagation (usually minutes, up to 24h). Vercel will automatically generate an SSL certificate.
+
 ## Troubleshooting
 - **Build Errors**: Check `npm run lint` locally.
 - **Connection Errors**: Verify `NEXT_PUBLIC_SUPABASE_URL` is correct in Vercel/Netlify.

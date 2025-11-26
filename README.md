@@ -1,73 +1,29 @@
-# Welcome to your Lovable project
+# Roomivo - Dual Mode Setup
 
-## Project info
+This project supports **two modes** to accommodate both Lovable preview and production deployment:
 
-**URL**: https://lovable.dev/projects/87501059-9967-4d7b-8b3c-a639ef23e1b8
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/87501059-9967-4d7b-8b3c-a639ef23e1b8) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## 🎨 Lovable Preview Mode (Vite)
+For working with the Lovable editor/preview:
+```bash
+npm run dev        # Vite dev server on http://localhost:3000
+npm run build:dev  # Vite development build
+npm run build      # Vite production build
 ```
 
-**Edit a file directly in GitHub**
+## 🚀 Production Mode (Next.js)
+For actual deployment and full functionality:
+```bash
+npm run next:dev    # Next.js dev server
+npm run next:build  # Next.js production build
+npm run next:start  # Next.js production server
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## ⚠️ Important Notes
+- **Lovable mode** uses Vite and shows a simplified version
+- **Production mode** uses Next.js with full App Router functionality
+- Deploy to Vercel using `npm run next:build`
+- For local Next.js testing, use `npm run next:dev`
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/87501059-9967-4d7b-8b3c-a639ef23e1b8) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 📝 Custom Domain
+- Domain: **roomivo.eu**
+- See `DEPLOY.md` for DNS configuration instructions
