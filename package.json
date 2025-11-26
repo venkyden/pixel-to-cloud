@@ -4,13 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "next build",
     "build:dev": "vite build --mode development",
-    "start": "vite preview",
-    "lint": "eslint",
-    "next:dev": "next dev",
-    "next:build": "next build",
-    "next:start": "next start"
+    "start": "next start",
+    "lint": "next lint",
+    "vite:build": "vite build",
+    "vite:preview": "vite preview"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
