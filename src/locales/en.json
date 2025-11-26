@@ -178,6 +178,12 @@
     "deleteError": "Error during deletion:"
   },
   "header": {
+    "properties": "Properties",
+    "dashboard": "Dashboard",
+    "incidents": "Incidents",
+    "payments": "Payments",
+    "messages": "Messages",
+    "myAccount": "My Account",
     "profile": "Profile",
     "signOut": "Sign Out"
   },

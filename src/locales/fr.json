@@ -178,6 +178,12 @@
     "deleteError": "Erreur lors de la suppression :"
   },
   "header": {
+    "properties": "Biens",
+    "dashboard": "Tableau de bord",
+    "incidents": "Incidents",
+    "payments": "Paiements",
+    "messages": "Messages",
+    "myAccount": "Mon Compte",
     "profile": "Profil",
     "signOut": "Déconnexion"
   },
